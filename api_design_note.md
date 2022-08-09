@@ -53,7 +53,8 @@
       * flasgger==0.9.2 (15M)
       * Flask-RESTful==0.3.7 (`pip install flask-restful`)
       * mistune==0.8.4 (with flasgger)
-  * Example:
+
+  * Example 1:
 
     ```python
     from flask import Flask
@@ -96,7 +97,65 @@ Reference:
 ## FastAPI
 
   * [FastAPI](https://fastapi.tiangolo.com/)
+  * [uvicorn](https://www.uvicorn.org/)
   * [Gunicorn Documentation](https://buildmedia.readthedocs.org/media/pdf/gunicorn-docs/stable/gunicorn-docs.pdf)
+
+* Example 1:
+  
+    ```python
+    import uvicorn
+    from fastapi import FastAPI
+
+    app = FastAPI()
+
+    @app.get("/")
+    def read_root():
+        return {"message": "Hello World"}
+
+    @app.get("/items/{item_id}")
+    def read_item(item_id: int, q: str = None):
+        return {"item_id": item_id, "q": q}
+
+    # intuitive way to define asynchronous code
+    @app.get("/async/")
+    async def async_read_root():
+        return {"Hello": "World"}
+
+    @app.get("/async/items/{item_id}")
+    async def async_read_item(item_id: int, q: str = None):
+        return {"item_id": item_id, "q": q}
+
+    if __name__ == '__main__':
+        uvicorn.run(app, host="0.0.0.0", port=8000, worker=10)
+    ```
+   
+
+* Example 2: multi-threads for asynchronously creating Postgres-DB session from SQLAlchemy
+  
+    ```python
+    import sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker, scoped_session
+
+    engine = create_engine('postgresql://{username}:{password}@{host}:{port}/{db_name}'.format(
+        username='postgres', password='superpassword', host='127.0.01',port='5432',db_name='database',
+    ))
+
+    db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+
+    class WorkerThread(Thread):
+        def __init__(self):
+            super().__init__()
+
+        def run(self) -> None:
+            print(db_session())
+
+    created_thread = [WorkerThread() for iin range(3)]
+
+    if __nemae__ == '__main__':
+        for thread in created_thread:
+            thread.start())
+
+    ```
 
 
 Reference:

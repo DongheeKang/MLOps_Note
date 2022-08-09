@@ -7,9 +7,9 @@
 ## Contents
 
   * [Python study notes](./python_study_note.md)
-  * [Network/IT Notes](./network_study_note.md)
-  * [API Study Notes](./api_study_note.md)
-
+  * [Network study notes](./network_study_note.md)
+  * [API study notes](./api_study_note.md)
+  * [API design notes](./api_design_note.md)
 
 <br/><a name="links"></a>
 ## References

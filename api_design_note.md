@@ -130,30 +130,47 @@ Reference:
     ```
    
 
-* Example 2: multi-threads for asynchronously creating Postgres-DB session from SQLAlchemy
+* Example 2: creating -DB session from SQLAlchemy
   
     ```python
+    from sqlalchemy import Column, Integer, String
     import sqlalchemy import create_engine
-    from sqlalchemy.orm import sessionmaker, scoped_session
+    from sqlalchemy.orm import sessionmaker
+    from sqlalchemy.ext.declarative import declarative_base
 
+    Base = declarative_base()
+
+
+    #engine = create_engine('sqlite:///sales.db', echo = True)
     engine = create_engine('postgresql://{username}:{password}@{host}:{port}/{db_name}'.format(
         username='postgres', password='superpassword', host='127.0.01',port='5432',db_name='database',
     ))
 
-    db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+    Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    db_session = Session()     
 
-    class WorkerThread(Thread):
-        def __init__(self):
-            super().__init__()
+    class Customers(Base):
+        __tablename__ = 'customers'
+        id = Column(Integer, primary_key =  True)
+        name = Column(String)
+        address = Column(String)
+        email = Column(String)
 
-        def run(self) -> None:
-            print(db_session())
-
-    created_thread = [WorkerThread() for iin range(3)]
+        '''    
+        SELECT customers.id 
+        AS customers_id, customers.name 
+        AS customers_name, customers.address 
+        AS customers_address, customers.email 
+        AS customers_email
+        FROM customers
+        '''
+      
+    result = session.query(Customers).all()
 
     if __nemae__ == '__main__':
-        for thread in created_thread:
-            thread.start())
+        
+        for row in result:
+            print ("Name: ",row.name, "Address:",row.address, "Email:",row.email)
 
     ```
 
@@ -169,6 +186,8 @@ Reference:
     - Pytest for backend testing
     - PGAdmin for PostgreSQL 
 
+**Note**: 
+    - please take care about the scoped_session with async mode (from sqlalchemy.orm import scoped_session)
 
 <br/><a name="swagger"></a>
 ## Swagger

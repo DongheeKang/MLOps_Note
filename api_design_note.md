@@ -8,6 +8,7 @@
 * [Flask API](#flask-api)
 * [WSGI Servers](#wsgi-servers)
 * [FastAPI](#fastapi)
+* [SQLAlchemy](#SQLAlchemy)
 * [Swagger](#swagger)
 
 
@@ -129,8 +130,21 @@ Reference:
         uvicorn.run(app, host="0.0.0.0", port=8000, worker=10)
     ```
    
+Reference:
+  * [Full stack FastAPI PorstgresSQL base project](https://github.com/tiangolo/full-stack-fastapi-postgresql)
+    - Docker integration
+    - Starlette build asynchronize web services 
+    - Pydantic type hints at runtime
+    - SQLAlchemy models
+    - CORS(Cross Origin Resource Sharing)
+    - authentication with OAuth2 JWT tokens
+    - Pytest for backend testing
+    - PGAdmin for PostgreSQL 
 
-* Example 2: creating -DB session from SQLAlchemy
+<br/><a name="SQLAlchemy"></a>
+## SQLAlchemy
+
+* Example 1: creating DB session from SQLAlchemy
   
     ```python
     from sqlalchemy import Column, Integer, String
@@ -139,7 +153,6 @@ Reference:
     from sqlalchemy.ext.declarative import declarative_base
 
     Base = declarative_base()
-
 
     #engine = create_engine('sqlite:///sales.db', echo = True)
     engine = create_engine('postgresql://{username}:{password}@{host}:{port}/{db_name}'.format(
@@ -157,15 +170,14 @@ Reference:
         email = Column(String)
 
         '''    
-        SELECT customers.id 
-        AS customers_id, customers.name 
-        AS customers_name, customers.address 
-        AS customers_address, customers.email 
-        AS customers_email
+        SELECT customers.id AS customers_id, 
+        customers.name AS customers_name, 
+        customers.address AS customers_address, 
+        customers.email AS customers_email
         FROM customers
         '''
       
-    result = session.query(Customers).all()
+    result = db_session.query(Customers).all()
 
     if __nemae__ == '__main__':
         
@@ -174,20 +186,9 @@ Reference:
 
     ```
 
-
-Reference:
-  * [Full stack FastAPI PorstgresSQL base project](https://github.com/tiangolo/full-stack-fastapi-postgresql)
-    - Docker integration
-    - Starlette build asynchronize web services 
-    - Pydantic type hints at runtime
-    - SQLAlchemy models
-    - CORS(Cross Origin Resource Sharing)
-    - authentication with OAuth2 JWT tokens
-    - Pytest for backend testing
-    - PGAdmin for PostgreSQL 
-
 **Note**: 
     - please take care about the scoped_session with async mode (from sqlalchemy.orm import scoped_session)
+
 
 <br/><a name="swagger"></a>
 ## Swagger

@@ -21,12 +21,12 @@ $ docker service create --replicas 1 --name my-prometheus \
 <br/><a name="kubernetes"></a>
 ## Kubernetes
 
-* 
-'''
+* Deployment
+```
 $ kubectl create -f ./load-balancer-example.yaml
 $ kubectl get deployments
 $ kubectl get pods --show-labels
-'''
+```
 
 
 <div><br/>

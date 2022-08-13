@@ -25,6 +25,8 @@ $ docker service create --replicas 1 --name my-prometheus \
 ```
 $ kubectl create -f ./load-balancer-example.yaml
 $ kubectl get deployments
+$ kubectl rollout status deployment/nginx-deployment
+$ kubectl describe deployments
 $ kubectl get pods --show-labels
 ```
 

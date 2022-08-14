@@ -1,615 +1,1188 @@
-# Netowrk and Security
+# System Administration
 
 
 ## Contents
-
-* [SSH](#ssh)
-* [GPG](#gpg)
-* [Network Topology](#topology)
-* [Next-Gen Firewalls (NGFW)](#ngfw)
-
-* [...](#...)
+  * [Linux System](#System)
+  * [Administration](#Administration)
+  * [High Availability](#HA)
+  * [Service](#Service)
+  * [Storage](#Storage)
 
 
+<br/><a name="System"></a>
+## Linux System
 
-<br/><a name="def"></a>
-## Definisiton
-
-
-
-### Glossary
-
-* 802.1X
-  - Enhance security of WLAN by IEEE, provides authentication frame work, allows users to be authenticated by a central authority. wireless.
-* Authenticated DHCP
-  - First network access control, authenticating user id/password be for delivering a DHCP.
-* Backbone
-  - Primary connectivity mechanism of a hierarchical distribution system. All systems that have connectivity to the backbone are assured of connectivity to each other.
-* Blacklisting
-  - An access control system that denies entry to specific users, programs, or net work addresses
-* Berkeley Internet Name Domain (BIND)
-  - The most commonly used DNS service of the internet
-* Broadcasting
-  - A packet that is received by all stations in the domain
-
-* Cyclic Redundant Check (CRC)
-  - A mathematical calculation on a frame work or cell that is used for error detection. If two CRCs don't match, there is an error.
-* DDI
-  - a unified service or solution that integrate DNS, DHCP, and IPAM (IP Address Management) into one.
-* Dynamic Host Configuration Protocol
-  - Assigning IP address to device
-* Domain Name System
-  - the system of domain names. eg. google.com (no www) godaddy.com
-* Frame
-  - A unit of data transmission in layer two, containing a packet to layer three
-* File Transfer Protocol (FTP)
-  - the protocol to transfer files from one host to another. eg. cyberduck (assure the security of transfer). Now people use FTP.
-* Hypertext Transfer Protocol (HTTP)
-  - Protocol that supports request-response from a server. eg. a browser sends hyper text "www.google.com" to google.com through HTTP, then google.com returns a HTML to our browser
-* Hop
-  - Each time a packet is forwarded, it undergoes a "hop". (traceroute www.google.com)
-* IP Address Management (IPAM)
-  - The administration of DNC and DHCP. It means Planing, tracking, and managing the Internet Protocol space used in a network. eg. DNS knowing the IP address taken via DHCP, and updating itself.
-* Local Area Network (LAN)
-  - Its a Network that connects computers and devices in a limited geographical area. oppose with WANs (Wide Area Network). eg. home and school. Smaller area, faster speed, no need for telecommunication line.
-* deep packet inspection
-  - routers looking inside the data packet other than just read the ip address, take very slow
-
-
-<br/><a name="network-terms"></a>
-## Network Terms
-
-### Hub, Switch and Router
-* Hub
-  - connects all the network devices together
-  - multiple ports
-  - not intelligent, do not know where data going to be sent
-  - data is copied to all its ports -- broadcasting
-* Switch
-  - like a hub, accepts ethernet connections from network devices
-  - it is intelligent, knows the physical address(MAC address) in switch table.
-  - when a data is sent, it is directed to to intended port
-  - reduce unnecessary traffic
-* Hub and switch are not capable of exchanging data outside its own network, because to be able to reach outside network a device need to be able to read IP addresses
-* Router
-  - A router routes data from one network to another based on its IP address
-  - The gateway of a network
-* Hub and switches are used create networks while routers are used to connect networks
-
-### Domain Name System (DNS)
-* resolves domain names to IP addresses
-  1. domain name typed in
-  2. DNS server search through its database to find its matching IP address
-  3. DNS will resolve the domain name into IP addresses
-* works like a phone book
-
-#### Detailed Steps:
-* type in the Domain Name in web browser
-* if the computer can't find its IP address in its cache memory, it will send the query to the Resolver server(basically your ISP)
-* Resolver will check its own cache memory, if not, it will send the query to Root server, the top or the root of the DNS hierarchy, 13 sets of root servers around the world, operated by 12 organizations. each set has its own IP address
-* The root server will direct the resolver the Top Level Domain server (TLD), for the .com, .net, .org(top level domains) domain.
-* TLD will direct the resolver to the Authoritative Name Server(ANS), and the resolver will ask the ANS for the IP address
-* ANS is responsible for knowing everything including the IP address of the domain
-* ANS will respond with IP address
-* the resolver will tell the computer the IP address
-* the resolver will store the IP Address in its cache memory
-
-
-
-<br/><a name="topology"></a>
-## Network Topology
-
-* network topology is a layout of how a network communicates with different devices
-* wired and wireless
-
-### Wired Topologies
-
-#### Star
-* all devices connected to one hub or switch
-* pro: one devices failed to connect will not affect other devices
-* con: if the central hub or switch failed, it will affect every all devices on that point. single point failure
-
-#### Ring
-* connected in a circle, every computer has two neighbors, every packet is sent through the ring
-* rarely used today
-* easy to install and fix
-* one point failure
-
-#### Bus
-* each device is connected to the back bone
-* the back bone is a coaxial cable, connected to the computers using BNC connector (T connectors)
-* pro: cheap and easy to implement
-* con: needs terminators at both end of back bone, if not there will be signal reflection, causing data flow disrupted
-
-#### Mesh
-* each computer is connected to each other
-* con: high redundancy level, rare failure
-* pro: expensive
-* rarely used on LAN, mainly used on WAN(like internet)
-
-
-### Wireless Topologies
-
-#### Infrastructure
-* a wireless port connected to one of switch or hub like a star topology
-
-
-
-
-
-
-
-
-<br/><a name="def"></a>
-## Security
-
-
-<br/><a name="ssh"></a>
-#### Secure Shell SSH
-
-
-SSH is a communication Protocol. The traffic is encrypted
-SSHD is the server (Open SSH Daemon) and SSH is the client.
-the server must have sshd installed and running
-
-
-*  ~/.ssh/id_rsa (private key)
-   ~/.ssh/id_rsa.pub (public key)
-  - public key goes into server "authorized_keys" file
-
-* Generating a new SSH key
-    create
-
-    ```
-    $ ssh-keygen -t ed25519 -C "your_email@example.com"
-    $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-    ```
-
-    adding your SSH key to the ssh-agent
-    ```
-    $ sudo -s -H
-    $ exec ssh-agent bash
-    $ eval "$(ssh-agent -s)"
-    ```
-
-    for MacOS do modify config to update keychain automatically,
-    ```
-    $ touch ~/.ssh/config
-    | Host *
-    |     AddKeysToAgent yes
-    |     UseKeychain yes
-    |     IdentityFile ~/.ssh/id_ed25519
-    ```  
-
-    Add your SSH private key to the ssh-agent and store your passphrase in the keychain
-    ```
-    $ ssh-add -K ~/.ssh/id_ed25519
-    ```
-
-    public key goes into server "authorized_keys" file
-    ```
-    ~/.ssh/id_rsa (private key)
-    ~/.ssh/id_rsa.pub (public key)
-    ```
-
-<br/><a name="gpg"></a>
-
-#### GPG encryption and signing tool
-gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provide digital encryption and signing services using the OpenPGP standard.
-* GPG algorithms
-    RSA
-    ElGamal
-    DSA
-    ECDH
-    ECDSA
-    EdDSA
-
-
-* creating GPG key
-  create key
-
-  ```
-  $ gpg --full-generate-key
-    $ gpg --default-new-key-algo rsa4096 --gen-key
-  ```
-  to list the long form of the GPG keys for both a public and private key
-  ```
-  $ gpg --list-secret-keys --keyid-format=long
-  |/Users/hubot/.gnupg/secring.gpg
-  |------------------------------------
-  |sec   4096R/3AA5C34371567BD2 2016-03-10 [expires: 2050-03-10]
-  |uid                          Hubot
-  |ssb   4096R/42B317FD4BA89E7A 2016-03-10   
-  ```  
-  export the public key
-  ```
-  $ gpg --armor --export 3AA5C34371567BD2
-  # Prints the GPG key ID, in ASCII armor format
-  ```
-
-#### SSL/TLS
     ===============================================================================================
-    SSL/TLS
+    System fundamental
     ===============================================================================================
-    - Self signed vs Let’s Encrypt vs StartSSL.com
+    - Kernel
+    	$ cat /proc/modules        : running module by current kernel
+    	$ cat /etc/modprob.d       : configuration data for modprod
+    	$ uname -r                 : print of current version of kernel
+    	$ lsmod | grep xfs	       : show info. about loaded xfs modules
+    	$ modinfo          	       : print of loaded modules in detail (with su)
+    	$ modprobe xfs             : load xfs module
+    	$ modprobe -r kvm	         : extract kvm module
+    	$ depmod -n 		           : wie depmod die Datei modules.dep konfig.
 
-	  You can use CA tools in SSL
-	  $ cd /etc/pki/tls/misc
-	  $ CA -newca   : create your private key, cakey.pem (private key)
-	  $ CA -newreq  : a signing request, newreq.pem(request CSR) & newkey.pem(new private key)
-	  $ CA -signreq : sign the request, newcert.pem (CA signed certificate)
-	  you will find the list of generated files under
-	  $ cd /etc/pki/CA/private/
+      Kernel location? Module des Kernels
+    	$ cat /lib/modules/<kernel version>/xxx
+      ernel-Quelldateien
+    	$ /usr/src/linux-2.6.11.4-21.9
+      Patch of kernel
+    	$ bzip2 -dc patch-2.6.39-rc4.bz2 | patch -p1 --dry-run
+      Modify kernel paramaters at runtime, listed under /proc/sys/
+    	$ sysctl -w net.ipv6.conf.all.forwarding=1  : write into /proc/sys/net../forwarding
+    	$ sysctl -w net.ipv6.conf.all.forwarding=1  : write into /proc/sys/net../forwarding
+    	$ sysctl kernel.shmmax=212222222            : write into /proc/sys/kernel/shmmax
 
-	  $ sudo apt-get install letsencrypt
-	  $ sudo letsencrypt certonly -a webroot --webroot-path=/var/www/html
-			 -d example.com -d www.example.com
-    $ sudo ls /etc/letsencrypt/live/example.com
-	  | cert.pem              : publick key, server certificate only.
-	  | chain.pem             : root and intermediate certificates only.
-	  | fullchain.pem         : full trust chain
-	  | privkey.pem           : private key
+    - /proc
+        Prozessdateisystem, runtime kernel module infromation
+    	$ cat /proc/cmdline        : from the bootloader to the kernel
+    	$ cat /proc/interrupts     : Info. about IRQs
+    	$ cat /proc/ioports        : Info. about I/O ports
 
-    Googld chrome StartSSL.com
-    ca.pem        - StartSSL's Root certificate
-    private.key   - The unencrypted version of your private key (be very careful)
-    server.ca.pem - The intermediate certificate for StartSSL
-    ssl.key       - The encrypted private key (does not need to be copied to server)
-    ssl.crt       - Your new certificate
+    - /sys
+        benutzer Treibermodell des laufendern Kernels, dynamische generiert wird
 
-    To convert a certificate or certificate chain from DER to PEM
-   	$ openssl x509 -inform DER -in Certificate.der -outform PEM -out Certificate.pem
+    - /dev
+    	udev            : To manage the /dev tree
+    	rdev            : query/set image root device, swap, RAM size, or video mode
+    	/dev/mapper     : hold device files related to LVM and RAID configuration
+    	udevadm monitor : new monitor
 
-   	To convert a private key from DER to PEM    
-    $ openssl rsa -inform DER -in PrivateKey.der -outform PEM -out PrivateKey.pem
+    - /usr
+        unix system resource - suggest read only
+    	executable programs that are not needed on boot
 
-    To decrypt an encrypted private key (remove the password or passphrase)
-   	$ openssl rsa -in EncryptedPrivateKey.pem -out PrivateKey.pem
+    - /var
+        temporally used system related files
+        /var/log           : system log files
+        /var/spool/mail    : grosser platz empfolen
+        /var/named         : DNS zone configuration file
+    	/var/spool/cron    : cron temporal configuration data
+    	/var/log/messages  : Hauptprotokolldatei in Linux
+    	/var/log/syslog    : ausser bei Debian und Derivaten
 
-   	To convert a certificate bundle from PKCS#12 (PFX) to PEM
-   	$ openssl pkcs12 -in CertificateBundle.p12 -out CertificateBundle.pem -nodes
+    - /boot
+        To have GRUB rescan all of the devices, the device.map
+    	/boot/grub/device.map          : generated by grub-mkdevicemap
+    	This file tell the paths of the fs partitions in the GRUB syntax
 
-   	To convert a certificate bundle from PKCS#7 to PEM
-   	$ openssl pkcs7 -in CertificateBundle.p7b -print_certs -out CertificateBundle.pem
+    - initrd (init ram disk)
+    	In der initrd befinden sich Kernel-module, die Linux beim Boot-vorgang benoetigt.
+    	Die initrd wird von Kernel beim System start in den Hauptspeicher geladen
+    	Die initrd muss bei jedem Kernel-Update nue erstellt werden
+
+    - 3 Wesentliche Initialisierungsverfahren fuer den Linux-Systemstart:
+    	SysVinit (wird kamm mehr benutzt)                 : linux system
+    	Upstart  (Ubuntu, in zwischen night mehr aktuell) : linux system
+    	Systemd  (inzwischen von allen grossen Distributionen eingesetzt)
+
+    - SysVinit or init:
+     	$ cat /etc/inittab    : main configuration file
+
+        /etc/init.d/      : init process or
+        /etc/rc.d/        : init process
+    	/etc/init.d/rc0.d : symbolic link of /etc/init.d/*  or
+    	/etc/rc0.d        : symbolic link of /etc/init.d/*
+
+    	$ telinit q    : read inittab configuration again and go back to previous state
+    			         without restart, tell init to re-examine the /etc/inittab
+    	$ update-rd.d  : install the init script links, use update-rc.d (Debian)
+    	$ chkconfig    : install and remove the init script links, use this (RedHat)
+    	$ sysv-rc-conf : command for the runlevel behavior for various services
+    	$ service --status-all
+
+    - Systemd
+        $ Systemctl start|stop|status <Subsystem>
+        wenn Sie systemd, dann kommt journald & journalctl
+
+    - How do I know whether systemd, SysVinit or upstart is used for system start?
+    	$ ps -A
+    	$ pstree
+    	$ sudo stat /proc/1/exe
+    	$ rpm -qf /sbin/init
+
+    - Distribution Packages
+        apt-get, dpkg, yum, rpm
+
+    - Was muss gesichert werden?
+      /bin    : backup
+      /boot   : backup
+      /etc	: backup, but no /etc/mtab
+      /home   : backup
+      /lib	: backup
+      /opt	: backup
+      /root   : backup
+      /sbin   : backup
+      /usr	: backup
+      /var	: backup weil mailservern
+      /sys    : no
+      /dev	: no
+      /mnt	: no
+      /proc   : no
+      /tmp	: no
 
 
+<br/><a name="Administration"></a>
+## Administration
+Technical Recommendations:
+	* Software Sources and Installation
+	* Software and System Maintenance
+	* Service Management
+	* Bootstrapping systems
+	* Logging
+	* User and Group
+	* Tools
+	* Scripting
+	* FileSystem locations
+	* Web Servers
+	* Security
+	* SSH
+	* SSL/TLS
+	* VPN
 
-    In server
-    generate key
-    openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "general_key.key" -out "general_key.pub"
-      -days 365 -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssdb/OU=dbcat/CN=general_key"
-
-    Sign the file
-    openssl dgst -sha256 -sign "general_key.key" -out .checksum.sha256 .checksum.md5
-
-    In local machine
-    verify the signature
-    openssl dgst -sha256 -verify <(openssl x509 -in "general_key.pub"  -pubkey -noout) -signature dbaenv.sha256 .checksum.md5
-
-    then will see OK
-    Verified OK
-
-    openssl dgst -sha256 -verify <(openssl x509 -in "/home/c5258293/git/dbcat/certs/SAPGlobalSSLCA.crt"  -pubkey -noout) \
-    -signature /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.sha256  /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.md5
-
-
-    ==============================================================================================
-    SSL vs GPG comparison
     ===============================================================================================
-    Hi all,
-
-    The following instructions assume that you are the administrator of swshare repository.
-    (https://dba.wdf.sap.corp/swshare/)
-
-    • SSL authentication (administrator level)
-
-        Create a certificate for the landscape's domain
-        $ openssl req -nodes -x509 -sha256 -newkey rsa:4096
-        -keyout "SAPGlobalSSLSign.crt"
-        -out "SAPGlobalSSLSign.key"
-        -days 365
-        -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
-
-        You should now have 2 certificates, keep key file in safe region. And copy the public key file to the swshare
-            "SAPGlobalSSLSign.crt" private certificate key move to /root/SAPGlobalSSLSign.crt
-            "SAPGlobalSSLSign.key" public certificate key move to /swshare/dbcat/v3.8/certs/SAPGlobalSSLSign.key
-
-        Generate self-signed certificate files, here is an example for signing of checksum list of ASE
-        $ export signfile=/swshare/ase/16.0.02.06/linux_x86_64
-        $ openssl dgst -sha256 -sign "/root/SAPGlobalSSLSign.crt" -out "${signfile}"/.checksum5.md5.sig "${signfile}"/.checksum.md5
-
-        Verification of signed file will be performed in the factory
-        modFactoryTransferValidateSignature( ) in factoryTransfer.sh
-
-
-    • GPG authentication (administrator level)
-
-        Generate a keypair using gpg2 command, enter name, email, keysize and choose a passphrase at the end (please keep all information in the note!)
-            gpg2 --gen-key
-            | .....................................
-            | .....................................
-            | Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O
-            | You need a Passphrase to protect your secret key.
-            | .....................................
-
-        keep the public master GPG key at the line on "pub 2048R/2AFFE2C5 2017-08-02" (2AFFE2C5 is key-id)
-            | gpg: checking the trustdb
-            | gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
-            | gpg: depth: 0 valid: 1 signed: 0 trust: 0-, 0q, 0n, 0m, 0f, 1u
-            | pub 2048R/2AFFE2C5 2017-08-02
-            | Key fingerprint = F619 5E0E 4B8A 0675 22A3 55FA ACBA 0973 2AFF E2C5
-            | uid SAPGlobalSign (GPG authentification) SAPGlobalSign@sap.com
-            | sub 2048R/00B0933C 2017-08-02
-
-
-        export your public key to use in signing
-            gpg2 --no-armor --output SAPGlobalGPGSign.key --export 2AFFE2C5
-            "SAPGlobalGPGSign.key" public key move to /swshare/dbcat/v3.8/certs/SAPGlobalGPGSign.key
-
-        signing your documents e.g. checksum file, you should need a passphrase in this stage. You can also use a batch mode without typing passphrase
-            export signfile=/swshare/ase/16.0.02.06/linux_x86_64
-            gpg2 --armor --output "${signfile}"/.checksum.md5.asc --detach-sign "${signfile}"/.checksum.md5
-            gpg2 --armor --output "${signfile}"/.checksum.md5.asc --batch --passphrase "Pa\$\$w0rd" --detach-sign "${signfile}"/.checksum.md5
-
-        In dbcat, verification of signed documents will be perforemd
-            gpg2 --no-default-keyring --keyring SAPGlobalGPGSign.key --verify .checksum.md5.asc .checksum.md5
-
-
-        ===============================================================================================
-        Practice and output
-        ===============================================================================================
-        test environment...........................
-        sudo su -
-        cd /var/tmp/dbcatTrans/zfinal/
-        openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "SAPGlobalSSLCA.key" -out "SAPGlobalSSLCA.crt" \
-                -days 365 -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
-        openssl dgst -sha256 -sign SAPGlobalSSLSign.crt -out .checksum.md5.sig .checksum.md5
-        openssl dgst -sha256 -verify <(openssl x509 -in /var/tmp/dbcatTrans/zfinal/SAPGlobalSSLSing.key -pubkey -noout) \
-        -signature .checksum.md5.sig .checksum.md5.sig
-
-        --------------------------------------------
-        gpg2 --gen-key
-        gpg: checking the trustdb
-        gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
-        gpg: depth: 0  valid:   3  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 3u
-        gpg: next trustdb check due at 2018-08-03
-             pub   2048R/2288A15E 2017-10-09
-                Key fingerprint = A51E BA24 9E16 3041 9D80  E42F 15F7 33D5 2288 A15E
-             uid                  Donghee Kang (test2) <donghee.kang@sap.com>
-        --------------------------------------------
-        gpg2 --armor --output SAPGlobalGPGSign.key --export 9ED95FE6
-        gpg2 --armor --output SAPGlobalGPGPrivate.key --export-secret-keys 9ED95FE7
-        gpg2 --armor --output .checksum.md5.gpg --batch --passphrase "Pa\$\$w0rd" --sign .checksum.md5
-        gpg2 --no-default-keyring --keyring /var/tmp/dbcatTrans/zfinal/SAPGlobalGPGSign.key --verify .checksum.md5.asc .checksum.md5
-        gpg2 --verify .checksum.md5.asc .checksum.md5
-        --------------------------------------------
-        gpg2 --no-armor output SAPGlobalGPGSign.gpg --export 9ED95FE6
-        gpg2 --armor --output .checksum.md5.asc --batch --passphrase "Pa\$\$w0rd" --detach-sig .checksum.md5
-        gpg2 --no-default-keyring --keyring /var/tmp/dbcatTrans/zfinal/SAPGlobalGPGSign.gpg --verify .checksum.md5.asc .checksum.md5
-        --------------------------------------------
-        gpg: [don not know]: invalid packet (ctb=78)
-        gpg: keydb_search failed: Invalid packet
-        gpg: Can't check signature: No public key
-
-        --------------------------------------------
-        gpg --list-keys
-        gpg --delete-secret-key key-ID
-        gpg --delete-key key-ID
-
-        --------------------------------------------
-        public key... don#t need at all...
-        gpg2 -k
-        gpg2 --armor --output gpg2-public-key.rsa --export donghee.kang@sap.com
-        gpg2 --armor --export donghee.kang@sap.com | tee gpg2-public-key.rsa
-
-        --------------------------------------------
-        private key...
-        gpg -a -o exportedKeyFilename.asc --export-secret-keys keyIDNumber
-        gpg -a -o gpg_private_key.asc --export-secret-keys 60F9D6E1
-
-        --------------------------------------------
-        encypytion
-        gpg --ouput a.txt.gpg --encrypt --recipient administrator@sap.com a.txt
-
-        --------------------------------------------
-        without passphrase......default output (--ouput a.txt.gpg)
-        gpg2 -se --passphrase yourpassword --batch --encrypt --recipient xxxxxx@sap.com a.txt
-        gpg2 --passphrase "Veritas47" --batch --encrypt --recipient donghee.kang@sap.com example2.txt
-
-        --------------------------------------------
-        descrytion
-        This is important and have to be set into the file...
-        gpg2 --output a.txt --batch --passphrase yourpassword --decrypt a.txt.gpg
-        gpg2 --output a.txt --batch -no-default-keyring --secret-keyring /path/gpg_private_key.asc --passphrase yourpassword --decrypt a.txt.gpg
-
-
-
-
-
-#### Stateless vs Stateful Firewall
+    Initial setup after installation (based on ubuntu)
     ===============================================================================================
-    Stateless vs Stateful Firewall
+    1. root login
+      $ ssh root@123.456.789.100
+      |
+      | warning..... bla blaa
+      |
+      $ ssh-keygen -R 123.456.789.100    : remove old key for root of 123.456.789.100
+      $ eval `ssh-agent -s`              : check ssh-agent of local machine
+      $ ssh-add ~/.ssh/id_rsa            : add private key to local machine
+      $ ssh root@123.456.789.100         : try again, now OK with root!
+
+    2. create user demo, who has root privileges
+      $ adduser demo
+
+    3. root privileges
+      $ gpasswd -a demo sudo
+
+    4. Add Public Key Authentication to demo user  : this is realy interesting!
+      Generate a Key Pair
+      $ ssh-keygen
+      Enter file in which to save the key (/Users/localuser/.ssh/id_rsa): <enter>
+      | ~/.ssh/id_rsa        (private key)
+      | ~/.ssh/id_ras.pub    (public key)
+
+      Copy the Public Key,
+      $ ssh-copy-id demo@SERVER_IP_ADDRESS
+      or
+      $ cat ~/.ssh/id_rsa.pub
+      | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...rggpFmu3HbXBnWSUdf localuser@machine.local
+      | ctrl + c
+      $ su - demo
+      $ mkdir .ssh
+      $ chmod 700 .ssh
+      $ nano .ssh/authorized_keys
+      | ctrl + v
+      $ chmod 600 .ssh/authorized_keys
+
+    5. Configure SSH Daemon
+      $ nano /etc/ssh/sshd_config
+      | PermitRootLogin no                : disabling remote root login is highly recommended
+
+    6. Reload SSH
+      $ service ssh restart
+      $ ssh demo@SERVER_IP_ADDRESS        : it work! login with demo accout from local to server
+
+    Optional) additional Recommended Steps
+    7. Firewall policies
+      $ sudo aptitude install ufw
+      $ sudo ufw status
+
+      $ sudo ufw allow ssh                : to configure your firewall policies
+      $ sudo ufw allow 4444/tcp           : extra SSH 2222
+      $ sudo ufw allow 80/tcp             : HTTP
+      $ sudo ufw allow 443/tcp            : SSL/TLS
+      $ sudo ufw allow 25/tcp             : SMTP
+      $ sudo ufw allow 21/tcp             : ftp
+      $ sudo ufw show added               : finalized
+      $ sudo ufw enable                   : confirm then type "y"
+
+      $ sudo ufw allow from 192.168.255.255
+
+      $ sudo ufw default deny incoming
+      $ sudo ufw default deny outgoing
+
+      $ sudo ufw delete allow 80/tcp
+      $ sudo ufw delete allow 1000:2000/tcp
+
+    8. Configure Timezones and Network Time Protocol Synchronization
+      $ sudo dpkg-reconfigure tzdata
+
+      $ sudo apt-get update
+      $ sudo apt-get install ntp
+
+    9. Create a Swap File
+      $ sudo fallocate -l 4G /swapfile
+      $ sudo chmod 600 /swapfile
+      $ sudo mkswap /swapfile
+      $ sudo swapon /swapfile
+      $ sudo sh -c 'echo "/swapfile none swap sw 0 0" >> /etc/fstab'
+
+
     ===============================================================================================
-    - Stateless firewall
-	  treats each network frame or packet individually. Such packet filters operate at the
-	  OSI Network Layer (layer 3) and function more efficiently because they only look at the
-	  header part of a packet. They do not keep track of the packet context. Such a firewall has
-	  no way of knowing if any given packet is part of an existing connection
-
-    - A stateful firewall
-	   keeps track of the state of network connections (such as TCP streams or UDP communication)
-	  and is able to hold significant attributes of each connection in memory.  Stateful inspection
-	  monitors incoming and outgoing packets over time, as well as the state of the connection,
-	  and stores the data in dynamic state tables.
-
-	  a stateful firewall is a network firewall that tracks the operating state and characteristics
-	  of network connections traversing it. The firewall is configured to distinguish legitimate
-	  packets for different types of connections. Only packets matching a known active connection
-	  are allowed to pass the firewall.
-
-	  Stateful packet inspection (SPI), also referred to as dynamic packet filtering,
-	  Stateful firewall technology was introduced by Check Point
-
-
-
-#### Firewall
-
-* scans each little packet of data
-* physical(routers) or software
-* can me exceptions by users
-
-####	firewalld @ CentOS
-
-####	iptables
-
-#### Intrusion Detection Prevention (IDP)
-
-
-#### Intrusion Detection System (IDS)
-is based on a specific pattern to detect the attacker's intrusion
-
-* connect to one of the port at a switch
-* IDS determine whether the traffic that is going to the web service is dangerous. eg. compare the signatures, anomalies with in quantity and types.
-* It does not stop the attack from happening. it simply alerts the attack
-
-#### Intrusion Prevention System (IPS)
-is an active defence to block the attacs detected
-
-* plug Between the firewall and switch.
-* can be virtual or physical
-* prevent attack from the begin, protect the computer or server
-
-#### Hosted Intrusion Detection/Prevention System (HIDS)
-* a IDS/IPS system sometime cost money, if we want to just protect one server, we can run prevent system as an software in tha server
-* We can install it into many devices in our networl. eg. routers, firewalls(eg. UTM(Unified Threat Management):Palo Alto, checkpoint)
-
-####  Snort (IDS/IPS, NIDS)
-is an open source network intrusion detection system (NIDS)
-to detect a variety of attacks, such as buffer overflows, stealth port scans,
-CGI attacks, SMB probes, OS fingerprinting attempts and much more.
-listen direct to the Network card, while fail2ban is not.
-Snort System can monitor traffic on the local network, since the network is well
-portected by the NAT router, outside attacks against the local(samba, nfs, ssh)
-are unlikely to reach the protected network, so external attacks won't be detected
-
-
-####	OpenVAS (Open Vulnerability Assessment System)
-is a framework of several tools offering a vulnerability management solution
-over 30,000 in total
-
-
-####	fail2ban (IPS)
-Fail2Ban is then used to update firewall rules to reject the IP addresses for a
-specified amount of time, scans log(e.g. /var/log/apache/error_log) and bans IPs that
-show the malicious signs too many password failures, seeking for exploits, etc.
-
-
-#### 	IPSec
+    Administration fundamental
     ===============================================================================================
-    IPSec (Internet Protocol Security)
+    - User and group
+    	- /etc/passwd
+    	- /etc/shadow
+    	- /etc/group
+
+    	$ id kang		: display UID and GID
+    	$ groups  		: list of all group for this user
+
+    	Necessariness tools and tips for security
+        $ find / -perm -u+s           : SUID bit
+    	$ find / -perm +4000 -type f  : list of files with SUID bit
+    	$ find / -perm -g+s           : GUID bit
+    	$ find /usr -uid 0            : owned by root
+
+    	$ useradd    		: without -m means NO home directoy
+    	$ adduser 		: some distribution also possible
+    	$ userdel      		: delete recursively home and also mail spool
+    	$ usermod 		: modification of user account
+
+    	$ chage -l kang         : administrative tool for passwd and expiring date
+    	# chfn & finger         : change personal data as like name, telefone, office number
+    	$ newgrp newgroup       : change primary group by newgroup from normal user
+    	$ groupadd,groupdel ,groupmod ,gpasswd
+
+    	Befehle zur Verwaltung des Shadow-Systems
+    	$ pwconv         : transferieren der Passwort-Hashes aus passwd -> nach shadow
+    	$ pwunconv       : shadow -> passwd
+    	$ pwck		 : Konsistenz von passwd u. shadow ueberpruefen
+    	$ grpconv,grpunconv,grpck
+
+    	$ chown kang:kang myfile     : group and owner
+    	$ chgrp kim myfile           : nur gruppe aendern
+
+    	$ getent passwd kang    :   Check a user whether exist or not
+
+    	# Generates a compact listing of all the users on the system.
+    	$ cut -d: -f < /etc/passwd | sort | xargs echo
+
+        /etc/skel : automatically copied over to a new user's home directory
+
+    - Der sudo-Mechanismus
+    	$ visudo                     : editor of sudoers
+    	$ sudo su 		     : simple su is not working at ubuntu
+    	$ vi /etc/sudoers
+
+    - crontab / anacrontab / at
+        $ cat /etc/crontab    : crontable
+    	$ crontab
+    	$ cat /var/spool/cron/crontab/kang
+    	# /etc/cron.{d,daily,hourly,monthly,weekly}
+        # /etc/cron.allow  : listed user can access
+        # /etc/cron.deny   : listed user cannot access, not cron.allow file
+        $ cat /etc/anacrontab
+
+    - Time syncronization
+        $ cat /etc/timezone
+        $ tzselect                   : set time zone Europe/Berlin
+    	$ timedatectl set-ntp true   : NTP network time synch is enable
+
+    	$ date
+        $ hwclock
+        $ ntpdate pool.ntp.org   : access to standard ntp server
+    	$ ntpq -p                : information about current ntpd server connection
+    	$ ntpdc                  : ntp diagnose with interactive mode
+
+    - Local information
+    	$ locale
+        $ iconv  : iconv can use for converting between win(euc-kr) and ubuntu(utf-8)
+
+    - Background prozess
+        $ bg 1
+    	$ fg 1
+    	$ nohup updatedb &
+    	$ screen (remote shell)
+
+    - Super user
+        /etc/nologin
+    	/etc/hosts.allow
+    	/etc/hosts.deny
+    	$ vi /etc/security/limits.conf
+    	$ vi /etc/security/access.conf
+    	$ chsh -s /bin/false kang             : user kang can not access anything!
+
+    	/var/run/utmp   : maintains a full accounting of the current status of the system
+    	/var/log/wtmp   : acts as a historical utmp
+    	/var/log/btmp   : records only failed login attempts.
+    	$ who -u        : users information
+
+    	$ dmesg         : write kernal message
+
+    	$ lspci         : display information PCI buses in the system
+    	$ lsusb -v      : display information USB buses in the system
+    	$ lsdev         : display information I/O address, IRQ/DMA channels
+
+        $ iostat        : monitoring system input/output device load
+        $ vmstat        : reports virtual memory statistics about processes, memory, paging,
+                              block I/O, traps, disks and cpu activity.
+        $ mpstat -P 1  	: output each available processor, 0 being the first one
+    	$ free -h       : total amount of physical and virtual memory
+
+        $ w             : Wer ist momentan an System angemeldet? info.  from /var/run/utmp
+        $ last          : Wer war momentan an diesem System eingemeldet?
+    	$ uptime       	: how long in service, how many user in machine
+
+        $ lsof /tmp     : open files and corresponding processes.
+    	$ sar -d 	: output disk statistics
+        $ fuser         : a block device mounted on that directory
+
+    	$ nice          : Prozessprioritaet
+    	$ renice        : Prozessprioritaet
+
+    	$ pgrep         : Wie viele Prozess fuer Kang im Lauf?
+    	$ pkill         : kill all process of kang?
+
+    	$ strace -p program	: Debug program to connect a running process
+    	$ ltrace cat /dev/null  : Debug program to check a library call tracer
+
+    	$ strings /bin/bash     : print characters, useful for reading non-text files.
+
+    - Log system protocol & analysis
+        Where is major log files?
+        # /var/log/dmesg      : booting message in RAMdisk with Ring buffer
+    	# /var/log/messages   : system log
+    	# /var/log/secure     : login log, authentication and authorization privileges
+        # /var/spool/cron     : cron logs
+    	# /var/log/mail.debug : for mail debugging
+
+    	$ cat /var/log/*
+
+    	Einsatz von Logdateien zur Fehlersuche
+    	$ less /var/log/messages
+    	$ tail -f /var/log/messages   : zeigt "Live" neue Zeilen an.
+    	$ grep sshd /var/log/messages | grep invalide | less
+
+        $ cat /etc/syslog.conf   : log system configuration, syslog-ng gibt auch
+        $ cat /etc/rsyslog.conf  : Heute benutzen diese Konfiguration Datei
+
+        $ /sbin/klogd        : kernel message daemon in init-process
+    	$ /proc/kmsg         : einstellungs Datei von klogd
+
+    	Ruuning process with PID
+    	$ cat /proc/2352/environ
+    	$ cat /proc/2352/environ | tr "\000" "\n"
+
+    	$ logger -t my_log_message  here is my message!
+
+        logrotate in order to save log files by rotation
+        /etc/logrotate.conf    : configuration
+    	/etc/logrotate.d       : contents, references
+
+    	wenn Sie systemd statt upstart oder SysVinit, dann journald ist antwortlich.
+    	$ journalctl --since "2015-01-10" --until "2015-01-11 03:00"
+
+        $ cat /etc/systemd/journald.conf
+        $ cat /var/log/journal/    : somtimes not here, but in /var/log/syslog
+
+    - Superdaemon, Einen Rechner absichern
+        FTP-Server, LPRd, CUPS, TCP/UDP-Dienste wie Daytime, Echo
+
+    	Konfigurationsdatei fuer Super Daemon
+        /etc/inetd.d/
+        /etc/inetd.conf
+        /etc/xinetd.d/
+        /etc/xinetd.conf
+
+    	TCP-Wrapper konfiguration
+        /etc/hosts.allow
+        /etc/hosts.deny
+
+    	tcpchk: eine inetd.conf auf Syntaxfehler pruefen
+
+    - Monitoring solutions (network and system)
+    	Nagios, MRTG(Multi Router Traffic Grapher), Cacti, Wireshark, Icinga2
+    	collectd(system statistics collection daemon for IT infrastructure)
+    	cloudwatch, rackspace    
+
+
+
     ===============================================================================================
-    - IPSec
-	   provides encryption and authentication at IP level.
-	   IPsec can run on routers, firewall machines, and application servers.
-	   ESP(Encapsulating Security Payload), AH(Autehntication Header) are standard protocol
-	   IKE(Internet Key Exchange) is used to handle tunneling as a higher level protocol.
-	   In configuraiton file, you should find left and right node for IPsec connection
-
-	IPsec is a protocol suite for secure Internet Protocol(IP) communications that works by
-	authenticating and encrypting each IP packet of a communication session. IPsec includes
-	protocols for establishing mutual authentication between agents at the beginning of the
-	session and negotiation of cryptographic keys to be used during the session. IPsec can be
-	used in protecting data flows between a pair of hosts (host-to-host), between a pair of
-	security gateways (network-to-network), or between a security gateway and a host
-	(network-to-host).
-
-	IPsec uses cryptographic security services to protect communications over IP networks.
-	IPsec supports network-level peer authentication, data origin authentication,
-	data integrity, data confidentiality (encryption), and replay protection.
-
-	IPsec is an end-to-end security scheme operating in the Internet Layer of the
-	Internet Protocol Suite, while some other Internet security systems in widespread use,
-	such as Transport Layer Security (TLS) and Secure Shell (SSH), operate in the upper
-	layers at the Transport Layer (TLS) and the Application layer (SSH). Hence, only IPsec
-	protects all application traffic over an IP network. Applications can be automatically
-	secured by IPsec at the IP layer.
-
-- IPsec	related program
-	sysctl+racoon
-	isk_psk
-	tcpdump
-	then....do firewall setting
-	iptables=netfilter=packetfilter
-	HAProxy
-	NAT
-
-
-#### Malware
-
-* Virus are a little piece of code, that can copy itself to other programs when triggered. corrupt datas. Often attached to an excutable file.
-* Malware are software crashing systems, stealing important information.
-* Trojans are harmful software that can steal information, user are usually lead to open the software.
-* Ransomware host pc hostage, threatening to destroy data
-* Spyware secretly gathers private information such as passwords
-* Worms replicate themselves and attack other devices in the network, slowing down traffic and
-* Malware today is an conclusion of all above and more.
-
-
-
-#### Next-Gen Firewalls (NGFW)
+    Must know
     ===============================================================================================
-    Next-Gen Firewalls (NGFW)
-    ===============================================================================================    
-    similarities
-    - static packet filtering
-    - Stateful inspection or dynamic packet filtering, which checks every connection on every interface of a firewall for validity
-    - Network address translation for re-mapping the IP addresses included in packet headers (NAT)
-    - Port address translation that facilitates the mapping of multiple devices on a LAN to a single IP address (PAT)
-    - Virtual private network (VPN) support, which maintains the same safety and security features of a private network over the portion of a connection that traverses the internet or other public network
-    * differences
-      - block to add application-level inspectioin
-      - IPS
-      - bringing intelligence from outside the firewall
+    1. How do I know my public IP in local machine!
+      $ curl ipinfo.io/ip
+      $ curl -s ipinfo.io/ip
+      $ wget -qO- http://ipecho.net/plain ; echo
+      $ dig +short myip.opendns.com @resolver1.opendns.com
 
 
-#### VPN
     ===============================================================================================
-    VPN (Virtual Private Network)
+    init
     ===============================================================================================
-    	allows you to connect remote networks securely over an insecure connection, e.g.
-    	public internet. The network connection acts a physical connection, but actually may
-    	traverse many physical networks and system. That is why we call "virtual" Solution and
-    	VPN implementations include IPSEC, VPND, SSH, Cisco Routers, SSL/TLS(Secure Sockets Layer/
-    	Transport Layer Security) as a cryptographic protocol Port 1194
+    - Setup to start automatically after a crash or reboot
+      Runlevel 0  : System shutdown
+      Runlevel 1  : Single-user, rescue mode
+      Runlevel 2-4: Multi-user, text mode with networking enabled
+      Runlevel 5  : Multi-user, network enabled, graphical mode
+      Runlevel 6  : System reboot
 
-    	VPN is a full-featured SSL VPN which implements OSI layer 2 or 3 secure network extension
-    	using the industry standard SSL/TLS protocol, supports flexible client authentication
-    	methods based on certificates, smart cards, and/or username/password credentials, and
-    	allows user or group-specific access control policies using firewall rules applied to the
-    	VPN virtual interface. OpenVPN is not a web application proxy and does not operate through
-    	a web browser.
+    - System V Init Sequence
+      1. The init daemon is created from the binary file /sbin/init
+      2. The first file the init daemon reads is /etc/inittab
+      3. One of the entries in this file decides the runlevel the machine should boot into.
+      4. Next, the init daemon looks further into the /etc/inittab file and reads configuration
 
-    -OpenVPN
-    	$ sudo apt-get update
-    	$ sudo apt-get install openvpn easy-rsa
-    	$ gunzip -c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz \
-     		> /etc/openvpn/server.conf
+      Looking at inittab -> rc(run command) -> init directory
+    	$ cat /etc/inittab | grep initdefault
+    	$ cat /etc/inittab | grep Runlevel
+    	$ ls -ld /etc/rc*.d
+    	$ ls -l /etc/rc2.d
+    	|S01rsyslog -> ../init.d/rsyslog
+    	|S02anacron -> ../init.d/anacron
+    	|S02atd -> ../init.d/atd
+    	|S02cron -> ../init.d/cron
+    	|S02mysql -> ../init.d/mysql
+    	|S02ssh -> ../init.d/ssh
+    	$ ls -l /etc/init.d/my*
+    	$ cat /etc/init.d/mysql | less
 
-    	$ vim /etc/openvpn/server.conf
-    	| dh2048.pem
-    	| push "redirect-gateway def1 bypass-dhcp"
+    	Using chkconfig or sysv-rc-conf, alternatively to look init setup
+    	$ chkonfig --list | grep service_name     : for centOS
+    	$ sudo apt-get install sysv-rc-conf -y    : for Debian
+    	$ sudo sysv-rc-conf                       <---- very nice tool!
 
-    	Options for Open
-    	| Packet Forwarding ip_forward
-    	| ufw...or iptables
+    - Init for MySQL
+      MySQL Startup Behavior at Boot
+    	$ sudo update-rc.d mysql disable
+    	$ sudo update-rc.d mysql enable
+    	$ ls -l /etc/rc2.d
 
-    	Creating a Certificate Authority and Server-Side Certificate & Key
-      RSA or IPSec
-    	Generate a Certificate and Key for the Server
-    	Move the Server Certificates and Keys
-    	Generate Certificates and Keys for Clients
-    	Transferring Certificates and Keys to Client Devices
-    	Creating a Unified OpenVPN Profile for Client Devices
+    	MySQL Start-up Behavior on Crash
+    	$ cat /etc/inittab
+    	| ms:2345:respawn:/bin/sh /usr/bin/mysqld_safe
+    	$ sudo reboot
+    	$ ps -ef | grep mysql
+    	| root    907    1 00:00:00  /bin/sh /usr/bin/mysqld_safe
+    	|mysql   1031  907 00:00:00  /usr/sbin/mysqld --basedir=/usr ...
+    	Kill the MySQL
+      $ sudo kill -9 907
+      $ sudo kill -9 1031
+    	Wait 5 minutes, then check mysql is still in working!
+    	$ sudo service mysql status
+
+    ===============================================================================================
+    Systemd
+    ===============================================================================================
+    - Systemd sequence
+    	runlevel 0 	  poweroff.target
+    	runlevel 1 	  resuce.target
+    	runlevel 2-4  multi-user.target
+    	runlevel 5 	  graphical.target
+    	runlevel 6 	  reboot.target
+
+    	/lib/systemd/system/
+    	/etc/systemd/system/
+
+    	Looking at the default.target File and Dependencies
+    	$ sudo ls -l /etc/systemd/system/default.target
+      | ... /etc/systemd/system/default.target -> /lib/systemd/system/multi-user.target
+
+    	$ sudo ls -l /etc/systemd/system/multi-user.target.wants/*.service
+    	|/etc/.../multi-user.target.wants/crond.service -> /usr/lib/systemd/system/crond.service
+    	|/etc/.../multi-user.target.wants/mysqld.service -> /usr/lib/systemd/system/mysqld.service
+    	| ...
+    	|/etc/.../multi-user.target.wants/sshd.service -> /usr/lib/systemd/system/sshd.service
+
+    	$ sudo systemctl show --property "Wants" multi-user.target | fmt -10 | grep mysql
+    	| Requires=basic.target
+
+    	$ sudo systemctl show --property "Requires" basic.target | fmt -10
+    	| Requires=sysinit.target
+
+    	$ sudo systemctl show --property "Wants" sysinit.target | fmt -10
+    	|Wants=local-fs.target
+    	|swap.target
+    	|cryptsetup.target
+    	|systemd-udevd.service
+    	|systemd-update-utmp.service
+    	|systemd-journal-flush.service
+    	|...
+
+    	Looking at a Unit File
+    	$ sudo nano /etc/systemd/system/multi-user.target.wants/sshd.service
+    	|[Unit]
+    	|Description=OpenSSH server daemon
+    	|After=syslog.target network.target auditd.service
+    	|[Service]
+    	|EnvironmentFile=/etc/sysconfig/sshd
+    	|ExecStartPre=/usr/sbin/sshd-keygen
+    	|ExecStart=/usr/sbin/sshd -D $OPTIONS
+    	|ExecReload=/bin/kill -HUP $MAINPID
+    	|KillMode=process
+    	|Restart=on-failure
+    	|RestartSec=42s
+    	|[Install]
+    	|WantedBy=multi-user.target
+
+    - systemd + mysql
+    	MySQL Startup Behavior at Boot
+    	$ sudo systemctl disable mysqld.service
+    	$ sudo systemctl enable mysqld.service
+    	$ sudo systemctl show --property "Wants" multi-user.target | fmt -10 | grep mysql
+    	$ sudo ls -l /etc/systemd/system/multi-user.target.wants/mysql*
+
+    	MySQL Startup Behavior on Crash
+    	$ sudo nano /etc/systemd/system/multi-user.target.wants/mysqld.service
+    	|[Unit]
+    	|...
+    	|[Install]
+    	|...
+    	|[Service]
+    	|...
+    	|Restart=always               <--- this is important piece
+    	|...
+    	$ sudo systemctl daemon-reload
+    	$ sudo systemctl restart mysqld.service
+    	$ sudo systemctl status mysqld.service
+    	$ sudo kill -9 11217
+    	Still survice mysql as wish
+    	$ sudo systemctl status mysqld.service
+
+
+    ===============================================================================================
+    Binary packages
+    ===============================================================================================
+    - dpkg:
+    	Originally used by Debian and now by Ubuntu. Uses the .deb format and was the first to have
+    	a widely known dependency resolution tool, APT. The ncurses-based front-end for APT,
+    	aptitude, is also a popular package manager for Debian-based systems.
+
+    - RPM Package Manager:
+    	Created by Red Hat. RPM is the Linux Standard Base packaging format and the base of a
+    	number of additional tools, including apt4rpm, Red Hat's up2date, Mandriva's urpmi,
+    	openSUSE's ZYpp, PLD Linux's poldek, and YUM, which is used by Fedora, Red Hat Enterprise
+    	Linux, and Yellow Dog Linux.
+
+    - dpkg
+    	$ dpkg -Gi package(s).deb	   	 	install/upgrade package file(s)
+    	$ dpkg -r package						 remove package
+    	$ dpkg -l '*spell*'					 show all packages whose names contain the spell
+    	$ dpkg -l package						show version of package installed
+    	$ dpkg -s package						show all package metadata
+    	$ dpkg -I package.deb					show all package file's metadata
+    	$ dpkg -S /path/file				     what package does file belong
+    	$ dpkg -L package						list where files were installed
+    	$ dpkg -c package.deb					list where files would be installed
+    	$ dpkg -x package.deb					extract package files to current dir
+    	$ dpkg -s package | grep ^Depends:  	 list files/packages that package needs
+    	$ dpkg --purge --dry-run package	     list packages that need package (see also whatrequires)
+
+      $ dpkg -b example...
+    	$ dpkg-deb --build helloworld_1.0-1
+    	| Package: backup-script
+    	| Architecture: all
+    	| Maintainer: Bas van Schaik
+    	| Depends: debconf (>= 0.5.00), rsync
+    	| Priority: optional
+    	| Version: 0.5
+    	| Description: My Simple backup script
+        | This script provides an easy way of creating backups
+        | .
+    	| Creating backups is now more fun than ever!
+
+
+    - rpm
+    	$ rpm -Uvh packages(s).rpm	    	install/upgrade package file(s)
+    	$ rpm -e package						remove package
+    	$ rpm -qa '*spell*'					show all packages whose names contain the spell
+    	$ rpm -q package						show version of package installed
+    	$ rpm -q -i package					show all package metadata
+    	$ rpm -q -i -p package.rpm			show all package file's metadata
+    	$ rpm -q -f /path/file				what package does file belong
+    	$ rpm -q -l package		    		list where files were installed
+    	$ rpm -q -l -p package.rpm	      	list where files would be installed
+    	$ rpm2cpio package.rpm | cpio -id		extract package files to current dir
+
+    	$ rpmdev-newspec
+    	$ rpmbuild -ba hello.spec
+    	| Name:     hello
+    	| Version:  2.8
+    	| Release:  1
+    	| Summary:  The "Hello World" program from GNU
+    	| License:  GPLv3+
+    	| URL:      https://www.gnu.org/software/hello/
+    	| Source0:  http://ftp.gnu.org/gnu/hello/hello-2.8.tar.gz
+    	| %description
+    	| The "Hello World" program, done with all bells and whistles of a proper FOSS
+    	| project, including configuration, build, internationalization, help files, etc.
+    	| %changelog
+    	| * Thu Jul 07 2011 The Coon of Ty <Ty@coon.org> - 2.8-1
+    	| - Initial version of the package
+
+
+    ===============================================================================================
+    Howto Jump host
+    ===============================================================================================
+    • How do I use jump host (local -> server1 -> server2)
+
+    	$ ssh -tt server1 ssh server2
+
+    	$ ssh -fqN -L2222:server2:22 server1
+    	$ ssh localhost -p 2222
+
+    	$ ssh -o ProxyCommand="ssh server1 nc server2 22" server2
+    	$ ssh -o ProxyCommand="ssh -W server2:22 server1" server2
+
+    	or one can configure server2 via server1
+    	$ vi ~/.ssh/config
+    	|Host s2
+    	|HostName server2
+    	|User user2
+    	|IdentityFile ~/.ssh/server2_id_rsa
+    	|ProxyCommand ssh -W server2:22 server1
+    	$ ssh s2
+    	$ ssh user2@s2
+
+
+<br/><a name="HA"></a>
+## High Availability
+
+
+
+- LVS (Linux Virtual Server)
+    LVS is a highly scalable and available server built on a cluster of real servers, with the load balancer running on the Linux operating system.
+
+  LVS components
+  * lvs daemon
+  * ipvsadm
+  * iptables
+  * acls
+
+  LVS Forwarding
+  * Network Address Translation (NAT)
+  * Direct Routing
+  * Tunneling
+  * Local Node
+
+
+- IPVS (IP Virtual Server)
+	IPVS is incorporated into the LVS, where it runs on a host and acts as a load balancer in front of a cluster of real servers.
+	usually called Layer-4 switching. IPVS running on a host acts as a load balancer
+
+- Virtual Router Redundancy Protocol (VRRP)
+	VRRP is a computer networking protocol that provides for automatic assignment of available IP routers to participating hosts.
+
+- keepalived
+	is a routing software written in C. The main goal is to provide robust facilities for
+	loadbalancing and high-availability to Linux based infrastructures.
+	Internally keepalived uses VRRP.
+
+- ldirectord
+	is a daemon to monitor and administer real servers in a LVS cluster of load balanced
+	virtual servers. ldirectord typically used as a resource for HAProxy.
+
+- HAProxy
+	provides a HA load balancer and proxy server
+
+- Nginx as a load balancing
+
+- Failover clusters
+	When the VM is temporarily stopped, snapshotted, moved, and then resumed on the new
+
+- Pacemaker
+	A scalable High Availability cluster resource manager.
+
+- Fencing
+  isolation of a failed node so that it does not cause disruption to a computer cluster.
+
+- STONITH
+	Shoot The Other Node In The Head (STONITH) is a technique for fencing.
+
+- HeartBeat
+  enables the highly available operation of services
+
+- Corosync and Pacemaker
+  allows to create a high availability (HA) server infrastructure with a Reserved IP
+
+- OpenAIS (Open Implementation of the Application Interface Specification)
+
+- CMAN (Oracle connection manager)
+
+
+
+<br/><a name="Service"></a>
+## Service
+
+
+
+
+<br/><a name="Storage"></a>
+## Storage
+
+    ===============================================================================================
+    Disk and Storage
+    ===============================================================================================
+    - check current partition
+    	$ cat /proc/paritions
+    	$ fdisk -l
+
+    - To display mounted filesystems
+    	$ fdisk -l
+    	$ df                : simple and easy
+    	$ cat /etc/mtab     : check mount option from data table
+    	$ cat /proc/mounts  : mounted device in current process/session
+    	$ mount             : list all mounted device currently
+
+    - Automatische Mounten file system via /etc/fstab (6 fields)
+
+    - Disk free (df)  : Displays information on mounted filesystems
+    	$ df -i   : zeigt mit Inode nicht mit Block
+
+    - Disk utilization (du) : esimate file space usage
+    	$ du -a   : all
+
+    - create new partion
+    	$ fdisk /dev/sdb  : MBR partition (4 Primary, 4T total and limit 2.2TB/partition)
+    	$ gdisk /dev/sdc  : GPT partion   (128 Primary, GUID partition, nur Primary)
+    	$ parted          : nice method
+
+    - File systems
+    	ReiserFS, Btrfs, msdos, vfat, ntfs, xfs, cramfs, jfs
+
+    - Formatting/Creating filesystems
+    	$ mkfs
+
+    - Swap fundamental
+    	$ cat /proc/swaps
+    	$ dd if=/dev/zero of=/swapfile bs=1024 count=524288
+        $ mkswap
+        $ swapon
+    	$ swapoff
+
+    - chceking filesystems
+    	$ fsck -c /dev/sdb1
+    	$ e2fsck -c /dev/sdb1
+    	$ badbocks /dev/dab1
+
+    - Modyfying, Checking And Repairing Filesystems
+    	debugfs
+    	dumpe2fs
+        e2fsck
+    	e2image
+    	mke2fs
+        tune2fs
+
+    - Disk Quotas
+    	$ quota 	       : see your quota
+    	$ quotacheck -augv     : all user group verbose, directory quota
+    	$ quotaon  -avug       : all user group verbose
+    	$ quataoff -avug       : all user group verbose
+    	$ edquota -u root      : for root
+    	$ repquota -v /home    :  Generates quota reports
+
+    - Attribute of directory
+    	$ lsattr     	: list of attribute
+     	$ chattr 	: change of attribute
+
+    - smart
+    	Self monitoring analysis and reporting technology to monitor hard drive
+    	$ smartctl -i /dev/sda    : info. about model, serial number, firmware ver.
+
+    - Automounter
+    	normally "hald" and "dbus" daemon has been used for mount-automatization of drives
+    	but network resouce "autofs" is better, consists of a kernel component and a daemon
+
+    	$ vi /etc/auto.master
+    	$ vi /etc/auto.misc
+    	$ /etc/init.d/autofs restart              : apply permanently
+    	/xxx/xxx will be created by auto.master and auto.netz
+
+    - Encrypted file systems
+    	Encryption algorithms : Twofish, AES, DES
+    	A virtual block is created in /dev/mapper (device mapper). All data to and from it goes
+    	to an encryption or decryption filter before being mapped to another blockdevice
+
+    	all relevant modules should be loaded at boot time
+    	# echo aes >> /etc/modules
+    	# echo dm_mod >> etc/moduls
+    	# echo dm_crypt >> /etc/moduls
+    	# modprobe -a aes dm_mod dm_crypt
+
+    	Set up an encrypted filesystem
+    	$ cryptsetup luksFormat /dev/sdb1         : use /dev/sdb1 partition
+    	> *****************                       : type the password
+    	$ cryptsetup luksOpen /dev/sdb1 safe      : create device mapper @ /dev/mapper/safe
+    	$ mkfs.ext2 /dev/mapper/safe		  : format filesystem
+    	$ mkdir /safe                             : need a mount point
+    	$ mount /dev/mapper/safe /safe		  : mount it
+
+    - List out information all block devices
+    	block devices are the hard drive partitions and other storage devices
+    	$ lsblk
+    	|NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+    	|sda      8:0    0 465.8G  0 disk
+    	|├─sda1   8:1    0    70G  0 part
+    	|├─sda2   8:2    0     1K  0 part
+    	|├─sda5   8:5    0  97.7G  0 part /media/4668484A68483B47
+    	|├─sda6   8:6    0  97.7G  0 part /
+    	|├─sda7   8:7    0   1.9G  0 part [SWAP]
+    	|└─sda8   8:8    0 198.5G  0 part /media/13f35f59-f023-4d98-b06f-9dfaebefd6c1
+    	|sr0     11:0    1  1024M  0 rom
+
+    - RAID configuration
+    	$ mdadm                : raid storage
+    	$ sfdisk               : fancy method
+    	$ resize2fs /dev/md0   : repossible expand without unmount
+
+    - Adjusting storage device access
+    	$ hdparm              : IDE/SATA device harddisk standard information
+    	$ sdparm --enumerate  : summary of SCSI device
+
+    - ISCSI
+    	Network transmission of scsi protocol via TCP connection
+    	SCSI (Small Computer System Interface)
+    	Server : iSCSI-Target
+    	Client : iSCSI-Initiator
+
+    	iscsitarget
+    	ietd.conf
+    	iscsid
+    	iscsiadm
+    	tgtd
+
+    - WWID, WWN, LUN
+    	SCSI, SATA, SAS, Fibre has an unique identification by
+    	SAS (Serial Attached SCSI) and SATA (Serial ATA)
+    	WWID : World Wide ID        : find at /dev/disk/by-id/
+    	WWD  : World Wide Name 	    : correspond to WWID
+    	LUNs : Logical Unit Nummber : is used to address a SCSI device
+
+    	If there are multiple paths from a system to a device, a special kernel-module
+    	and associated daemons and other software will use the WWID to detect the paths.
+        /dev/mapper/wwid will be created by them.
+
+    	LUN persistence with udev+scsi_id
+    	$ scsi_id -g -u -s /block/sdc    : find WWID
+    	$ /lib/udev/scsi_id --page=0x80 --whitelisted /dev/sdb
+
+    	LUN persistence can also be made with multipath
+    	$ multipath -l
+    	$ cd /dev/mpath/backupdisk
+
+    - LVM (Logical Volume Manager)
+        /sbin/pv*   : physical volume - a real partitions with administrative data
+        /sbin/lv*   : logical volume - extend block introduced inside volume group
+        /sbin/vg*   : volume group - mehreren physikalischen Volumen
+
+    	Device mapper at LVM /proc/mapper
+     	The device mapper is a kernel driver that provides a framework for volume management.
+    	LVM logical volumes are activated using the device mapper.
+
+    	Partition of device(disk)
+    	$ fdisk,sfdisk,vgscan
+
+    	create a physical volume
+    	$ pvcreate, pvdisplay
+
+    	configuration of volume group
+    	$ vgcreate, vgdisplay
+
+    	configuraion of logical volume
+    	$ lvcreate, lvdisplay
+
+    	Format of LV
+    	$ mkfs.ext4, mkdir, mount
+
+    	Modifying of LV
+    	$ lvextend, resize2fs, xfs_growfs
+
+    	Verkleinern of LV
+    	$ umount, resize2fs, lvreduce
+
+    	Delete PV
+    	$ vgreduce, vgextend vg_big /dev/sdc1
+
+        LVM snapshots
+    	$ lvcreate
+
+    	If file systems are upgraded and have to move data to new one.
+    	$ pvmove
+
+    	Activate If you meet machine crash, emergency boot, and activate LVM device
+      $ vgchange
+
+    	Rename of VG and LV
+    	$ vgrename, lvrename
+
+    - DRBD (Distributed Replicated Block Device)
+    	is a software-based, shared-nothing, replicated storage solution mirroring the content
+    	of block devices (hard disks, partitions, logical volumes etc.) between servers.
+
+    	DRBD's core functionality is implemented by way of a Linux kernel module.
+    	DRBD constitutes a driver for a virtual block device
+
+     	LVM setup for DRBD
+    	lvm, vgchange, drbdadm, vgscan(vgs)
+
+    	DRBD with pacemaker
+    	pacemaker + crm + CIB(Cluster Information Base)
+
+    	DRBD with HeartBeat
+    	Heartbeat + CRM + CIB(xml)
+
+    - DLM (Distributed Lock Manager)
+    	A distributed lock manager (DLM) provides distributed software applications with a
+    	means to synchronize their accesses to shared resources. A lock manager is a traffic
+    	cop who controls access to resources in the cluster, such as access to a GFS
+
+    - GFS2
+    	Global File System 2 (GFS2) is a shared disk file system for Linux clusters.
+    	GFS2 + cLVM(LVM2) + DLM + pacemaker
+
+    - OCFS2
+    	Oracle Cluster File System (OCFS2) is a shared disk file system
+
+    	O2CB manages the shared file access within a cluster of servers
+    	O2CB cluster stack: Node Manager, Heartbeat, TCP, DLM & DLMFS, CONFIGFS
+
+        OSFS2 + pacemaker + DLM + O2CB + STOHICH
+
+    - Other clustered file systems
+        Coda, CephFS, GlusterFS, AFS(Andrew File System), lustre, HDFS, DFS(win), EVMS
+
+    ===============================================================================================
+    Upgrade of 'HANA' volume size
+    ===============================================================================================
+    1. Create the volume in the monsoon dashboard with 200GB volume size
+
+        volume name   : lw_testbase_volume
+        volume id     : vol-7ecfa92a
+        volume region : Rot DC2
+        volume device : /dev/xda (xda=sdb)
+
+    2. Login to the server and perform the following steps
+
+      • In order to get rid of filtering issue of "device /dev/xda not found (or ignored by filtering)"
+        I have to comment out filter
+
+        $  vi /etc/lvm/lvm.conf
+        | # filter = [ "r|/dev/.*/by-path/.*|", "r|/dev/.*/by-id/.*|", "r|/dev/fd.*|", "r|/dev/cdrom|", "a/.*/" ]
+        | filter = [ "r|/dev/fd.*|", "r|/dev/cdrom|", "a/.*/" ]
+
+      • then created file system and copy all HANA related contents into new and extended vlolume place
+        $ pvcreate /dev/monsoon/vol-7ecfa92a
+        $ vgcreate vg_hana /dev/monsoon/vol-7ecfa92a
+
+        $ lvcreate -l 100%FREE -n lv_hana vg_hana
+        $ mkfs.xfs /dev/vg_hana/lv_hana
+
+        $ mkdir /sapmnt/hana
+
+        $ vi /etc/fstab
+        | /dev/vg_hana/lv_hana   /sapmnt/hana              xfs defaults  0  0
+        $ mount -a
+
+        $ mkdir -p /sapmnt/hana/uar/sap
+        $ chown root:sapsys /sapmnt/hana/usr/sap
+        $ rsync -av /usr/sap/ /sapmnt/hana/usr/sap/
+
+        $ mkdir -p /sapmnt/hana/hana/{data,log,shared,backup/{data,log}}
+        $ chown root:sapsys /sapmnt/hana/*
+        $ rsync -av /hana/ /sapmnt/hana/hana/
+
+        $ vi /etc/fstab
+        | /sapmnt/hana/usr/sap          /usr/sap           none bind 0 0
+        | /sapmnt/hana/hana/data        /hana/data         none bind 0 0
+        | /sapmnt/hana/hana/log         /hana/log          none bind 0 0
+        | /sapmnt/hana/hana/shared      /hana/shared       none bind 0 0
+        | /sapmnt/hana/hana/backup/data /hana/backup/data  none bind 0 0
+        | /sapmnt/hana/hana/backup/log  /hana/backup/log   none bind 0 0
+        $ mount -a
+
+    ===============================================================================================
+    Upgrade of HANA volume size
+    ===============================================================================================
+    1. Command sets
+      $ sudo su -
+      $ sudo -i
+      $ su - hdbadm
+      $ su - root
+
+      $ shutdown -r -t 4 now
+      $ poweroff
+      $ shutdown -h
+
+      $ df -h
+      $ df -alh
+
+      $ lsblk
+      $ fdisk -h
+      $ fdisk /dev/xvdb
+      $ mount /dev/xvdb1 /mnt/
+      $ mount -a
+      $ mkfs.xfs /dev/xvdb1
+      $ mount /deb/xvdb1 sysfiles/
+
+      $ cp -R . /mnt/ -v
+      $ rsync -av /hana/log/HDB/ /mnt/log/
+
+      $ service --status-all
+
+      $ lsof | grep hana
+
+      $ screen
+      $ screen -A -D
+
+      $ mount /dev/xvdb1 sysfiles/
+      $ mount /dev/xvdc1 data/
+      $ mount /dev/xvdd1 log/
+
+      $ /etc/init.d/sapinit stop
+      $ /etc/fstab
+
+    2. Case for lots of volumes: scripts for LVM
+      $ pvcreate /dev/xvde
+      $ vgextend vgcal /dev/xvde
+      $ pvmove --alloc anywhere /dev/xvdj /dev/xvde
+
+      $ lvextend -l +100%FREE /dev/mapper/vgcal-dbdata
+      $ resize2fs /dev/mapper/vgcal-dbdata
+      $ xfs_growfs /dev/mapper/vgcal-dbdata
+
+      $ vi create_lvm_volume.sh
+      |!/bin/bash
+      | for i in (/dev/xvdn /dev/xvdm /dev/xvdl /dev/xvdk /dev/xvdj /dev/xvdi /dev/xvdh
+      |            /dev/xvds /dev/xvdr /dev/xvdq /dev/xvdp /dev/xvdo);
+      | do
+      |     pvmove $i /dev/xvde
+      | done
+
+    3. LVM suggestion from PCS team
+      $ pvcreate $NEUES_VOLUME
+      $ vgextend vgcal /dev/$NEUE_VOLUME
+
+      -- Für jedes vorhandene Physical Volume
+      $ pvmove --alloc anywhere $ALTES_PV $NEUEV_VOLUME
+
+      -- Alte Volumes aus Volume Group entfernen
+      $ vgreduce vgcal /dev/xvdh /dev/xvdi /dev/xvdj
+      $ lvextend +L100%FREE /dev/mapper/vgcal-dbdata
+      $ resize2fs  /dev/mapper/vgcal-dbdata
+
+      - oder ein Alternative wäre
+      $ xfs_growfs /hana/data/HDB
+
+
+    ===============================================================================================
+    Increase volume (from LPIC note)
+    ===============================================================================================
+    • LVM
+      Logical Volume Manager is an abstraction of physical disk devices and volumes  to volume groups (a virtual disk, multiple disks and storage pool)
+
+        /sbin/pv*   : physical volume - a real partitions with administrative data
+        /sbin/lv*   : logical volume - extend block introduced inside volume group
+        /sbin/vg*   : volume group - mehreren physikalischen Volumen
+
+      Device mapper at LVM /proc/mapper:
+      The device mapper is a kernel driver that provides a framework for volume management.
+      It provides a generic way of creating mapped devices, which may be used as LV
+      LVM logical volumes are activated using the device mapper.
+      Each logical volume is translated into a mapped device.
+      Each segment translates into a line in the mapping table that describes the device.
+
+    • Creation of LVM
+    	1.LVM installation
+    	$ yum install lvm2
+    	$ apt-get install lvm2
+
+    	2.Partition of device(disk)
+    	$ fdisk /dev/sdb
+        > n,p,1,t
+        > 8e
+        > w
+        $ sfdisk -d /dev/sdb | sfdisk /dev/sdc
+        $ sfdisk -d /dev/sdb | sfdisk /dev/sdd
+        $ sfdisk -d /dev/sdb | sfdisk /dev/sde
+        $ vgscan -v       : sucht angeschlossene Festplatten nach vg und auch pv!
+
+    	3.create a physical volume
+    	$ pvcreate -v /dev/sdb1
+    	$ pvcreate -v /dev/sdc1
+    	$ pvcreate -v /dev/sdd1
+    	$ pvcreate -v /dev/sde1
+    	$ pvdisplay
+
+    	4.configuration of volume group
+    	$ vgcreate vg_dig /dev/sdb1 /dev/sdc1 /dev/sdd1 /dev/sde1
+    	$ vgdisplay
+
+    	5.configuraion of logical volume
+    	$ lvcreate -n lv_big_1 -L 20G vg_big
+    	$ lvdisplay
+
+    	6.Format of LV
+    	$ mkfs.ext4 /dev/vg_big/lv_big_1
+    	$ mkdir /mnt
+    	$ mount /dev/vg_big/lv_big_1 /mnt  : mapper start to come into play
+    	> /dev/mapper/vg_big-lv_big_1 on /mnt type ext4 (rw)
+    	$ cp /boot/*  /mnt/
+
+
+    • Modifying of LV
+    	Q) If you add some more disk space within Logiral Volume? "lvextend"
+    	$ lvextend -L 25G /dev/vg_big/lv_big_1
+    	$ lvextend -L +5G /dev/vg_big/lv_big_1
+    	$ resize2fs /dev/vg_big/lv_big_1        : automatic
+    	$ xfs_growfs /dev/vg_big/lv_big_1       : if xfs filesystem is used
+
+    	Q) if you want to resize/reduce LV? "lvreduce"
+    	$ umount /lvtest                         : absolutely neccessary umount
+    	$ e2fsck -f /dev/vg_big/lv_big_1         : test healthy
+    	$ resize2fs /dev/vg_big/lv_big_1 1024000 : here is a blcok x 4k = 4GB
+    	$ lvreduce -L 4G /dev/vg_big/lvbig_1	 : also do verkleinern for LV
+
+    	Q) if you want to delete physics volume from volume group? "vgreduce, vgextend"
+    	$ vgreduce -a vg_big          : 4 partition to 1
+    	$ vgextend vg_big /dev/sdc1   : redefine only first partition into volume group
+
+        Q) LVM snapshots
+        the snapshot logical volume only saves data blocks from the original logical volume
+        that are changed in the original
+        $ lvcreate -L 1G -s -n backup /dev/vg_big/lv_big_1
+    	$ mount /dev/vg_big/backup /backup
+    	$ tar -pzcf backup.tar.gz  /backup
+    	$ umount /backup
+    	$ lvremove /dev/vg_big/backup
+    	> y
+
+    	Q) If file systems are upgraded and have to move data to new one.
+    	$ pvmove   /dev/hdb2  /dev/sdc1   : move hdb2 data into sdc1
+
+    	Q) Activate If you meet machine crash, emergency boot, and activate LVM device
+        $ vgchange -ay            : activate all known volume group's device
+
+    	Q) Rename of VG and LV
+    	$ vgrename vg_orignal vg_new
+    	$ lvrename MyLVM debian fedora
+
+    	Q) What command is used to make an exact copy of a logical volume for backup purposes? "lvcreate (no lvsnapshot)"
+
+        Remark) sdc (full device) can also be used a volume group, not only sdc1 or sdc2!
+
+    ===============================================================================================
+    SAN
+    ===============================================================================================
+    - Storage area network (SAN)
+    	is a network which provides access to consolidated, block level data storage. SANs are
+    	primarily used to enhance storage devices, such as disk arrays, tape libraries, and optical
+    	jukeboxes, accessible to servers so that the devices appear to the operating system as
+    	locally attached devices. A SAN typically has its own network of storage devices that are
+    	generally not accessible through the local area network (LAN) by other devices.
+    	The cost and complexity of SANs dropped in the early 2000s to levels allowing wider
+    	adoption across both enterprise and small to medium-sized business environments.
+    	A SAN does not provide file abstraction, only block-level operations. However, file systems
+    	built on top of SANs do provide file-level access, and are known as shared-disk file systems.
 
 
 <div><br/>

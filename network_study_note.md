@@ -426,16 +426,16 @@ network topology is a layout of how a network communicates with different device
 Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provide digital encryption and signing services using the OpenPGP standard.
 
 * GPG algorithms
-  - RSA
-  - ElGamal
-  - DSA
-  - ECDH
-  - ECDSA
-  - EdDSA
-
+  ```
+  RSA
+  ElGamal
+  DSA
+  ECDH
+  ECDSA
+  EdDSA
+  ```
 
 * creating a new GPG key
-
   - create gpg key
     ```
     $ gpg --full-generate-key
@@ -557,65 +557,77 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
     Secure Sockets Layer and Transport Layer Security with ECC, RSA or DSA encryption
 
     • Self signed vs Let’s Encrypt vs StartSSL.com
-	   -- You can use CA tools in SSL
-	   $ cd /etc/pki/tls/misc
-	   $ CA -newca   : create your private key, cakey.pem (private key)
-	   $ CA -newreq  : a signing request, newreq.pem(request CSR) & newkey.pem(new private key)
-	   $ CA -signreq : sign the request, newcert.pem (CA signed certificate)
-
-	   -- you will find the list of generated files under
-	   $ cd /etc/pki/CA/private/
-	   $ sudo apt-get install letsencrypt
-	   $ sudo letsencrypt certonly -a webroot --webroot-path=/var/www/html -d example.com -d www.example.com
-
-       -- to see
-       $ sudo ls /etc/letsencrypt/live/example.com \
-	   cert.pem              : publick key, server certificate only.
-	   chain.pem             : root and intermediate certificates only.
-	   fullchain.pem         : full trust chain
-	   privkey.pem           : private key
-
-       -- google chrome StartSSL.com
-       ca.pem        - StartSSL's Root certificate
-       private.key   - The unencrypted version of your private key (be very careful)
-       server.ca.pem - The intermediate certificate for StartSSL
-       ssl.key       - The encrypted private key (does not need to be copied to server)
-       ssl.crt       - Your new certificate
+      - You can use CA tools in SSL
+      ```
+      $ cd /etc/pki/tls/misc
+      $ CA -newca   : create your private key, cakey.pem (private key)
+      $ CA -newreq  : a signing request, newreq.pem(request CSR) & newkey.pem(new private key)
+      $ CA -signreq : sign the request, newcert.pem (CA signed certificate)
+      ```
+      - you will find the list of generated files under
+      ```
+      $ cd /etc/pki/CA/private/
+      $ sudo apt-get install letsencrypt
+      $ sudo letsencrypt certonly -a webroot --webroot-path=/var/www/html -d example.com -d www.example.com
+      ```
+      - to check server certificate for example.com
+      ``        
+      $ sudo ls /etc/letsencrypt/live/example.com \
+      cert.pem            : publick key, server certificate only.
+      chain.pem           : root and intermediate certificates only.
+      fullchain.pem       : full trust chain
+      privkey.pem         : private key
+      ```
+      - google chrome StartSSL.com
+      ca.pem              : StartSSL's Root certificate
+      private.key         : The unencrypted version of your private key (be very careful)
+      server.ca.pem       ; The intermediate certificate for StartSSL
+      ssl.key             ; The encrypted private key (does not need to be copied to server)
+      ssl.crt             ; Your new certificate
 
 
     • Converting certificates
-       -- To convert a certificate or certificate chain from DER to PEM
-   	$ openssl x509 -inform DER -in Certificate.der -outform PEM -out Certificate.pem
-
-   	-- To convert a private key from DER to PEM    
+       - To convert a certificate or certificate chain from DER to PEM
+       ```
+       $ openssl x509 -inform DER -in Certificate.der -outform PEM -out Certificate.pem
+       ```
+       - To convert a private key from DER to PEM
+       ```
        $ openssl rsa -inform DER -in PrivateKey.der -outform PEM -out PrivateKey.pem
-
-       -- To decrypt an encrypted private key (remove the password or passphrase)
-   	$ openssl rsa -in EncryptedPrivateKey.pem -out PrivateKey.pem
-
-   	-- To convert a certificate bundle from PKCS#12 (PFX) to PEM
-   	$ openssl pkcs12 -in CertificateBundle.p12 -out CertificateBundle.pem -nodes
-
-   	-- To convert a certificate bundle from PKCS#7 to PEM
-   	$ openssl pkcs7 -in CertificateBundle.p7b -print_certs -out CertificateBundle.pem
-
+       ```
+       - To decrypt an encrypted private key (remove the password or passphrase)
+       ```
+       $ openssl rsa -in EncryptedPrivateKey.pem -out PrivateKey.pem
+       ```
+       - To convert a certificate bundle from PKCS#12 (PFX) to PEM
+       ```
+       $ openssl pkcs12 -in CertificateBundle.p12 -out CertificateBundle.pem -nodes
+       ```
+       - To convert a certificate bundle from PKCS#7 to PEM
+       ```
+       $ openssl pkcs7 -in CertificateBundle.p7b -print_certs -out CertificateBundle.pem
+       ```
 
     • How to create and verify SSL
-       -- In server, generate ssl key
+       - In server, generate ssl key
+       ```
        $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "general_key.key" \
          -out "general_key.pub" -days 365 -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssdb/OU=dbcat/CN=general_key"
-
-       -- Sign the file
+       ```
+       - Sign the file
+       ```
        $ openssl dgst -sha256 -sign "general_key.key" -out .checksum.sha256 .checksum.md5
-
-       -- In local machine verify the signature
+       ```
+       - In local machine verify the signature
+       ```
        $ openssl dgst -sha256 -verify <(openssl x509 -in "general_key.pub"  -pubkey -noout) \
          -signature dbaenv.sha256 .checksum.md5
-
-       -- then will verify
+       ```
+       - then will verify
+       ```
        $ openssl dgst -sha256 -verify <(openssl x509 -in "/home/c5258293/git/dbcat/certs/SAPGlobalSSLCA.crt"  \
-         -pubkey -noout) -signature /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.sha256 /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.md5
-
+          -pubkey -noout) -signature /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.sha256 /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.md5
+       ```
 
 #### SSL/TLS authentication
     ==============================================================================================
@@ -626,40 +638,40 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
 
     • SSL authentication (administrator level)
 
-        Create a certificate for the landscape's domain
-        $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 \
-          --keyout "SAPGlobalSSLSign.crt" \
-          -out "SAPGlobalSSLSign.key" \
-          -days 365 \
-          -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
+      Create a certificate for the landscape's domain
+      $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 \
+        --keyout "SAPGlobalSSLSign.crt" \
+        -out "SAPGlobalSSLSign.key" \
+        -days 365 \
+        -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
 
-        You should now have 2 certificates, keep key file in safe region. And copy the public key file to the swshare
-        "SAPGlobalSSLSign.crt" private certificate key move to /root/SAPGlobalSSLSign.crt
-        "SAPGlobalSSLSign.key" public certificate key move to /swshare/dbcat/v3.8/certs/SAPGlobalSSLSign.key
+      You should now have 2 certificates, keep key file in safe region. And copy the public key file to the swshare
+      "SAPGlobalSSLSign.crt" private certificate key move to /root/SAPGlobalSSLSign.crt
+      "SAPGlobalSSLSign.key" public certificate key move to /swshare/dbcat/v3.8/certs/SAPGlobalSSLSign.key
 
-        Generate self-signed certificate files, here is an example for signing of checksum list of ASE
-        $ export signfile=/swshare/ase/16.0.02.06/linux_x86_64
-        $ openssl dgst -sha256 -sign "/root/SAPGlobalSSLSign.crt" -out "${signfile}"/.checksum5.md5.sig "${signfile}"/.checksum.md5
+      Generate self-signed certificate files, here is an example for signing of checksum list of ASE
+      $ export signfile=/swshare/ase/16.0.02.06/linux_x86_64
+      $ openssl dgst -sha256 -sign "/root/SAPGlobalSSLSign.crt" -out "${signfile}"/.checksum5.md5.sig "${signfile}"/.checksum.md5
 
-        Verification of signed file will be performed in the factory
-        modFactoryTransferValidateSignature( ) in factoryTransfer.sh
+      Verification of signed file will be performed in the factory
+      modFactoryTransferValidateSignature( ) in factoryTransfer.sh
 
 #### SSL practice
     ===============================================================================================
     SSL Practice
     ===============================================================================================
-      need super user privileges
-      $ sudo su -
+    need super user privileges
+    $ sudo su -
 
-      $ cd /var/tmp/dbcatTrans/zfinal/
+    $ cd /var/tmp/dbcatTrans/zfinal/
 
-      $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "SAPGlobalSSLCA.key" -out "SAPGlobalSSLCA.crt" \
-        -days 365 -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
+    $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "SAPGlobalSSLCA.key" -out "SAPGlobalSSLCA.crt" \
+      -days 365 -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
 
-      $ openssl dgst -sha256 -sign SAPGlobalSSLSign.crt -out .checksum.md5.sig .checksum.md5
+    $ openssl dgst -sha256 -sign SAPGlobalSSLSign.crt -out .checksum.md5.sig .checksum.md5
 
-      $ openssl dgst -sha256 -verify <(openssl x509 -in /var/tmp/dbcatTrans/zfinal/SAPGlobalSSLSing.key -pubkey -noout) \
-        -signature .checksum.md5.sig .checksum.md5.sig
+    $ openssl dgst -sha256 -verify <(openssl x509 -in /var/tmp/dbcatTrans/zfinal/SAPGlobalSSLSing.key -pubkey -noout) \
+      -signature .checksum.md5.sig .checksum.md5.sig
 
 ### Firewall
 scans each little packet of data, physical(routers) or software, can me exceptions by users

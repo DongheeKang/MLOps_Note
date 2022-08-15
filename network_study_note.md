@@ -264,6 +264,7 @@
 ### Netwrok connectivity
 
 * Connectivity test
+
       $ ping -c 1 141.1.1.1
       $ ping6 ::1
       $ traceroute   www.xxxx.com

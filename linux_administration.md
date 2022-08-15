@@ -239,21 +239,19 @@ Technical Recommendations:
     - Useful command for administration
       $ expand    : Converts tabs to spaces
       $ unexpand  : Converts spaces to tab
-      # fmt       : a formatter for simplifying and optimizing text files
-      # nl  	    : numbers of lines of files
-      # wc        : counts of bytes, characers, words and lines of a file
-      # sort      : sort lines of text files alphabetically
-      # uniq      : removes consecutive duplicate lines
-      # split     : splits a file into different groups/files
-      # cut       : cut the field
-      # paste     : horizontalles cat, paste together lines on a file into vertical columns
-      # join      : horizontalles cat, prints a pair of input lines
-
-      # pr        : Convertsa text file for printing few page printing
+      $ fmt       : a formatter for simplifying and optimizing text files
+      $ nl        : numbers of lines of files
+      $ wc        : counts of bytes, characers, words and lines of a file
+      $ sort      : sort lines of text files alphabetically
+      $ uniq      : removes consecutive duplicate lines
+      $ split     : splits a file into different groups/files
+      $ cut       : cut the field
+      $ paste     : horizontalles cat, paste together lines on a file into vertical columns
+      $ join      : horizontalles cat, prints a pair of input lines
+      $ pr        : Convertsa text file for printing few page printing
       $ stat      : Status of this files who access, modify, etc
-
-      $ file                         : show info about file
-      $ type (ls, echo, firefox, [)  : type zeigt fuer ausfuehrbare Dateien
+      $ file      : show info about file
+      $ type (ls, echo, firefox)         : type zeigt fuer ausfuehrbare Dateien
 
 
 #### Administration fundamental

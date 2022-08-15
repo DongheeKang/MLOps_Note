@@ -223,6 +223,39 @@ Technical Recommendations:
       $ sudo swapon /swapfile
       $ sudo sh -c 'echo "/swapfile none swap sw 0 0" >> /etc/fstab'
 
+#### Bash and command set
+    ===============================================================================================
+    Bash and command
+    ===============================================================================================
+    - Wenn ich Hilfe brauche unbekannte Programm Name!
+      $ whatis <command>         : sucht Erklaerung der Befehl                            
+      $ apropos <command>        : search the whatis database for complete words with apropos
+      $ whereis <command>        : zeigt Pfade zu Binaer und /oder Konfigurationsdateien
+      $ which <command>          : zeigt Pfade zu ausfuehrbaren Dateien.                     
+      $ man -k <command>         : Pfade der Manpages und Pfade zu Programmquellen
+
+      $ ls -l 'which locate'     : list of location indicated by 'which locate'
+
+    - Useful command for administration
+      $ expand    : Converts tabs to spaces
+      $ unexpand  : Converts spaces to tab
+      # fmt       : a formatter for simplifying and optimizing text files
+      # nl  	    : numbers of lines of files
+      # wc        : counts of bytes, characers, words and lines of a file
+      # sort      : sort lines of text files alphabetically
+      # uniq      : removes consecutive duplicate lines
+      # split     : splits a file into different groups/files
+      # cut       : cut the field
+      # paste     : horizontalles cat, paste together lines on a file into vertical columns
+      # join      : horizontalles cat, prints a pair of input lines
+
+      # pr        : Convertsa text file for printing few page printing
+      $ stat      : Status of this files who access, modify, etc
+
+      $ file                         : show info about file
+      $ type (ls, echo, firefox, [)  : type zeigt fuer ausfuehrbare Dateien
+
+
 #### Administration fundamental
     ===============================================================================================
     Administration fundamental
@@ -407,6 +440,14 @@ Technical Recommendations:
       Nagios, MRTG(Multi Router Traffic Grapher), Cacti, Wireshark, Icinga2
       collectd(system statistics collection daemon for IT infrastructure)
       cloudwatch, rackspace, prometheus    
+    
+    - Desktops - standard xserver location
+      $ crtl+alt+f7
+      $ startx         : ein Frontend fuer das eigentliche Startskript xinit
+      $ x :1 -query 10.2.11.21  : show a xserver from Centos in tty8 (differ @ VBox)
+      $ xhost +10.2.11.23           : Serverseitige Massnahmen (Debian IP)
+      $ xdpyinfo  : X-display variables
+      $ xwininfo  : window information utility for X-server
 
 
 #### you must know for system administration

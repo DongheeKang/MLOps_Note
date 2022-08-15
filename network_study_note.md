@@ -398,11 +398,11 @@ network topology is a layout of how a network communicates with different device
         ~/.ssh/id_rsa (private key)
         ~/.ssh/id_rsa.pub (public key)
 
-  - copy the Public Key
+  - copy the public key
 
         $ ssh-copy-id demo@SERVER_IP_ADDRESS
 
-        or do manually
+  - (optional) copy public key manually
 
         $ cat ~/.ssh/id_rsa.pub
         | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...rggpFmu3HbXBnWSUdf localuser@machine.local
@@ -856,12 +856,14 @@ iptables is a utility that allows a system administrator to configure the IP pac
 
 ### Malware
     Virus are a little piece of code, that can copy itself to other programs when triggered. corrupt datas. Often attached to an excutable file.
-    Malware are software crashing systems, stealing important information.
-    Trojans are harmful software that can steal information, user are usually lead to open the software.
-    Ransomware host pc hostage, threatening to destroy data
-    Spyware secretly gathers private information such as passwords
-    Worms replicate themselves and attack other devices in the network, slowing down traffic and
-    Malware today is an conclusion of all above and more.
+
+    - Malware are software crashing systems, stealing important information.
+    - Trojans are harmful software that can steal information, user are usually lead to open the software.
+    - Ransomware host pc hostage, threatening to destroy data
+    - Spyware secretly gathers private information such as passwords
+    - Worms replicate themselves and attack other devices in the network, slowing down traffic and
+
+    - Malware today is an conclusion of all above and more.
 
 
 ### Intrusion Detection Prevention (IDP)

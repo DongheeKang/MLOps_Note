@@ -383,7 +383,7 @@ network topology is a layout of how a network communicates with different device
     $ exec ssh-agent bash
     $ eval "$(ssh-agent -s)"
     ```
-  - for MacOS, please do modify config to update keychain automatically,
+  - for MacOS, please do modify config to update keychain automatically
     ```
     $ touch ~/.ssh/config
     | Host *
@@ -437,20 +437,23 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
 * creating a new GPG key
 
   - create gpg key
-        $ gpg --full-generate-key
-        $ gpg --default-new-key-algo rsa4096 --gen-key
-
+    ```
+    $ gpg --full-generate-key
+    $ gpg --default-new-key-algo rsa4096 --gen-key
+    ```
   - to list the long form of the GPG keys for both a public and private key
-        $ gpg --list-secret-keys --keyid-format=long  /Users/hubot/.gnupg/secring.gpg
-        |------------------------------------
-        |sec   4096R/3AA5C34371567BD2 2016-03-10 [expires: 2050-03-10]
-        |uid                          Hubot
-        |ssb   4096R/42B317FD4BA89E7A 2016-03-10   
-
+    ```
+    $ gpg --list-secret-keys --keyid-format=long  /Users/hubot/.gnupg/secring.gpg
+    |------------------------------------
+    |sec   4096R/3AA5C34371567BD2 2016-03-10 [expires: 2050-03-10]
+    |uid                          Hubot
+    |ssb   4096R/42B317FD4BA89E7A 2016-03-10   
+    ```
   - export the public key
-        $ gpg --armor --export 3AA5C34371567BD2
-        # this will prints the GPG key ID in ASCII armor format
-
+    ```
+    $ gpg --armor --export 3AA5C34371567BD2
+    # this will prints the GPG key ID in ASCII armor format
+    ```
 
 #### GPG authentication from LPIC
 
@@ -459,100 +462,90 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
     ==============================================================================================
     Generate a keypair using gpg2 command, enter name, email, keysize and choose a passphrase at the end
     (please keep all information in the note!)
-          $ gpg2 --gen-key
-          | .....................................
-          | .....................................
-          | Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O
-          | You need a Passphrase to protect your secret key.
-          | .....................................
+      $ gpg2 --gen-key
+      | .....................................
+      | .....................................
+      | Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O
+      | You need a Passphrase to protect your secret key.
+      | .....................................
 
-      keep the public master GPG key at the line on "pub 2048R/2AFFE2C5 2017-08-02" (2AFFE2C5 is key-id)
-          | gpg: checking the trustdb
-          | gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
-          | gpg: depth: 0 valid: 1 signed: 0 trust: 0-, 0q, 0n, 0m, 0f, 1u
-          | pub 2048R/2AFFE2C5 2017-08-02
-          | Key fingerprint = F619 5E0E 4B8A 0675 22A3 55FA ACBA 0973 2AFF E2C5
-          | uid SAPGlobalSign (GPG authentification) SAPGlobalSign@sap.com
-          | sub 2048R/00B0933C 2017-08-02
+    keep the public master GPG key at the line on "pub 2048R/2AFFE2C5 2017-08-02" (2AFFE2C5 is key-id)
+      | gpg: checking the trustdb
+      | gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
+      | gpg: depth: 0 valid: 1 signed: 0 trust: 0-, 0q, 0n, 0m, 0f, 1u
+      | pub 2048R/2AFFE2C5 2017-08-02
+      | Key fingerprint = F619 5E0E 4B8A 0675 22A3 55FA ACBA 0973 2AFF E2C5
+      | uid SAPGlobalSign (GPG authentification) SAPGlobalSign@sap.com
+      | sub 2048R/00B0933C 2017-08-02
 
+    export your public key to use in signing
+      $ gpg2 --no-armor --output SAPGlobalGPGSign.key --export 2AFFE2C5
+      "SAPGlobalGPGSign.key" public key move to /swshare/dbcat/v3.8/certs/SAPGlobalGPGSign.key
 
-      export your public key to use in signing
-          $ gpg2 --no-armor --output SAPGlobalGPGSign.key --export 2AFFE2C5
-          "SAPGlobalGPGSign.key" public key move to /swshare/dbcat/v3.8/certs/SAPGlobalGPGSign.key
+    signing your documents e.g. checksum file, you should need a passphrase in this stage. You can also use a batch mode without typing passphrase
+      $ export signfile=/swshare/ase/16.0.02.06/linux_x86_64
+      $ gpg2 --armor --output "${signfile}"/.checksum.md5.asc --detach-sign "${signfile}"/.checksum.md5
+      $ gpg2 --armor --output "${signfile}"/.checksum.md5.asc --batch --passphrase "Pa\$\$w0rd" --detach-sign "${signfile}"/.checksum.md5
 
-      signing your documents e.g. checksum file, you should need a passphrase in this stage. You can also use a batch mode without typing passphrase
-          $ export signfile=/swshare/ase/16.0.02.06/linux_x86_64
-          $ gpg2 --armor --output "${signfile}"/.checksum.md5.asc --detach-sign "${signfile}"/.checksum.md5
-          $ gpg2 --armor --output "${signfile}"/.checksum.md5.asc --batch --passphrase "Pa\$\$w0rd" --detach-sign "${signfile}"/.checksum.md5
+    In dbcat, verification of signed documents will be perforemd
+      $ gpg2 --no-default-keyring --keyring SAPGlobalGPGSign.key --verify .checksum.md5.asc .checksum.md5
 
-      In dbcat, verification of signed documents will be perforemd
-          $ gpg2 --no-default-keyring --keyring SAPGlobalGPGSign.key --verify .checksum.md5.asc .checksum.md5
-
-#### GPG practice
+#### GPG command
 
     ===============================================================================================
-    GPG Practice
+    GPG command
     ===============================================================================================
-        --------------------------------------------
-        [generate key]
-        gpg2 --gen-key
-        gpg: checking the trustdb
-        gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
-        gpg: depth: 0  valid:   3  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 3u
-        gpg: next trustdb check due at 2018-08-03
-             pub   2048R/2288A15E 2017-10-09
-             Key fingerprint = A51E BA24 9E16 3041 9D80  E42F 15F7 33D5 2288 A15E
-             uid   Donghee Kang (test2) <donghee.kang@sap.com>
+    [generate key]
+      gpg2 --gen-key
+      gpg: checking the trustdb
+      gpg: 3 marginal(s) needed, 1 complete(s) needed, PGP trust model
+      gpg: depth: 0  valid:   3  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 3u
+      gpg: next trustdb check due at 2018-08-03
+            pub   2048R/2288A15E 2017-10-09
+            Key fingerprint = A51E BA24 9E16 3041 9D80  E42F 15F7 33D5 2288 A15E
+            uid   Donghee Kang (test2) <donghee.kang@sap.com>
 
-        --------------------------------------------
-        [export, armor, keying]
-        gpg2 --armor --output SAPGlobalGPGSign.key --export 9ED95FE6
-        gpg2 --armor --output SAPGlobalGPGPrivate.key --export-secret-keys 9ED95FE7
-        gpg2 --armor --output .checksum.md5.gpg --batch --passphrase "Pa\$\$w0rd" --sign .checksum.md5
-        gpg2 --no-default-keyring --keyring /var/tmp/dbcatTrans/zfinal/SAPGlobalGPGSign.key --verify .checksum.md5.asc .checksum.md5
-        gpg2 --verify .checksum.md5.asc .checksum.md5
+    [export, armor, keying]
+      gpg2 --armor --output SAPGlobalGPGSign.key --export 9ED95FE6
+      gpg2 --armor --output SAPGlobalGPGPrivate.key --export-secret-keys 9ED95FE7
+      gpg2 --armor --output .checksum.md5.gpg --batch --passphrase "Pa\$\$w0rd" --sign .checksum.md5
+      gpg2 --no-default-keyring --keyring /var/tmp/dbcatTrans/zfinal/SAPGlobalGPGSign.key --verify .checksum.md5.asc .checksum.md5
+      gpg2 --verify .checksum.md5.asc .checksum.md5
 
-        gpg2 --no-armor output SAPGlobalGPGSign.gpg --export 9ED95FE6
-        gpg2 --armor --output .checksum.md5.asc --batch --passphrase "Pa\$\$w0rd" --detach-sig .checksum.md5
-        gpg2 --no-default-keyring --keyring /var/tmp/dbcatTrans/zfinal/SAPGlobalGPGSign.gpg --verify .checksum.md5.asc .checksum.md5
+      gpg2 --no-armor output SAPGlobalGPGSign.gpg --export 9ED95FE6
+      gpg2 --armor --output .checksum.md5.asc --batch --passphrase "Pa\$\$w0rd" --detach-sig .checksum.md5
+      gpg2 --no-default-keyring --keyring /var/tmp/dbcatTrans/zfinal/SAPGlobalGPGSign.gpg --verify .checksum.md5.asc .checksum.md5
 
-        --------------------------------------------
-        [output]
-        gpg: [don not know]: invalid packet (ctb=78)
-        gpg: keydb_search failed: Invalid packet
-        gpg: Can't check signature: No public key
+    [output]
+      gpg: [don not know]: invalid packet (ctb=78)
+      gpg: keydb_search failed: Invalid packet
+      gpg: Can't check signature: No public key
 
-        --------------------------------------------
-        [remove key]
-        gpg --list-keys
-        gpg --delete-secret-key key-ID
-        gpg --delete-key key-ID
+    [remove key]
+      gpg --list-keys
+      gpg --delete-secret-key key-ID
+      gpg --delete-key key-ID
 
-        --------------------------------------------
-        [public key]
-        gpg2 -k
-        gpg2 --armor --output gpg2-public-key.rsa --export donghee.kang@sap.com
-        gpg2 --armor --export donghee.kang@sap.com | tee gpg2-public-key.rsa
+    [public key]
+      gpg2 -k
+      gpg2 --armor --output gpg2-public-key.rsa --export donghee.kang@sap.com
+      gpg2 --armor --export donghee.kang@sap.com | tee gpg2-public-key.rsa
 
-        --------------------------------------------
-        [private key]
-        gpg -a -o exportedKeyFilename.asc --export-secret-keys keyIDNumber
-        gpg -a -o gpg_private_key.asc --export-secret-keys 60F9D6E1
+    [private key]
+      gpg -a -o exportedKeyFilename.asc --export-secret-keys keyIDNumber
+      gpg -a -o gpg_private_key.asc --export-secret-keys 60F9D6E1
 
-        --------------------------------------------
-        [encypytion]
-        gpg --ouput a.txt.gpg --encrypt --recipient administrator@sap.com a.txt
+    [encypytion]
+      gpg --ouput a.txt.gpg --encrypt --recipient administrator@sap.com a.txt
 
-        --------------------------------------------
-        without passphrase......default output (--ouput a.txt.gpg)
-        gpg2 -se --passphrase yourpassword --batch --encrypt --recipient xxxxxx@sap.com a.txt
-        gpg2 --passphrase "Veritas47" --batch --encrypt --recipient donghee.kang@sap.com example2.txt
+    [without passphrase default output (--ouput a.txt.gpg)]
+      gpg2 -se --passphrase yourpassword --batch --encrypt --recipient xxxxxx@sap.com a.txt
+      gpg2 --passphrase "Veritas47" --batch --encrypt --recipient donghee.kang@sap.com example2.txt
 
-        --------------------------------------------
-        [descrytion]
-        This is important and have to be set into the file...
-        gpg2 --output a.txt --batch --passphrase yourpassword --decrypt a.txt.gpg
-        gpg2 --output a.txt --batch -no-default-keyring --secret-keyring /path/gpg_private_key.asc --passphrase yourpassword --decrypt a.txt.gpg
+    [descrytion]
+      This is important and have to be set into the file...
+      gpg2 --output a.txt --batch --passphrase yourpassword --decrypt a.txt.gpg
+      gpg2 --output a.txt --batch -no-default-keyring --secret-keyring /path/gpg_private_key.asc --passphrase yourpassword --decrypt a.txt.gpg
 
 
 <br/><a name="ssl"></a>

@@ -134,15 +134,15 @@
     ```
 
 * Detailed Steps
-      1. type in the Domain Name in web browser
-      2. if the computer can't find its IP address in its cache memory, it will send the query to the Resolver server(basically your ISP)
-      3. Resolver will check its own cache memory, if not, it will send the query to Root server, the top or the root of the DNS hierarchy, 13 sets of root servers around the world, operated by 12 organizations. each set has its own IP address
-      4. he root server will direct the resolver the Top Level Domain server (TLD), for the .com, .net, .org(top level domains) domain.
-      5. TLD will direct the resolver to the Authoritative Name Server(ANS), and the resolver will ask the ANS for the IP address
-      6. ANS is responsible for knowing everything including the IP address of the domain
-      7. ANS will respond with IP address
-      8. the resolver will tell the computer the IP address
-      9. the resolver will store the IP Address in its cache memory
+  1. type in the Domain Name in web browser
+  2. if the computer can't find its IP address in its cache memory, it will send the query to the Resolver server(basically your ISP)
+  3. Resolver will check its own cache memory, if not, it will send the query to Root server, the top or the root of the DNS hierarchy, 13 sets of root servers around the world, operated by 12 organizations. each set has its own IP address
+  4. he root server will direct the resolver the Top Level Domain server (TLD), for the .com, .net, .org(top level domains) domain.
+  5. TLD will direct the resolver to the Authoritative Name Server(ANS), and the resolver will ask the ANS for the IP address
+  6. ANS is responsible for knowing everything including the IP address of the domain
+  7. ANS will respond with IP address
+  8. the resolver will tell the computer the IP address
+  9. the resolver will store the IP Address in its cache memory
 
 * DNS security
   TSIG or DNSSEC (DNS Security Extensions)
@@ -172,9 +172,11 @@
   ```
 
   Total 65536(=2^16Bit) Ports available.
+  ```
            0 -  1023  : Well known Ports
         1024 - 49151  : registered ports
        49152 - 65535  : client ports
+  ```
 
   | Port   |      Are      |               Description |
   |--------:|:-------------:|------:|

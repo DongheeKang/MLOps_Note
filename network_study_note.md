@@ -373,44 +373,53 @@ network topology is a layout of how a network communicates with different device
 
 * Generating a new SSH key
   - create ssh key
-      $ ssh-keygen -t ed25519 -C "your_email@example.com"
-      $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+    ```
+    $ ssh-keygen -t ed25519 -C "your_email@example.com"
+    $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+    ```
   - adding your SSH key to the ssh-agent
-      $ sudo -s -H
-      $ exec ssh-agent bash
-      $ eval "$(ssh-agent -s)"
+    ```
+    $ sudo -s -H
+    $ exec ssh-agent bash
+    $ eval "$(ssh-agent -s)"
+    ```
   - for MacOS, please do modify config to update keychain automatically,
-      $ touch ~/.ssh/config
-      | Host *
-      |     AddKeysToAgent yes
-      |     UseKeychain yes
-      |     IdentityFile ~/.ssh/id_ed25519
+    ```
+    $ touch ~/.ssh/config
+    | Host *
+    |     AddKeysToAgent yes
+    |     UseKeychain yes
+    |     IdentityFile ~/.ssh/id_ed25519
+    ```
   - add your SSH private key to the ssh-agent and store your passphrase in the keychain
-      $ ssh-add -K ~/.ssh/id_ed25519
-
+    ```
+    $ ssh-add -K ~/.ssh/id_ed25519
+    ```
   - public key goes into the target server as "authorized_keys" file
-      ~/.ssh/id_rsa (private key)
-      ~/.ssh/id_rsa.pub (public key)
-
+    ```
+    ~/.ssh/id_rsa (private key)
+    ~/.ssh/id_rsa.pub (public key)
+    ```
   - copy the Public Key
-      $ ssh-copy-id demo@SERVER_IP_ADDRESS
+    ```
+    $ ssh-copy-id demo@SERVER_IP_ADDRESS
+    ```
+    or do manually
+    ```
+    $ cat ~/.ssh/id_rsa.pub
+    | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...rggpFmu3HbXBnWSUdf localuser@machine.local
+    | ctrl + c
 
-      or do manually
+    $ gpasswd -a demo sudo
+    $ su - demo
+    $ mkdir .ssh
+    $ chmod 700 .ssh
 
-      $ cat ~/.ssh/id_rsa.pub
-      | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...rggpFmu3HbXBnWSUdf localuser@machine.local
-      | ctrl + c
+    $ vi .ssh/authorized_keys
+    | ctrl + v
 
-      $ gpasswd -a demo sudo
-      $ su - demo
-      $ mkdir .ssh
-      $ chmod 700 .ssh
-
-      $ vi .ssh/authorized_keys
-      | ctrl + v
-
-      $ chmod 600 .ssh/authorized_keys
-
+    $ chmod 600 .ssh/authorized_keys
+    ```
 
 <br/><a name="gpg"></a>
 ### GPG

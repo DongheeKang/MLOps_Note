@@ -391,32 +391,32 @@ network topology is a layout of how a network communicates with different device
 
   - add your SSH private key to the ssh-agent and store your passphrase in the keychain
 
-      $ ssh-add -K ~/.ssh/id_ed25519
+        $ ssh-add -K ~/.ssh/id_ed25519
 
   - public key goes into the target server as "authorized_keys" file
 
-      ~/.ssh/id_rsa (private key)
-      ~/.ssh/id_rsa.pub (public key)
+        ~/.ssh/id_rsa (private key)
+        ~/.ssh/id_rsa.pub (public key)
 
   - copy the Public Key
 
-      $ ssh-copy-id demo@SERVER_IP_ADDRESS
+        $ ssh-copy-id demo@SERVER_IP_ADDRESS
 
-      or do manually
+        or do manually
 
-      $ cat ~/.ssh/id_rsa.pub
-      | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...rggpFmu3HbXBnWSUdf localuser@machine.local
-      | ctrl + c
+        $ cat ~/.ssh/id_rsa.pub
+        | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...rggpFmu3HbXBnWSUdf localuser@machine.local
+        | ctrl + c
 
-      $ gpasswd -a demo sudo
-      $ su - demo
-      $ mkdir .ssh
-      $ chmod 700 .ssh
+        $ gpasswd -a demo sudo
+        $ su - demo
+        $ mkdir .ssh
+        $ chmod 700 .ssh
 
-      $ vi .ssh/authorized_keys
-      | ctrl + v
+        $ vi .ssh/authorized_keys
+        | ctrl + v
 
-      $ chmod 600 .ssh/authorized_keys
+        $ chmod 600 .ssh/authorized_keys
 
 
 <br/><a name="gpg"></a>
@@ -436,21 +436,21 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
 * creating a new GPG key
   - create gpg key
 
-      $ gpg --full-generate-key
-      $ gpg --default-new-key-algo rsa4096 --gen-key
+        $ gpg --full-generate-key
+        $ gpg --default-new-key-algo rsa4096 --gen-key
 
   - to list the long form of the GPG keys for both a public and private key
 
-      $ gpg --list-secret-keys --keyid-format=long  /Users/hubot/.gnupg/secring.gpg
-      |------------------------------------
-      |sec   4096R/3AA5C34371567BD2 2016-03-10 [expires: 2050-03-10]
-      |uid                          Hubot
-      |ssb   4096R/42B317FD4BA89E7A 2016-03-10   
+        $ gpg --list-secret-keys --keyid-format=long  /Users/hubot/.gnupg/secring.gpg
+        |------------------------------------
+        |sec   4096R/3AA5C34371567BD2 2016-03-10 [expires: 2050-03-10]
+        |uid                          Hubot
+        |ssb   4096R/42B317FD4BA89E7A 2016-03-10   
 
   - export the public key
 
-      $ gpg --armor --export 3AA5C34371567BD2
-      # this will prints the GPG key ID in ASCII armor format
+        $ gpg --armor --export 3AA5C34371567BD2
+        # this will prints the GPG key ID in ASCII armor format
 
 
 #### GPG authentication from LPIC

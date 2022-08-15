@@ -87,43 +87,50 @@
 
 ### Domain Name System (DNS)
 * working principle: resolves domain names to IP addresses
-  1. domain name typed in
-  2. DNS server search through its database to find its matching IP address
-  3. DNS will resolve the domain name into IP addresses
+    1. domain name typed in
+    2. DNS server search through its database to find its matching IP address
+    3. DNS will resolve the domain name into IP addresses
 
 * DNS Types
-      Master (Primary) DNS Server
-      Slave (Secondary) DNS Server
-      Caching (hint) DNS Server
-      Forwarding (Proxy, Client, Remote) DNS Server
-      Stealth (DMZ or Split) DNS Server
-      Authoritative Only DNS Server
-      Recursive name server = cache name server = resolving name server
-
+    ```
+    Master (Primary) DNS Server
+    Slave (Secondary) DNS Server
+    Caching (hint) DNS Server
+    Forwarding (Proxy, Client, Remote) DNS Server
+    Stealth (DMZ or Split) DNS Server
+    Authoritative Only DNS Server
+    Recursive name server = cache name server = resolving name server
+    ```
 * DNS configuration
-      $ cat /etc/hosts
-      $ cat /etc/hostname
-      $ cat /etc/hosts.conf
-      $ cat /etc/nsswitch.conf
-      $ cat /etc/resolv.conf
+    ```
+    $ cat /etc/hosts
+    $ cat /etc/hostname
+    $ cat /etc/hosts.conf
+    $ cat /etc/nsswitch.conf
+    $ cat /etc/resolv.conf
+    ```
 
 * DNS Testing
-      $ host         : to get host information from name server
-      $ nslookup     : tool to ask host information from name server
-      $ dig          : after finish DNS configuration,one can test DNS
-      $ whois        : a program to find domain holder
-      $ getent       : a tool for carry out the database of administrator
-      $ rndc         :   name server control utility for BIND
+    ```
+    $ host         : to get host information from name server
+    $ nslookup     : tool to ask host information from name server
+    $ dig          : after finish DNS configuration,one can test DNS
+    $ whois        : a program to find domain holder
+    $ getent       : a tool for carry out the database of administrator
+    $ rndc         :   name server control utility for BIND
 
-      $ vi /etc/bind/named.conf        debian
-      $ vi /etc/named/named.conf       fedora
+    $ vi /etc/bind/named.conf        debian
+    $ vi /etc/named/named.conf       fedora
+    ```
 
 * DNS operation
     Start by systemctl, service, init.d
 
     Firewall open via iptables configuration
+      ```
       $ vi /etc/iptables/rules           : debinas
       $ vi /etc/sysconf/iptables         : CentOS, Fedora
+      ```
 
 * Detailed Steps:
     1. type in the Domain Name in web browser

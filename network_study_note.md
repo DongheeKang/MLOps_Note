@@ -151,33 +151,32 @@
 ### IP address
 
 * IP and bit
-    ```
-    IPv4 :  32 Bit Addressen, darstellt in DDN(dotted deciaml notation)
-    IPv6 : 128 Bit
-    MAC  :  48 Bit
-    ```
-* IP Class
-    ```
-    Private :  10.  0. 0. 0 -  10.255.255.255   (1 nets)
-    Private : 172. 16. 0. 0 - 172. 31.255.255  (16 nets)
-    Private : 192.168. 0. 0 - 192.168.255.255 (256 nets)
 
-    Loopback: 127.0.0.0 & 127.0.0.1
-    Heimnetzwerk: 169.254.0.0/16
-    ```
+      IPv4 :  32 Bit Addressen, darstellt in DDN(dotted deciaml notation)
+      IPv6 : 128 Bit
+      MAC  :  48 Bit
+
+* IP Class
+
+      Private :  10.  0. 0. 0 -  10.255.255.255   (1 nets)
+      Private : 172. 16. 0. 0 - 172. 31.255.255  (16 nets)
+      Private : 192.168. 0. 0 - 192.168.255.255 (256 nets)
+
+      Loopback: 127.0.0.0 & 127.0.0.1
+      Heimnetzwerk: 169.254.0.0/16
+
 
 * IP port number
-  To check see
-  ```
-  $ cat /etc/services
-  ```
+    To check see
+      $ cat /etc/services
 
-  Total 65536(=2^16Bit) Ports available.
-  ```
-           0 -  1023  : Well known Ports
-        1024 - 49151  : registered ports
-       49152 - 65535  : client ports
-   ```
+
+    Total 65536(=2^16Bit) Ports available.
+
+          0 -  1023  : Well known Ports
+       1024 - 49151  : registered ports
+      49152 - 65535  : client ports
+
 
   | Port   |      Are      |               Description |
   |--------:|:-------------:|------:|
@@ -214,117 +213,115 @@
 ### IP setting
 
 * Routing
-    ```
-    $ ip monitor               : live monitoring for connection of MAC and IP
-    $ ip route add 10.10.20.0/24 via 192.168.50.100 dev eth0    : add static router
-    $ route add default gw 20.14.5.65   : result of routing table of network
-    ```
+
+      $ ip monitor               : live monitoring for connection of MAC and IP
+      $ ip route add 10.10.20.0/24 via 192.168.50.100 dev eth0    : add static router
+      $ route add default gw 20.14.5.65   : result of routing table of network
+
 * MAC address access
-    ```
-    $ ip neighbour show
-    $ arp -a  :  (address resolution protocol) using IP one can access MAC address
-    ```
+
+      $ ip neighbour show
+      $ arp -a  :  (address resolution protocol) using IP one can access MAC address
+
 * Wireless
-    ```
-    $ iwconfig wlan0   : show WLAN adapter/interface
-    $ iwlist wlan0     : show an information about WLAN cards
-    $ iw dev wlan0 	   : show wireless devices and their configuration
-    ```
+
+      $ iwconfig wlan0   : show WLAN adapter/interface
+      $ iwlist wlan0     : show an information about WLAN cards
+      $ iw dev wlan0 	   : show wireless devices and their configuration
+
 
 
 ### Netwrok interface configuration
 
 * command
-    ```    
-    $ ifconfig
-    $ ifup
-    $ ifdown
-    $ brctl show
-    ```
+
+      $ ifconfig
+      $ ifup
+      $ ifdown
+      $ brctl show
+
 * configurations
-    ```
-    $ cat /etc/network/interfaces                    : for Debian
-    $ cat /etc/sysconfig/network                     : for CentOS
-    $ cat /etc/sysconfig/network-scripts/ifcfg-eth0  : for CentOS
-    ```
+
+      $ cat /etc/network/interfaces                    : for Debian
+      $ cat /etc/sysconfig/network                     : for CentOS
+      $ cat /etc/sysconfig/network-scripts/ifcfg-eth0  : for CentOS
+
 * run interface
-    ```
-    $ /etc/init.d/networking restart    (for Debian)
-    $ /etc/rc.d/init.d/network restart  (for CentOS)
-    ```
+
+      $ /etc/init.d/networking restart    (for Debian)
+      $ /etc/rc.d/init.d/network restart  (for CentOS)
+
 * Netzwerkkonfiguration Ubuntu Server 14.04
-    ```
-    $ vi /etc/network/interfaces
-    |auto eth0
-    |iface eth0 inet dhcp
-    |sudo ifup eth0
 
-    |auto eth0:0
-    |iface eth0:0 inet static
-    |address ABC.DEF.GHI.JKL
-    |netmask 255.255.255.255
-    |network ABC.DEF.GHI.0
-    |broadcast ABC.DEF.GHI.JKL
-    |gateway 10.255.255.1
+      $ vi /etc/network/interfaces
+      |auto eth0
+      |iface eth0 inet dhcp
+      |sudo ifup eth0
 
-    $ /etc/init.d/networking restart
-    ```
+      |auto eth0:0
+      |iface eth0:0 inet static
+      |address ABC.DEF.GHI.JKL
+      |netmask 255.255.255.255
+      |network ABC.DEF.GHI.0
+      |broadcast ABC.DEF.GHI.JKL
+      |gateway 10.255.255.1
+
+      $ /etc/init.d/networking restart
+
 * Netzwerkkonfiguration CentOS 6
-    ```
-    $ vi /etc/sysconfig/network-scripts/ifcfg-eth0
-    |ONBOOT=no
-    |ONBOOT=yes
-    |ifup eth0
 
-    $ cp -a /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0:0
-    $ vi ifcfg-eth0:0
-    |DEVICE=eth0:0
-    |BOOTPROTO=static
-    |BROADCAST=ABC.DEF.GHI.JKL
-    |IPADDR= ABC.DEF.GHI.JKL
-    |NETMASK=255.255.255.255
-    |NETWORK= ABC.DEF.GHI.0
-    |ONBOOT=yes
-    |NM_CONTROLLED=no
-    ```
+      $ vi /etc/sysconfig/network-scripts/ifcfg-eth0
+      |ONBOOT=no
+      |ONBOOT=yes
+      |ifup eth0
+
+      $ cp -a /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0:0
+      $ vi ifcfg-eth0:0
+      |DEVICE=eth0:0
+      |BOOTPROTO=static
+      |BROADCAST=ABC.DEF.GHI.JKL
+      |IPADDR= ABC.DEF.GHI.JKL
+      |NETMASK=255.255.255.255
+      |NETWORK= ABC.DEF.GHI.0
+      |ONBOOT=yes
+      |NM_CONTROLLED=no
+
 
 ### Netwrok connectivity
 
 * Connectivity test
-    ```
-    $ ping -c 1 141.1.1.1
-    $ ping6 ::1
-    $ traceroute   www.xxxx.com
-    $ tracepath -n 217.18.182.170
 
-    $ netstat -nc            : connection with all open port
-    $ nc -z daum.net 80      : nc(netcat) network conneciton tool, use in the shell
-    $ nmap                   : port scanning and defending networks
-    $ lsof /tmp              : prozesse, die auf einen Netzwerk-Socket zugreifen
-    $ tcpdump -i eth0        : show network flow into the screen using dump
+      $ ping -c 1 141.1.1.1
+      $ ping6 ::1
+
+      $ traceroute   www.xxxx.com
+      $ tracepath -n 217.18.182.170
+
+      $ netstat -nc            : connection with all open port
+      $ nc -z daum.net 80      : nc(netcat) network conneciton tool, use in the shell
+      $ nmap                   : port scanning and defending networks
+      $ lsof /tmp              : prozesse, die auf einen Netzwerk-Socket zugreifen
+      $ tcpdump -i eth0        : show network flow into the screen using dump
 
 * To test the correlation between two computers without firewall
   bidirectional interactive text-oriented communication facility
-    ```
-    $ server1> nc -l 4444
-    $ server2> nc server1.com 4444
-    $ telnet impa.lpic.de 143      <--- telnet also possible! this is a great tip!
-    ```
+
+      $ server1> nc -l 4444
+      $ server2> nc server1.com 4444
+      $ telnet impa.lpic.de 143      <--- telnet also possible! this is a great tip!
+
 
 * Q) tools to check for open ports on a local computer?     
-    ```
-    nmap, netstat, lsof
-    ```
+
+      nmap, netstat, lsof
 
 * Q) A program run through the port 5112, if you want to check whether this port is active and has been blocked by firewall, how can you check?  
-    ```
-    netcat
-    ```
+
+      netcat
 
 * Q) What program uses local system calls to locate local ports that are currentl open?
-    ```
-    netstat is a scanner just for local Ports, nmap & nessus is a scanner for local ports and also for other computers in networks
-    ```
+
+      netstat is a scanner just for local Ports, nmap & nessus is a scanner for local ports and also for other computers in networks
 
 
 <br/><a name="topology"></a>
@@ -334,33 +331,33 @@ network topology is a layout of how a network communicates with different device
 #### Wired Topologies
 
 * Star
-  -- all devices connected to one hub or switch
-  -- pro: one devices failed to connect will not affect other devices
-  -- con: if the central hub or switch failed, it will affect every all devices on that point. single point failure
+  all devices connected to one hub or switch
+  pro: one devices failed to connect will not affect other devices
+  con: if the central hub or switch failed, it will affect every all devices on that point. single point failure
 
 * Ring
-  -- connected in a circle, every computer has two neighbors, every packet is sent through the ring
-  -- rarely used today
-  -- easy to install and fix
-  -- one point failure
+  connected in a circle, every computer has two neighbors, every packet is sent through the ring
+  rarely used today
+  easy to install and fix
+  one point failure
 
 * Bus
-  -- each device is connected to the back bone
-  -- the back bone is a coaxial cable, connected to the computers using BNC connector (T connectors)
-  -- pro: cheap and easy to implement
-  -- con: needs terminators at both end of back bone, if not there will be signal reflection, causing data flow disrupted
+  each device is connected to the back bone
+  the back bone is a coaxial cable, connected to the computers using BNC connector (T connectors)
+  pro: cheap and easy to implement
+  con: needs terminators at both end of back bone, if not there will be signal reflection, causing data flow disrupted
 
 * Mesh
-  -- each computer is connected to each other
-  -- con: high redundancy level, rare failure
-  -- pro: expensive
-  -- rarely used on LAN, mainly used on WAN(like internet)
+  each computer is connected to each other
+  con: high redundancy level, rare failure
+  pro: expensive
+  rarely used on LAN, mainly used on WAN(like internet)
 
 
 #### Wireless Topologies
 
 * Infrastructure
-  -- a wireless port connected to one of switch or hub like a star topology
+  a wireless port connected to one of switch or hub like a star topology
 
 
 

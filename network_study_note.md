@@ -372,22 +372,22 @@ network topology is a layout of how a network communicates with different device
 * Generating a new SSH key
   - create ssh key
 
-      $ ssh-keygen -t ed25519 -C "your_email@example.com"
-      $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+        $ ssh-keygen -t ed25519 -C "your_email@example.com"
+        $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 
   - adding your SSH key to the ssh-agent
 
-      $ sudo -s -H
-      $ exec ssh-agent bash
-      $ eval "$(ssh-agent -s)"
+        $ sudo -s -H
+        $ exec ssh-agent bash
+        $ eval "$(ssh-agent -s)"
 
   - for MacOS, please do modify config to update keychain automatically
 
-      $ touch ~/.ssh/config
-      | Host *
-      |     AddKeysToAgent yes
-      |     UseKeychain yes
-      |     IdentityFile ~/.ssh/id_ed25519
+        $ touch ~/.ssh/config
+        | Host *
+        |     AddKeysToAgent yes
+        |     UseKeychain yes
+        |     IdentityFile ~/.ssh/id_ed25519
 
   - add your SSH private key to the ssh-agent and store your passphrase in the keychain
 

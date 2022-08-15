@@ -675,27 +675,27 @@ use Firewalld (firewall daemon), which is an alternative to the iptables service
 iptables is a utility that allows a system administrator to configure the IP packet filter rules of the Linux kernel firewall
 
 - Firewall open via iptables configuration
-      $ sudo apt-get install iptables
-      $ vi /etc/iptables/rules           : debian, ubuntu
-      $ vi /etc/sysconf/iptables         : CentOS, Fedora
+        $ sudo apt-get install iptables
+        $ vi /etc/iptables/rules           : debian, ubuntu
+        $ vi /etc/sysconf/iptables         : CentOS, Fedora
 
 - Saving Changes
-      $ sudo /sbin/iptables-save           : debian, ubuntu
-      $ /sbin/service iptables save        : CentOS, Fedora
-      $ /etc/init.d/iptables save
+        $ sudo /sbin/iptables-save           : debian, ubuntu
+        $ /sbin/service iptables save        : CentOS, Fedora
+        $ /etc/init.d/iptables save
 
-      $ iptables -L -v
+        $ iptables -L -v
 
 - change policy
-      $ iptables --policy INPUT ACCEPT    (accept, drop, reject)
-      $ iptables --policy OUTPUT ACCEPT   (accept, drop, reject)
-      $ iptables --policy FORWARD ACCEPT  (accept, drop, reject)
+        $ iptables --policy INPUT ACCEPT    (accept, drop, reject)
+        $ iptables --policy OUTPUT ACCEPT   (accept, drop, reject)
+        $ iptables --policy FORWARD ACCEPT  (accept, drop, reject)
 
 - block all connections from the IP address 10.10.10.10.
-      $ iptables -A INPUT -s 10.10.10.10 -j DROP
+        $ iptables -A INPUT -s 10.10.10.10 -j DROP
 
 - block a specific port
-      $ iptables -A INPUT -p tcp --dport ssh -s 10.10.10.10 -j DROP
+        $ iptables -A INPUT -p tcp --dport ssh -s 10.10.10.10 -j DROP
 
 
 ### Next-Gen Firewalls (NGFW)

@@ -17,7 +17,6 @@
 
 <br/><a name="Network"></a>
 ## Network
-
 <br/><a name="glossary"></a>
 ### Definition & Glossary
 
@@ -33,7 +32,6 @@
   -- The most commonly used DNS service of the internet
 * Broadcasting
   -- A packet that is received by all stations in the domain
-
 * Cyclic Redundant Check (CRC)
   -- A mathematical calculation on a frame work or cell that is used for error detection. If two CRCs don't match, there is an error.
 * DDI
@@ -61,6 +59,15 @@
 <br/><a name="terminology"></a>
 ## Network Terminology
 
+### Network Modell: 7 Layer	OSI layer model
+  1. Application Layer  : HTTP, FTP, SMTP, DNS, Telnet
+  2. Presentation       : ASCII, MPEG, JPEG, MIDI
+  3. Session		        : NetBIOS, SAP, SDP, NWLink
+  4. Transport(Segment) : TCP, UDP, SPX
+  5. Network(Packet)    : IPv4, IPv6, RIP, OSPF, ICMP, IGMP, ARP
+  6. Data Link(Frame)   : Ethernet, PPPoE, Token Ring, FFDI, ATM
+  7. Physical Layer     : devices
+
 ### Hub, Switch and Router
 * Hub
   -- connects all the network devices together
@@ -79,21 +86,209 @@
 * Hub and switches are used create networks while routers are used to connect networks
 
 ### Domain Name System (DNS)
-* resolves domain names to IP addresses
+* working principle: resolves domain names to IP addresses
   1. domain name typed in
   2. DNS server search through its database to find its matching IP address
   3. DNS will resolve the domain name into IP addresses
 
-### Detailed Steps:
-* type in the Domain Name in web browser
-* if the computer can't find its IP address in its cache memory, it will send the query to the Resolver server(basically your ISP)
-* Resolver will check its own cache memory, if not, it will send the query to Root server, the top or the root of the DNS hierarchy, 13 sets of root servers around the world, operated by 12 organizations. each set has its own IP address
-* The root server will direct the resolver the Top Level Domain server (TLD), for the .com, .net, .org(top level domains) domain.
-* TLD will direct the resolver to the Authoritative Name Server(ANS), and the resolver will ask the ANS for the IP address
-* ANS is responsible for knowing everything including the IP address of the domain
-* ANS will respond with IP address
-* the resolver will tell the computer the IP address
-* the resolver will store the IP Address in its cache memory
+* DNS Types
+      Master (Primary) DNS Server
+      Slave (Secondary) DNS Server
+      Caching (hint) DNS Server
+      Forwarding (Proxy, Client, Remote) DNS Server
+      Stealth (DMZ or Split) DNS Server
+      Authoritative Only DNS Server
+      Recursive name server = cache name server = resolving name server
+
+
+* DNS configuration
+      $ cat /etc/hosts
+      $ cat /etc/hostname
+      $ cat /etc/hosts.conf
+      $ cat /etc/nsswitch.conf
+      $ cat /etc/resolv.conf
+
+* DNS Testing
+      $ host         : to get host information from name server
+      $ nslookup     : tool to ask host information from name server
+      $ dig          : after finish DNS configuration,one can test DNS
+      $ whois        : a program to find domain holder
+      $ getent       : a tool for carry out the database of administrator
+      $ rndc         :   name server control utility for BIND
+
+      $ vi /etc/bind/named.conf        debian
+      $ vi /etc/named/named.conf       fedora
+
+* DNS operation
+    Start by systemctl, service, init.d
+
+    Firewall open via iptables configuration
+      $ vi /etc/iptables/rules           : debinas
+      $ vi /etc/sysconf/iptables         : CentOS, Fedora
+
+* Detailed Steps:
+  1. type in the Domain Name in web browser
+  2. if the computer can't find its IP address in its cache memory, it will send the query to the Resolver server(basically your ISP)
+  3. Resolver will check its own cache memory, if not, it will send the query to Root server, the top or the root of the DNS hierarchy, 13 sets of root servers around the world, operated by 12 organizations. each set has its own IP address
+  4. he root server will direct the resolver the Top Level Domain server (TLD), for the .com, .net, .org(top level domains) domain.
+  5. TLD will direct the resolver to the Authoritative Name Server(ANS), and the resolver will ask the ANS for the IP address
+  6. ANS is responsible for knowing everything including the IP address of the domain
+  7. ANS will respond with IP address
+  8. the resolver will tell the computer the IP address
+  9. the resolver will store the IP Address in its cache memory
+
+
+* DNS security
+  TSIG or DNSSEC (DNS Security Extensions)
+
+### IP address
+* IP and bit
+      IPv4 :  32 Bit Addressen, darstellt in DDN(dotted deciaml notation)
+      IPv6 : 128 Bit
+      MAC  :  48 Bit
+
+* IP Class
+      Private:  10.  0. 0. 0 -  10.255.255.255   (1 nets)
+      Private: 172. 16. 0. 0 - 172. 31.255.255  (16 nets)
+      Private: 192.168. 0. 0 - 192.168.255.255 (256 nets)
+      Loopback: 127.0.0.0    and    127.0.0.1
+      Heimnetzwerk: 169.254.0.0/16
+
+* IP port number
+  To check see
+      $ cat /etc/services
+
+  Total 65536(=2^16Bit) Ports available.
+
+           0 -  1023  : Well known Ports
+        1024 - 49151  : registered ports
+       49152 - 65535  : client ports
+
+  | Port   |      Are      |               Description |
+  |--------:|:-------------:|------:|
+  |    21  |  FTP    | File Transfer Protocol
+  |    22  |  SSH    | Secure Shell
+  |    23  |  Telnet | Telnet remote login service, a plan text protocol
+  |    25  |  SMTP   | Simple Mail Transfer Protocol
+  |    53  |  DNS    | Domain Name System service
+  |    80  |  HTTP   | Hypertext Transfer Protocol
+  |   110  |  POP3   | Post Office Protocol
+  |   119  |  NNTP   | Network News Transfer Protocol
+  |   123  |  NTP    | Network Time Protocol
+  |   143  |  IMAP   | Internet Message Access Protocol
+  |   161  |  SNMP   | Simple Network Management Protocol
+  |   194  |  IRC    | Internet Relay Chat
+  |   443  |  HTTPs  | secure HTTPs
+  |   993  |  imaps  | secure IMAPs
+  |   995  |  pop3s  | secure POP3
+  |  3128  |         | Proxy server port
+  |  7100  |         | X-Font server port
+  |  8080  |         | extended HTTP port
+
+* P-packet forwarding and ICMP
+
+      $ vi /etc/sysctl.conf
+      $ sysctl -w
+
+      or
+
+      $ /proc/sys/net/ipv4/ip_forward
+      $ /proc/sys/net/ipv4/icmp_echo_ignore_all
+
+### IP setting
+* Routing
+      $ ip monitor             : live monitoring for connection of MAC and IP
+      $ ip route add 10.10.20.0/24 via 192.168.50.100 dev eth0 : add static router
+      $ route add default gw 20.14.5.65   : result of routing table of network
+
+* MAC address access
+      $ ip neighbour show
+      $ arp -a  :  (address resolution protocol) using IP one can access MAC address
+
+* Wireless
+      $ iwconfig wlan0   : show WLAN adapter/interface
+      $ iwlist wlan0     : show an information about WLAN cards
+      $ iw dev wlan0 	   : show wireless devices and their configuration
+
+### Netwrok interface configuration
+* command
+      $ ifconfig
+      $ ifup
+      $ ifdown
+      $ brctl show
+
+* configurations
+      $ cat /etc/network/interfaces                    : for Debian
+      $ cat /etc/sysconfig/network                     : for CentOS
+      $ cat /etc/sysconfig/network-scripts/ifcfg-eth0  : for CentOS
+
+* run interface
+      $ /etc/init.d/networking restart    (for Debian)
+      $ /etc/rc.d/init.d/network restart  (for CentOS)
+
+* Netzwerkkonfiguration Ubuntu Server 14.04
+      $ vi /etc/network/interfaces
+      |auto eth0
+      |iface eth0 inet dhcp
+      |sudo ifup eth0
+
+      |auto eth0:0
+      |iface eth0:0 inet static
+      |address ABC.DEF.GHI.JKL
+      |netmask 255.255.255.255
+      |network ABC.DEF.GHI.0
+      |broadcast ABC.DEF.GHI.JKL
+      |gateway 10.255.255.1
+
+      $ /etc/init.d/networking restart
+
+* Netzwerkkonfiguration CentOS 6
+      $ vi /etc/sysconfig/network-scripts/ifcfg-eth0
+      |ONBOOT=no
+      |ONBOOT=yes
+      |ifup eth0
+
+      $ cp -a /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0:0
+      $ vi ifcfg-eth0:0
+      |DEVICE=eth0:0
+      |BOOTPROTO=static
+      |BROADCAST=ABC.DEF.GHI.JKL
+      |IPADDR= ABC.DEF.GHI.JKL
+      |NETMASK=255.255.255.255
+      |NETWORK= ABC.DEF.GHI.0
+      |ONBOOT=yes
+      |NM_CONTROLLED=no
+
+### Netwrok connectivity
+* Connectivity test
+      $ ping -c 1 141.1.1.1
+      $ ping6 ::1
+      $ traceroute   www.xxxx.com
+      $ tracepath -n 217.18.182.170
+
+      $ netstat -nc            : connection with all open port
+      $ nc -z daum.net 80      : nc(netcat) network conneciton tool, use in the shell
+      $ nmap                   : port scanning and defending networks
+      $ lsof /tmp              : prozesse, die auf einen Netzwerk-Socket zugreifen
+      $ tcpdump -i eth0        : show network flow into the screen using dump
+
+* To test the correlation between two computers without firewall
+  bidirectional interactive text-oriented communication facility
+      $ server1> nc -l 4444
+      $ server2> nc server1.com 4444
+      $ telnet impa.lpic.de 143      <--- telnet also possible! this is a great tip!
+
+
+* Q) tools to check for open ports on a local computer?
+      nmap, netstat, lsof
+
+
+* Q) A program run through the port 5112, if you want to check whether this port is active and has been blocked by firewall, how can you check?  
+      netcat
+
+
+* Q) What program uses local system calls to locate local ports that are currentl open?
+      netstat is a scanner just for local Ports, nmap & nessus is a scanner for local ports and also for other computers in networks
 
 
 
@@ -138,7 +333,6 @@ network topology is a layout of how a network communicates with different device
 
 <br/><a name="Security"></a>
 ## Security
-
 <br/><a name="ssh"></a>
 ### Secure Shell SSH
 SSH is a communication Protocol. The traffic is encrypted
@@ -146,93 +340,78 @@ SSHD is the server (Open SSH Daemon) and SSH is the client.
 the server must have sshd installed and running
 
 * Generating a new SSH key
-    -- create ssh key
-    ```
-    $ ssh-keygen -t ed25519 -C "your_email@example.com"
-    $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-    ```
+  - create ssh key
+        $ ssh-keygen -t ed25519 -C "your_email@example.com"
+        $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+  - adding your SSH key to the ssh-agent
+        $ sudo -s -H
+        $ exec ssh-agent bash
+        $ eval "$(ssh-agent -s)"
+  - for MacOS, please do modify config to update keychain automatically,
+        $ touch ~/.ssh/config
+        | Host *
+        |     AddKeysToAgent yes
+        |     UseKeychain yes
+        |     IdentityFile ~/.ssh/id_ed25519
+  - add your SSH private key to the ssh-agent and store your passphrase in the keychain
+        $ ssh-add -K ~/.ssh/id_ed25519
 
-    -- adding your SSH key to the ssh-agent
-    ```
-    $ sudo -s -H
-    $ exec ssh-agent bash
-    $ eval "$(ssh-agent -s)"
-    ```
+  - public key goes into the target server as "authorized_keys" file
+        ~/.ssh/id_rsa (private key)
+        ~/.ssh/id_rsa.pub (public key)
 
-    -- for MacOS, please do modify config to update keychain automatically,
-    ```
-    $ touch ~/.ssh/config
-    | Host *
-    |     AddKeysToAgent yes
-    |     UseKeychain yes
-    |     IdentityFile ~/.ssh/id_ed25519
-    ```  
+  - copy the Public Key
+        $ ssh-copy-id demo@SERVER_IP_ADDRESS
 
-    -- add your SSH private key to the ssh-agent and store your passphrase in the keychain
-    ```
-    $ ssh-add -K ~/.ssh/id_ed25519
-    ```
+        or do manually
 
-    -- public key goes into the target server as "authorized_keys" file
-    ```
-    ~/.ssh/id_rsa (private key)
-    ~/.ssh/id_rsa.pub (public key)
-    ```
+        $ cat ~/.ssh/id_rsa.pub
+        | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...rggpFmu3HbXBnWSUdf localuser@machine.local
+        | ctrl + c
 
-    -- copy the Public Key
-    ```
-    $ ssh-copy-id demo@SERVER_IP_ADDRESS
-    ```   
-    or do manually
-    ```
-  	$ cat ~/.ssh/id_rsa.pub
-      | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...rggpFmu3HbXBnWSUdf localuser@machine.local
-  	| ctrl + c
+        $ gpasswd -a demo sudo
+        $ su - demo
+        $ mkdir .ssh
+        $ chmod 700 .ssh
 
-      $ gpasswd -a demo sudo
-  	$ su - demo
-      $ mkdir .ssh
-      $ chmod 700 .ssh
+        $ vi .ssh/authorized_keys
+        | ctrl + v
 
-      $ vi .ssh/authorized_keys
-  	| ctrl + v
+        $ chmod 600 .ssh/authorized_keys
 
-  	$ chmod 600 .ssh/authorized_keys
-    ```
 
 <br/><a name="gpg"></a>
-### GPG encryption and signing tool
+### GPG
 Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provide digital encryption and signing services using the OpenPGP standard.
+
 * GPG algorithms
-    -- RSA
-    -- ElGamal
-    -- DSA
-    -- ECDH
-    -- ECDSA
-    -- EdDSA
+  - RSA
+  - ElGamal
+  - DSA
+  - ECDH
+  - ECDSA
+  - EdDSA
 
 
 * creating a new GPG key
-  -- create gpg key
 
-  ```
-  $ gpg --full-generate-key
-  $ gpg --default-new-key-algo rsa4096 --gen-key
-  ```
-  -- to list the long form of the GPG keys for both a public and private key
-  ```
-  $ gpg --list-secret-keys --keyid-format=long  /Users/hubot/.gnupg/secring.gpg
-  |------------------------------------
-  |sec   4096R/3AA5C34371567BD2 2016-03-10 [expires: 2050-03-10]
-  |uid                          Hubot
-  |ssb   4096R/42B317FD4BA89E7A 2016-03-10   
-  ```  
-  -- export the public key
-  ```
-  $ gpg --armor --export 3AA5C34371567BD2
-  # this will prints the GPG key ID in ASCII armor format
-  ```
+  - create gpg key
+        $ gpg --full-generate-key
+        $ gpg --default-new-key-algo rsa4096 --gen-key
 
+  - to list the long form of the GPG keys for both a public and private key
+        $ gpg --list-secret-keys --keyid-format=long  /Users/hubot/.gnupg/secring.gpg
+        |------------------------------------
+        |sec   4096R/3AA5C34371567BD2 2016-03-10 [expires: 2050-03-10]
+        |uid                          Hubot
+        |ssb   4096R/42B317FD4BA89E7A 2016-03-10   
+
+  - export the public key
+        $ gpg --armor --export 3AA5C34371567BD2
+        # this will prints the GPG key ID in ASCII armor format
+
+
+#### GPG authentication from LPIC
 
     ==============================================================================================
     GPG authentication (administrator level)
@@ -267,6 +446,8 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
 
       In dbcat, verification of signed documents will be perforemd
           $ gpg2 --no-default-keyring --keyring SAPGlobalGPGSign.key --verify .checksum.md5.asc .checksum.md5
+
+#### GPG practice
 
     ===============================================================================================
     GPG Practice
@@ -335,6 +516,7 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
 
 <br/><a name="ssl"></a>
 ### SSL/TLS
+#### SSL/TLS encryption
     ===============================================================================================
     SSL/TLS standard
     ===============================================================================================
@@ -401,6 +583,7 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
          -pubkey -noout) -signature /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.sha256 /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.md5
 
 
+#### SSL/TLS authentication
     ==============================================================================================
     SSL authentication
     ===============================================================================================
@@ -427,7 +610,7 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
         Verification of signed file will be performed in the factory
         modFactoryTransferValidateSignature( ) in factoryTransfer.sh
 
-
+#### SSL practice
     ===============================================================================================
     SSL Practice
     ===============================================================================================
@@ -445,17 +628,13 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
         -signature .checksum.md5.sig .checksum.md5.sig
 
 ### Firewall
-
-* scans each little packet of data
-* physical(routers) or software
-* can me exceptions by users
-
+scans each little packet of data, physical(routers) or software, can me exceptions by users
 
     ==============================================================================================
     Configure Uncomplicated Firewall(UFW) in ubuntu
     ==============================================================================================
       $ sudo apt-get install ufw
-  	$ sudo ufw status
+      $ sudo ufw status
 
   	$ sudo ufw allow ssh                : to configure your firewall policies
   	$ sudo ufw allow 4444/tcp           : extra SSH 2222
@@ -476,42 +655,43 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
 
 
 ###	Firewalld @ CentOS
+use Firewalld (firewall daemon), which is an alternative to the iptables service
 
-* use Firewalld (firewall daemon), which is an alternative to the iptables service
-    ```
-    $ rpm -qa firewalld
-    $ sudo apt install firewalld
-    ```
-    manage firewalld
-    ```
-    $ sudo systemctl start firewalld	#start the service for the mean time
-    $ sudo systemctl enable firewalld	#enable the service to auto-start at boot time
-    $ sudo systemctl status firewalld	#view service status
-    ```
+- installation
+      $ rpm -qa firewalld
+      $ sudo apt install firewalld
+
+- manage firewalld
+
+      $ sudo systemctl start firewalld	#start the service for the mean time
+      $ sudo systemctl enable firewalld	#enable the service to auto-start at boot time
+
 
 ###	iptables
-    Firewall open via iptables configuration
-    $ sudo apt-get install iptables
-    $ vi /etc/iptables/rules           : debian, ubuntu
-    $ vi /etc/sysconf/iptables         : CentOS, Fedora
+iptables is a utility that allows a system administrator to configure the IP packet filter rules of the Linux kernel firewall
 
-    Saving Changes
-    $ sudo /sbin/iptables-save           : debian, ubuntu
-    $ /sbin/service iptables save        : CentOS, Fedora
-    $ /etc/init.d/iptables save
+- Firewall open via iptables configuration
+      $ sudo apt-get install iptables
+      $ vi /etc/iptables/rules           : debian, ubuntu
+      $ vi /etc/sysconf/iptables         : CentOS, Fedora
 
-    $ iptables -L -v
+- Saving Changes
+      $ sudo /sbin/iptables-save           : debian, ubuntu
+      $ /sbin/service iptables save        : CentOS, Fedora
+      $ /etc/init.d/iptables save
 
-    change policy
-    $ iptables --policy INPUT ACCEPT    (accept, drop, reject)
-    $ iptables --policy OUTPUT ACCEPT   (accept, drop, reject)
-    $ iptables --policy FORWARD ACCEPT  (accept, drop, reject)
+      $ iptables -L -v
 
-    block all connections from the IP address 10.10.10.10.
-    $ iptables -A INPUT -s 10.10.10.10 -j DROP
+- change policy
+      $ iptables --policy INPUT ACCEPT    (accept, drop, reject)
+      $ iptables --policy OUTPUT ACCEPT   (accept, drop, reject)
+      $ iptables --policy FORWARD ACCEPT  (accept, drop, reject)
 
-    block a specific port
-    $ iptables -A INPUT -p tcp --dport ssh -s 10.10.10.10 -j DROP
+- block all connections from the IP address 10.10.10.10.
+      $ iptables -A INPUT -s 10.10.10.10 -j DROP
+
+- block a specific port
+      $ iptables -A INPUT -p tcp --dport ssh -s 10.10.10.10 -j DROP
 
 
 ### Next-Gen Firewalls (NGFW)
@@ -574,6 +754,7 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
 
 
 ### VPN
+#### Description
     ===============================================================================================
     VPN (Virtual Private Network)
     ===============================================================================================
@@ -590,7 +771,8 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
     VPN virtual interface. OpenVPN is not a web application proxy and does not operate through
     a web browser.
 
-    • OpenVPN
+#### OpenVPN
+* Installation and configuration of OpenVPN
       $ sudo apt-get update
       $ sudo apt-get install openvpn easy-rsa
 
@@ -603,13 +785,13 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
       | Packet Forwarding ip_forward
       | ufw...or iptables
 
-      Creating a Certificate Authority and Server-Side Certificate & Key
-      - RSA or IPSec
-      - Generate a Certificate and Key for the Server
-      - Move the Server Certificates and Keys
-      - Generate Certificates and Keys for Clients
-      - Transferring Certificates and Keys to Client Devices
-      - Creating a Unified OpenVPN Profile for Client Devices
+* Creating a Certificate Authority and Server-Side Certificate & Key
+      1. RSA or IPSec
+      2. Generate a Certificate and Key for the Server
+      3. Move the Server Certificates and Keys
+      4. Generate Certificates and Keys for Clients
+      5. Transferring Certificates and Keys to Client Devices
+      6. Creating a Unified OpenVPN Profile for Client Devices
 
 
 ### Stateless vs Stateful Firewall

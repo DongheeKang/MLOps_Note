@@ -11,7 +11,7 @@
 
 <br/><a name="System"></a>
 ## Linux System
-
+#### system fundamental
     ===============================================================================================
     System fundamental
     ===============================================================================================
@@ -53,16 +53,16 @@
 
     - /usr
         unix system resource - suggest read only
-    	executable programs that are not needed on boot
+        executable programs that are not needed on boot
 
     - /var
         temporally used system related files
         /var/log           : system log files
         /var/spool/mail    : grosser platz empfolen
         /var/named         : DNS zone configuration file
-    	/var/spool/cron    : cron temporal configuration data
-    	/var/log/messages  : Hauptprotokolldatei in Linux
-    	/var/log/syslog    : ausser bei Debian und Derivaten
+        /var/spool/cron    : cron temporal configuration data
+        /var/log/messages  : Hauptprotokolldatei in Linux
+        /var/log/syslog    : ausser bei Debian und Derivaten
 
     - /boot
         To have GRUB rescan all of the devices, the device.map
@@ -74,7 +74,7 @@
     	Die initrd wird von Kernel beim System start in den Hauptspeicher geladen
     	Die initrd muss bei jedem Kernel-Update nue erstellt werden
 
-    - 3 Wesentliche Initialisierungsverfahren fuer den Linux-Systemstart:
+    - Drei Wesentliche Initialisierungsverfahren fuer den Linux-Systemstart:
     	SysVinit (wird kamm mehr benutzt)                 : linux system
     	Upstart  (Ubuntu, in zwischen night mehr aktuell) : linux system
     	Systemd  (inzwischen von allen grossen Distributionen eingesetzt)
@@ -143,6 +143,7 @@ Technical Recommendations:
 	* SSL/TLS
 	* VPN
 
+#### Initial setup
     ===============================================================================================
     Initial setup after installation (based on ubuntu)
     ===============================================================================================
@@ -225,7 +226,7 @@ Technical Recommendations:
       $ sudo swapon /swapfile
       $ sudo sh -c 'echo "/swapfile none swap sw 0 0" >> /etc/fstab'
 
-
+#### Administration fundamental
     ===============================================================================================
     Administration fundamental
     ===============================================================================================
@@ -406,17 +407,42 @@ Technical Recommendations:
     	cloudwatch, rackspace    
 
 
-
+#### you must know for system administration
     ===============================================================================================
-    Must know
+    my public IP
     ===============================================================================================
-    1. How do I know my public IP in local machine!
+    • How do I know my public IP in local machine!
       $ curl ipinfo.io/ip
       $ curl -s ipinfo.io/ip
       $ wget -qO- http://ipecho.net/plain ; echo
       $ dig +short myip.opendns.com @resolver1.opendns.com
 
 
+    ==============================================================================================
+    Howto Jump host
+    ===============================================================================================
+    • How do I use jump host (local -> server1 -> server2)
+
+      $ ssh -tt server1 ssh server2
+
+      $ ssh -fqN -L2222:server2:22 server1
+      $ ssh localhost -p 2222
+
+      $ ssh -o ProxyCommand="ssh server1 nc server2 22" server2
+      $ ssh -o ProxyCommand="ssh -W server2:22 server1" server2
+
+      or one can configure server2 via server1
+      $ vi ~/.ssh/config
+      |Host s2
+      |HostName server2
+      |User user2
+      |IdentityFile ~/.ssh/server2_id_rsa
+      |ProxyCommand ssh -W server2:22 server1
+      $ ssh s2
+      $ ssh user2@s2
+
+
+#### init & systemd
     ===============================================================================================
     init
     ===============================================================================================
@@ -549,7 +575,7 @@ Technical Recommendations:
     	Still survice mysql as wish
     	$ sudo systemctl status mysqld.service
 
-
+#### Linuix packages
     ===============================================================================================
     Binary packages
     ===============================================================================================
@@ -591,7 +617,6 @@ Technical Recommendations:
         | .
     	| Creating backups is now more fun than ever!
 
-
     - rpm
     	$ rpm -Uvh packages(s).rpm	    	install/upgrade package file(s)
     	$ rpm -e package						remove package
@@ -621,34 +646,9 @@ Technical Recommendations:
     	| - Initial version of the package
 
 
-    ===============================================================================================
-    Howto Jump host
-    ===============================================================================================
-    • How do I use jump host (local -> server1 -> server2)
-
-    	$ ssh -tt server1 ssh server2
-
-    	$ ssh -fqN -L2222:server2:22 server1
-    	$ ssh localhost -p 2222
-
-    	$ ssh -o ProxyCommand="ssh server1 nc server2 22" server2
-    	$ ssh -o ProxyCommand="ssh -W server2:22 server1" server2
-
-    	or one can configure server2 via server1
-    	$ vi ~/.ssh/config
-    	|Host s2
-    	|HostName server2
-    	|User user2
-    	|IdentityFile ~/.ssh/server2_id_rsa
-    	|ProxyCommand ssh -W server2:22 server1
-    	$ ssh s2
-    	$ ssh user2@s2
-
 
 <br/><a name="HA"></a>
 ## High Availability
-
-
 
 - LVS (Linux Virtual Server)
     LVS is a highly scalable and available server built on a cluster of real servers, with the load balancer running on the Linux operating system.
@@ -713,13 +713,150 @@ Technical Recommendations:
 
 <br/><a name="Service"></a>
 ## Service
+#### Services
+    ===============================================================================================
+    Services
+    ===============================================================================================
+    - Mail
+        SMTP 25  : default SMTP
+        SMTP 465 : to send messages using SMTP securely
+        IMAP 143 : non-encrypted port
+        IMAP 993 : using IMAP securely
+        POP3 110 : default POP3 non-encrypted port
+        POP3 995 : using POP3 securely
+
+        /var/spool/mail   : delievered by MDA
+        /var/spool/mqueue : auszuliefernde Mail-Queue
+
+        Mail alias by root
+        $ vi /etc/aliases
+
+        SMTP mail server
+        Postfix, sendmail, exim  qmail
+
+        MDA, POP and IMAP server
+        dovecot, courier
+
+        MDA(mail delivery agent)
+        Procmail
+
+        //General way to test
+        $ netcat localhost 25
+        $ telnet localhost 25
+
+    - FTP
+        FTP client Port 21 ---> FTP Server Port 20
+        vsftp Pure-FTPd  ProFTPD
+
+    - printer
+        BSD   -> Apple
+        SysmV -> Oracle
+        CUPS  -> Common Unix Printing System by Apple
+
+    - SSH
+        SSH tunneling
+        $ ssh destination -L 4711:server:port
+
+        SSH public key technic
+        /etc/ssh/sshd_config
+        /etc/ssh/ssh_config
+        /etc/hosts.allow
+        /etc/hosts.deny
+        /etc/nologin
+        /etc/ssh/ssh_known_hosts
+        /etc/sshrc
+
+        ssh-keygen -t dsa
+
+        ssh-agent bash  : in memory protect user's private key
+        ssh-add         : one can add private key
+
+        gpg (GNU Privacy Guard)
+
+    - Database
+        MySQL
+    	sql> USE
+    	sql> CREATE TABLE
+    	sql> INSERT INTO
+    	sql> SELECT FROM
+    	sql> UPDATE SET  WHERE
+    	sql> DROP TABLE
+    	sql> DROP DATABASES
+
+    - Leading Web Server
+    	Apache, Microsoft-IIS, nginx, Tomcat, Node.js
+    	Proxy Server: HAProxy, Nginx, Squid, Varnish are mostly used
+
+        Apache
+    	/etc/apache2/apache2.conf  @ Debian
+    	/etc/httpd/conf/httpd.conf @ CentOS
+
+    	htpasswd can create a password.list to allow access
+    	$ ./htpasswd kim
+        $ vi .htaccess
+    	$ vi .htgroup
+
+        Apache Module
+    	/usr/src/mod_php,mod_perl,mod_auth
+    	OpenSSL(Secure Sockets Layer) + Apache =  Apache-SSL -> mod_ssl
+
+    	Certificates are usually stored in /etc/ssl/ or /etc/pki/.
+    	/etc/ssl/    : the standard location for OpenSSL configuration
+    	/etc/pki/    : the standard location for PKI (Puclbic Key Infrastructure)
+
+        Nginx with firewall @ CentOS (optional)
+    	$ sudo firewall-cmd
+
+    - Samba
+        smbd, nmbd, smbstatus, smbpasswd, cifs
+
+    - NFS(Network File System)
+    	exportfs, nfsstat, showmout, rpcinfo    at server
+    	fstab, mount                            at client
+
+    	Securing NFS
+    	The tcp wrapper / Firewall software can be used to limit access to an NFS server.
+        disadvantage of iptables
+    	TCP Wrapper restrict access by matching usernames, but iptables does not support.
+
+    - DHCP
+    	relay agent
+
+    - LDAP
+        LDAP permission by SSSD (System Security Services Daemon) to authentication resource
+    	LDIF (LDAP Data Interchange Format) and (dn: uid=kang, ou=users, dc=linux, dc=net)
+    	slapadd, slapcat, slapindex
+    	ldapadd, ldapsearch, ldappasswd, ldapdelete
+
+    - PAM (Pluggable Authentication Modules)
+    	/lib/security/pam_ldap.so   : configures authentication via LDAP.
+    	/lib/security/pam_securetty : user allow to log in as root, when /etc/securetty exists
+
+    	Those data location is related with PAM modules
+    	/etc/security/opasswd       : old password is saved into
+    	/etc/security/limits.d      : default limits are taken from
+    	/etc/security/limits.conf   : configuration of limitatio
+
+    	If you want to deny some users from ssh connection,
+    	$ vi /etc/nosshuser
+    	$ vi /etc/pam.d/sshd
+    	| auth required pam_listfile.so item=user sense=deny file=/etc/nosshuser
+
+    	If you want to allow users, then do this
+    	$ vi /etc/sshuser
+    	$ vi /etc/pam.d/sshd
+    	| auth required pam_listfile.so item=user sense=allow file=/etc/sshuser
+
+    	Simple way to deny any user login
+    	$ vi /etc/nologin
+    	$ vi /etc/pam.d/login
 
 
 
 
 <br/><a name="Storage"></a>
 ## Storage
-
+#### Disk and Storage in Linux
     ===============================================================================================
     Disk and Storage
     ===============================================================================================
@@ -951,6 +1088,8 @@ Technical Recommendations:
     - Other clustered file systems
         Coda, CephFS, GlusterFS, AFS(Andrew File System), lustre, HDFS, DFS(win), EVMS
 
+#### HANA DB and Storage
+
     ===============================================================================================
     Upgrade of 'HANA' volume size
     ===============================================================================================
@@ -1000,6 +1139,7 @@ Technical Recommendations:
         | /sapmnt/hana/hana/backup/log  /hana/backup/log   none bind 0 0
         $ mount -a
 
+#### Upgrade of HANA DB
     ===============================================================================================
     Upgrade of HANA volume size
     ===============================================================================================
@@ -1074,8 +1214,9 @@ Technical Recommendations:
       $ xfs_growfs /hana/data/HDB
 
 
+#### Increase LVM Volume
     ===============================================================================================
-    Increase volume (from LPIC note)
+    Increase LVM volume (from LPIC note)
     ===============================================================================================
     • LVM
       Logical Volume Manager is an abstraction of physical disk devices and volumes  to volume groups (a virtual disk, multiple disks and storage pool)
@@ -1170,6 +1311,8 @@ Technical Recommendations:
 
         Remark) sdc (full device) can also be used a volume group, not only sdc1 or sdc2!
 
+
+#### Storage area network (SAN)
     ===============================================================================================
     SAN
     ===============================================================================================

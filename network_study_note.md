@@ -134,15 +134,15 @@
     ```
 
 * Detailed Steps
-    1.type in the Domain Name in web browser
-    2.if the computer can't find its IP address in its cache memory, it will send the query to the Resolver server(basically your ISP)
-    3.Resolver will check its own cache memory, if not, it will send the query to Root server, the top or the root of the DNS hierarchy, 13 sets of root servers around the world, operated by 12 organizations. each set has its own IP address
-    4.he root server will direct the resolver the Top Level Domain server (TLD), for the .com, .net, .org(top level domains) domain.
-    5.TLD will direct the resolver to the Authoritative Name Server(ANS), and the resolver will ask the ANS for the IP address
-    6.ANS is responsible for knowing everything including the IP address of the domain
-    7.ANS will respond with IP address
-    8.the resolver will tell the computer the IP address
-    9.the resolver will store the IP Address in its cache memory
+      1. type in the Domain Name in web browser
+      2. if the computer can't find its IP address in its cache memory, it will send the query to the Resolver server(basically your ISP)
+      3. Resolver will check its own cache memory, if not, it will send the query to Root server, the top or the root of the DNS hierarchy, 13 sets of root servers around the world, operated by 12 organizations. each set has its own IP address
+      4. he root server will direct the resolver the Top Level Domain server (TLD), for the .com, .net, .org(top level domains) domain.
+      5. TLD will direct the resolver to the Authoritative Name Server(ANS), and the resolver will ask the ANS for the IP address
+      6. ANS is responsible for knowing everything including the IP address of the domain
+      7. ANS will respond with IP address
+      8. the resolver will tell the computer the IP address
+      9. the resolver will store the IP Address in its cache memory
 
 * DNS security
   TSIG or DNSSEC (DNS Security Extensions)
@@ -232,86 +232,96 @@
 ### Netwrok interface configuration
 
 * command
-      $ ifconfig
-      $ ifup
-      $ ifdown
-      $ brctl show
-
+    ```    
+    $ ifconfig
+    $ ifup
+    $ ifdown
+    $ brctl show
+    ```
 * configurations
-      $ cat /etc/network/interfaces                    : for Debian
-      $ cat /etc/sysconfig/network                     : for CentOS
-      $ cat /etc/sysconfig/network-scripts/ifcfg-eth0  : for CentOS
-
+    ```
+    $ cat /etc/network/interfaces                    : for Debian
+    $ cat /etc/sysconfig/network                     : for CentOS
+    $ cat /etc/sysconfig/network-scripts/ifcfg-eth0  : for CentOS
+    ```
 * run interface
-      $ /etc/init.d/networking restart    (for Debian)
-      $ /etc/rc.d/init.d/network restart  (for CentOS)
-
+    ```
+    $ /etc/init.d/networking restart    (for Debian)
+    $ /etc/rc.d/init.d/network restart  (for CentOS)
+    ```
 * Netzwerkkonfiguration Ubuntu Server 14.04
-      $ vi /etc/network/interfaces
-      |auto eth0
-      |iface eth0 inet dhcp
-      |sudo ifup eth0
+    ```
+    $ vi /etc/network/interfaces
+    |auto eth0
+    |iface eth0 inet dhcp
+    |sudo ifup eth0
 
-      |auto eth0:0
-      |iface eth0:0 inet static
-      |address ABC.DEF.GHI.JKL
-      |netmask 255.255.255.255
-      |network ABC.DEF.GHI.0
-      |broadcast ABC.DEF.GHI.JKL
-      |gateway 10.255.255.1
+    |auto eth0:0
+    |iface eth0:0 inet static
+    |address ABC.DEF.GHI.JKL
+    |netmask 255.255.255.255
+    |network ABC.DEF.GHI.0
+    |broadcast ABC.DEF.GHI.JKL
+    |gateway 10.255.255.1
 
-      $ /etc/init.d/networking restart
-
+    $ /etc/init.d/networking restart
+    ```
 * Netzwerkkonfiguration CentOS 6
-      $ vi /etc/sysconfig/network-scripts/ifcfg-eth0
-      |ONBOOT=no
-      |ONBOOT=yes
-      |ifup eth0
+    ```
+    $ vi /etc/sysconfig/network-scripts/ifcfg-eth0
+    |ONBOOT=no
+    |ONBOOT=yes
+    |ifup eth0
 
-      $ cp -a /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0:0
-      $ vi ifcfg-eth0:0
-      |DEVICE=eth0:0
-      |BOOTPROTO=static
-      |BROADCAST=ABC.DEF.GHI.JKL
-      |IPADDR= ABC.DEF.GHI.JKL
-      |NETMASK=255.255.255.255
-      |NETWORK= ABC.DEF.GHI.0
-      |ONBOOT=yes
-      |NM_CONTROLLED=no
+    $ cp -a /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0:0
+    $ vi ifcfg-eth0:0
+    |DEVICE=eth0:0
+    |BOOTPROTO=static
+    |BROADCAST=ABC.DEF.GHI.JKL
+    |IPADDR= ABC.DEF.GHI.JKL
+    |NETMASK=255.255.255.255
+    |NETWORK= ABC.DEF.GHI.0
+    |ONBOOT=yes
+    |NM_CONTROLLED=no
+    ```
 
 ### Netwrok connectivity
 
 * Connectivity test
+    ```
+    $ ping -c 1 141.1.1.1
+    $ ping6 ::1
+    $ traceroute   www.xxxx.com
+    $ tracepath -n 217.18.182.170
 
-      $ ping -c 1 141.1.1.1
-      $ ping6 ::1
-      $ traceroute   www.xxxx.com
-      $ tracepath -n 217.18.182.170
-
-      $ netstat -nc            : connection with all open port
-      $ nc -z daum.net 80      : nc(netcat) network conneciton tool, use in the shell
-      $ nmap                   : port scanning and defending networks
-      $ lsof /tmp              : prozesse, die auf einen Netzwerk-Socket zugreifen
-      $ tcpdump -i eth0        : show network flow into the screen using dump
+    $ netstat -nc            : connection with all open port
+    $ nc -z daum.net 80      : nc(netcat) network conneciton tool, use in the shell
+    $ nmap                   : port scanning and defending networks
+    $ lsof /tmp              : prozesse, die auf einen Netzwerk-Socket zugreifen
+    $ tcpdump -i eth0        : show network flow into the screen using dump
 
 * To test the correlation between two computers without firewall
   bidirectional interactive text-oriented communication facility
-      $ server1> nc -l 4444
-      $ server2> nc server1.com 4444
-      $ telnet impa.lpic.de 143      <--- telnet also possible! this is a great tip!
+    ```
+    $ server1> nc -l 4444
+    $ server2> nc server1.com 4444
+    $ telnet impa.lpic.de 143      <--- telnet also possible! this is a great tip!
+    ```
 
-
-* Q) tools to check for open ports on a local computer?
-      nmap, netstat, lsof
-
+* Q) tools to check for open ports on a local computer?     
+    ```
+    nmap, netstat, lsof
+    ```
 
 * Q) A program run through the port 5112, if you want to check whether this port is active and has been blocked by firewall, how can you check?  
-      netcat
-
+    ```
+    netcat
+    ```
 
 * Q) What program uses local system calls to locate local ports that are currentl open?
-      netstat is a scanner just for local Ports, nmap & nessus is a scanner for local ports and also for other computers in networks
-
+    ```
+    netstat is a scanner just for local Ports, nmap & nessus is a scanner for local ports and also for other computers in networks
+    ```
 
 
 <br/><a name="topology"></a>

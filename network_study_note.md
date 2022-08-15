@@ -70,19 +70,19 @@
 
 ### Hub, Switch and Router
 * Hub
-  -- connects all the network devices together
-  -- multiple ports
-  -- not intelligent, do not know where data going to be sent
-  -- data is copied to all its ports -- broadcasting
+  - connects all the network devices together
+  - multiple ports
+  - not intelligent, do not know where data going to be sent
+  - data is copied to all its ports -- broadcasting
 * Switch
-  -- like a hub, accepts ethernet connections from network devices
-  -- it is intelligent, knows the physical address(MAC address) in switch table.
-  -- when a data is sent, it is directed to to intended port
-  -- reduce unnecessary traffic
+  - like a hub, accepts ethernet connections from network devices
+  - it is intelligent, knows the physical address(MAC address) in switch table.
+  - when a data is sent, it is directed to to intended port
+  - reduce unnecessary traffic
 * Hub and switch are not capable of exchanging data outside its own network, because to be able to reach outside network a device need to be able to read IP addresses
 * Router
-  -- A router routes data from one network to another based on its IP address
-  -- The gateway of a network
+  - A router routes data from one network to another based on its IP address
+  - The gateway of a network
 * Hub and switches are used create networks while routers are used to connect networks
 
 ### Domain Name System (DNS)
@@ -142,17 +142,20 @@
 ### IP address
 
 * IP and bit
+      ```
       IPv4 :  32 Bit Addressen, darstellt in DDN(dotted deciaml notation)
       IPv6 : 128 Bit
       MAC  :  48 Bit
-
+      ```
 * IP Class
+      ```
       Private :  10.  0. 0. 0 -  10.255.255.255   (1 nets)
       Private : 172. 16. 0. 0 - 172. 31.255.255  (16 nets)
       Private : 192.168. 0. 0 - 192.168.255.255 (256 nets)
 
       Loopback: 127.0.0.0 & 127.0.0.1
       Heimnetzwerk: 169.254.0.0/16
+      ```
 
 * IP port number
   To check see
@@ -640,22 +643,22 @@ scans each little packet of data, physical(routers) or software, can me exceptio
       $ sudo apt-get install ufw
       $ sudo ufw status
 
-  	$ sudo ufw allow ssh                : to configure your firewall policies
-  	$ sudo ufw allow 4444/tcp           : extra SSH 2222
-  	$ sudo ufw allow 80/tcp             : HTTP
-  	$ sudo ufw allow 443/tcp 			      : SSL/TLS
-  	$ sudo ufw allow 25/tcp				      : SMTP
-  	$ sudo ufw allow 21/tcp				      : ftp
-  	$ sudo ufw show added               : finalized
-  	$ sudo ufw enable                   : confirm then type "y"
+      $ sudo ufw allow ssh                : to configure your firewall policies
+      $ sudo ufw allow 4444/tcp           : extra SSH 2222
+      $ sudo ufw allow 80/tcp             : HTTP
+      $ sudo ufw allow 443/tcp            : SSL/TLS
+      $ sudo ufw allow 25/tcp             : SMTP
+      $ sudo ufw allow 21/tcp             : ftp
+      $ sudo ufw show added               : finalized
+      $ sudo ufw enable                   : confirm then type "y"
 
-  	$ sudo ufw allow from 192.168.255.255
+      $ sudo ufw allow from 192.168.255.255
 
-  	$ sudo ufw default deny incoming
-  	$ sudo ufw default deny outgoing
+      $ sudo ufw default deny incoming
+      $ sudo ufw default deny outgoing
 
-  	$ sudo ufw delete«» allow 80/tcp
-  	$ sudo ufw delete allow 1000:2000/tcp    
+      $ sudo ufw delete«» allow 80/tcp
+      $ sudo ufw delete allow 1000:2000/tcp    
 
 
 ###	Firewalld @ CentOS
@@ -675,27 +678,27 @@ use Firewalld (firewall daemon), which is an alternative to the iptables service
 iptables is a utility that allows a system administrator to configure the IP packet filter rules of the Linux kernel firewall
 
 * Firewall open via iptables configuration
-        $ sudo apt-get install iptables
-        $ vi /etc/iptables/rules           : debian, ubuntu
-        $ vi /etc/sysconf/iptables         : CentOS, Fedora
+      $ sudo apt-get install iptables
+      $ vi /etc/iptables/rules             : debian, ubuntu
+      $ vi /etc/sysconf/iptables           : CentOS, Fedora
 
 * Saving Changes
-        $ sudo /sbin/iptables-save           : debian, ubuntu
-        $ /sbin/service iptables save        : CentOS, Fedora
-        $ /etc/init.d/iptables save
+      $ sudo /sbin/iptables-save           : debian, ubuntu
+      $ /sbin/service iptables save        : CentOS, Fedora
+      $ /etc/init.d/iptables save
 
-        $ iptables -L -v
+      $ iptables -L -v
 
 * change policy
-        $ iptables --policy INPUT ACCEPT    (accept, drop, reject)
-        $ iptables --policy OUTPUT ACCEPT   (accept, drop, reject)
-        $ iptables --policy FORWARD ACCEPT  (accept, drop, reject)
+      $ iptables --policy INPUT ACCEPT    (accept, drop, reject)
+      $ iptables --policy OUTPUT ACCEPT   (accept, drop, reject)
+      $ iptables --policy FORWARD ACCEPT  (accept, drop, reject)
 
 * block all connections from the IP address 10.10.10.10.
-        $ iptables -A INPUT -s 10.10.10.10 -j DROP
+      $ iptables -A INPUT -s 10.10.10.10 -j DROP
 
 * block a specific port
-        $ iptables -A INPUT -p tcp --dport ssh -s 10.10.10.10 -j DROP
+      $ iptables -A INPUT -p tcp --dport ssh -s 10.10.10.10 -j DROP
 
 
 ### Next-Gen Firewalls (NGFW)

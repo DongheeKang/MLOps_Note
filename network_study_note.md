@@ -127,21 +127,22 @@
     Start by systemctl, service, init.d
 
     Firewall open via iptables configuration
-      ```
-      $ vi /etc/iptables/rules           : debinas
-      $ vi /etc/sysconf/iptables         : CentOS, Fedora
-      ```
 
-* Detailed Steps:
-    1. type in the Domain Name in web browser
-    2. if the computer can't find its IP address in its cache memory, it will send the query to the Resolver server(basically your ISP)
-    3. Resolver will check its own cache memory, if not, it will send the query to Root server, the top or the root of the DNS hierarchy, 13 sets of root servers around the world, operated by 12 organizations. each set has its own IP address
-    4. he root server will direct the resolver the Top Level Domain server (TLD), for the .com, .net, .org(top level domains) domain.
-    5. TLD will direct the resolver to the Authoritative Name Server(ANS), and the resolver will ask the ANS for the IP address
-    6. ANS is responsible for knowing everything including the IP address of the domain
-    7. ANS will respond with IP address
-    8. the resolver will tell the computer the IP address
-    9. the resolver will store the IP Address in its cache memory
+    ```
+    $ vi /etc/iptables/rules           : debinas
+    $ vi /etc/sysconf/iptables         : CentOS, Fedora
+    ```
+
+* Detailed Steps
+    1.type in the Domain Name in web browser
+    2.if the computer can't find its IP address in its cache memory, it will send the query to the Resolver server(basically your ISP)
+    3.Resolver will check its own cache memory, if not, it will send the query to Root server, the top or the root of the DNS hierarchy, 13 sets of root servers around the world, operated by 12 organizations. each set has its own IP address
+    4.he root server will direct the resolver the Top Level Domain server (TLD), for the .com, .net, .org(top level domains) domain.
+    5.TLD will direct the resolver to the Authoritative Name Server(ANS), and the resolver will ask the ANS for the IP address
+    6.ANS is responsible for knowing everything including the IP address of the domain
+    7.ANS will respond with IP address
+    8.the resolver will tell the computer the IP address
+    9.the resolver will store the IP Address in its cache memory
 
 * DNS security
   TSIG or DNSSEC (DNS Security Extensions)
@@ -149,27 +150,28 @@
 ### IP address
 
 * IP and bit
-      ```
-      IPv4 :  32 Bit Addressen, darstellt in DDN(dotted deciaml notation)
-      IPv6 : 128 Bit
-      MAC  :  48 Bit
-      ```
+    ```
+    IPv4 :  32 Bit Addressen, darstellt in DDN(dotted deciaml notation)
+    IPv6 : 128 Bit
+    MAC  :  48 Bit
+    ```
 * IP Class
-      ```
-      Private :  10.  0. 0. 0 -  10.255.255.255   (1 nets)
-      Private : 172. 16. 0. 0 - 172. 31.255.255  (16 nets)
-      Private : 192.168. 0. 0 - 192.168.255.255 (256 nets)
+    ```
+    Private :  10.  0. 0. 0 -  10.255.255.255   (1 nets)
+    Private : 172. 16. 0. 0 - 172. 31.255.255  (16 nets)
+    Private : 192.168. 0. 0 - 192.168.255.255 (256 nets)
 
-      Loopback: 127.0.0.0 & 127.0.0.1
-      Heimnetzwerk: 169.254.0.0/16
-      ```
+    Loopback: 127.0.0.0 & 127.0.0.1
+    Heimnetzwerk: 169.254.0.0/16
+    ```
 
 * IP port number
   To check see
-      $ cat /etc/services
+  ```
+  $ cat /etc/services
+  ```
 
   Total 65536(=2^16Bit) Ports available.
-
            0 -  1023  : Well known Ports
         1024 - 49151  : registered ports
        49152 - 65535  : client ports
@@ -205,21 +207,27 @@
       $ /proc/sys/net/ipv4/ip_forward
       $ /proc/sys/net/ipv4/icmp_echo_ignore_all
 
+
 ### IP setting
 
 * Routing
-      $ ip monitor               : live monitoring for connection of MAC and IP
-      $ ip route add 10.10.20.0/24 via 192.168.50.100 dev eth0    : add static router
-      $ route add default gw 20.14.5.65   : result of routing table of network
-
+    ```
+    $ ip monitor               : live monitoring for connection of MAC and IP
+    $ ip route add 10.10.20.0/24 via 192.168.50.100 dev eth0    : add static router
+    $ route add default gw 20.14.5.65   : result of routing table of network
+    ```
 * MAC address access
-      $ ip neighbour show
-      $ arp -a  :  (address resolution protocol) using IP one can access MAC address
-
+    ```
+    $ ip neighbour show
+    $ arp -a  :  (address resolution protocol) using IP one can access MAC address
+    ```
 * Wireless
-      $ iwconfig wlan0   : show WLAN adapter/interface
-      $ iwlist wlan0     : show an information about WLAN cards
-      $ iw dev wlan0 	   : show wireless devices and their configuration
+    ```
+    $ iwconfig wlan0   : show WLAN adapter/interface
+    $ iwlist wlan0     : show an information about WLAN cards
+    $ iw dev wlan0 	   : show wireless devices and their configuration
+    ```
+
 
 ### Netwrok interface configuration
 

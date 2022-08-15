@@ -558,26 +558,23 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
 
     • Self signed vs Let’s Encrypt vs StartSSL.com
       - You can use CA tools in SSL
-      ```
       $ cd /etc/pki/tls/misc
       $ CA -newca   : create your private key, cakey.pem (private key)
       $ CA -newreq  : a signing request, newreq.pem(request CSR) & newkey.pem(new private key)
       $ CA -signreq : sign the request, newcert.pem (CA signed certificate)
-      ```
+
       - you will find the list of generated files under
-      ```
       $ cd /etc/pki/CA/private/
       $ sudo apt-get install letsencrypt
       $ sudo letsencrypt certonly -a webroot --webroot-path=/var/www/html -d example.com -d www.example.com
-      ```
-      - to check server certificate for example.com
-      ``        
+
+      - to check server certificate for example.com     
       $ sudo ls /etc/letsencrypt/live/example.com \
       cert.pem            : publick key, server certificate only.
       chain.pem           : root and intermediate certificates only.
       fullchain.pem       : full trust chain
       privkey.pem         : private key
-      ```
+
       - google chrome StartSSL.com
       ca.pem              : StartSSL's Root certificate
       private.key         : The unencrypted version of your private key (be very careful)
@@ -588,46 +585,38 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
 
     • Converting certificates
        - To convert a certificate or certificate chain from DER to PEM
-       ```
-       $ openssl x509 -inform DER -in Certificate.der -outform PEM -out Certificate.pem
-       ```
+         $ openssl x509 -inform DER -in Certificate.der -outform PEM -out Certificate.pem
+
        - To convert a private key from DER to PEM
-       ```
-       $ openssl rsa -inform DER -in PrivateKey.der -outform PEM -out PrivateKey.pem
-       ```
+         $ openssl rsa -inform DER -in PrivateKey.der -outform PEM -out PrivateKey.pem
+
        - To decrypt an encrypted private key (remove the password or passphrase)
-       ```
-       $ openssl rsa -in EncryptedPrivateKey.pem -out PrivateKey.pem
-       ```
+         $ openssl rsa -in EncryptedPrivateKey.pem -out PrivateKey.pem
+
        - To convert a certificate bundle from PKCS#12 (PFX) to PEM
-       ```
-       $ openssl pkcs12 -in CertificateBundle.p12 -out CertificateBundle.pem -nodes
-       ```
+         $ openssl pkcs12 -in CertificateBundle.p12 -out CertificateBundle.pem -nodes
+
        - To convert a certificate bundle from PKCS#7 to PEM
-       ```
-       $ openssl pkcs7 -in CertificateBundle.p7b -print_certs -out CertificateBundle.pem
-       ```
+         $ openssl pkcs7 -in CertificateBundle.p7b -print_certs -out CertificateBundle.pem
+
 
     • How to create and verify SSL
        - In server, generate ssl key
-       ```
-       $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "general_key.key" \
-         -out "general_key.pub" -days 365 -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssdb/OU=dbcat/CN=general_key"
-       ```
+         $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "general_key.key" \
+           -out "general_key.pub" -days 365 -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssdb/OU=dbcat/CN=general_key"
+
        - Sign the file
-       ```
-       $ openssl dgst -sha256 -sign "general_key.key" -out .checksum.sha256 .checksum.md5
-       ```
+         $ openssl dgst -sha256 -sign "general_key.key" -out .checksum.sha256 .checksum.md5
+
        - In local machine verify the signature
-       ```
-       $ openssl dgst -sha256 -verify <(openssl x509 -in "general_key.pub"  -pubkey -noout) \
-         -signature dbaenv.sha256 .checksum.md5
-       ```
+
+         $ openssl dgst -sha256 -verify <(openssl x509 -in "general_key.pub"  -pubkey -noout) \
+           -signature dbaenv.sha256 .checksum.md5
+
        - then will verify
-       ```
-       $ openssl dgst -sha256 -verify <(openssl x509 -in "/home/c5258293/git/dbcat/certs/SAPGlobalSSLCA.crt"  \
-          -pubkey -noout) -signature /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.sha256 /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.md5
-       ```
+         $ openssl dgst -sha256 -verify <(openssl x509 -in "/home/c5258293/git/dbcat/certs/SAPGlobalSSLCA.crt"  \
+           -pubkey -noout) -signature /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.sha256 /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.md5
+
 
 #### SSL/TLS authentication
     ==============================================================================================
@@ -638,40 +627,40 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
 
     • SSL authentication (administrator level)
 
-      Create a certificate for the landscape's domain
-      $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 \
-        --keyout "SAPGlobalSSLSign.crt" \
-        -out "SAPGlobalSSLSign.key" \
-        -days 365 \
-        -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
+      - Create a certificate for the landscape's domain
+        $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 \
+          --keyout "SAPGlobalSSLSign.crt" \
+          -out "SAPGlobalSSLSign.key" \
+          -days 365 \
+          -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
 
-      You should now have 2 certificates, keep key file in safe region. And copy the public key file to the swshare
-      "SAPGlobalSSLSign.crt" private certificate key move to /root/SAPGlobalSSLSign.crt
-      "SAPGlobalSSLSign.key" public certificate key move to /swshare/dbcat/v3.8/certs/SAPGlobalSSLSign.key
+      - You should now have 2 certificates, keep key file in safe region. And copy the public key file to the swshare
+        "SAPGlobalSSLSign.crt" private certificate key move to /root/SAPGlobalSSLSign.crt
+        "SAPGlobalSSLSign.key" public certificate key move to /swshare/dbcat/v3.8/certs/SAPGlobalSSLSign.key
 
-      Generate self-signed certificate files, here is an example for signing of checksum list of ASE
-      $ export signfile=/swshare/ase/16.0.02.06/linux_x86_64
-      $ openssl dgst -sha256 -sign "/root/SAPGlobalSSLSign.crt" -out "${signfile}"/.checksum5.md5.sig "${signfile}"/.checksum.md5
+      - Generate self-signed certificate files, here is an example for signing of checksum list of ASE
+        $ export signfile=/swshare/ase/16.0.02.06/linux_x86_64
+        $ openssl dgst -sha256 -sign "/root/SAPGlobalSSLSign.crt" -out "${signfile}"/.checksum5.md5.sig "${signfile}"/.checksum.md5
 
-      Verification of signed file will be performed in the factory
-      modFactoryTransferValidateSignature( ) in factoryTransfer.sh
+      - Verification of signed file will be performed in the factory
+        modFactoryTransferValidateSignature( ) in factoryTransfer.sh
 
-#### SSL practice
+#### SSL apply
     ===============================================================================================
-    SSL Practice
+    SSL apply
     ===============================================================================================
-    need super user privileges
-    $ sudo su -
+    Need super user privileges
+      $ sudo su -
 
-    $ cd /var/tmp/dbcatTrans/zfinal/
+      $ cd /var/tmp/dbcatTrans/zfinal/
 
-    $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "SAPGlobalSSLCA.key" -out "SAPGlobalSSLCA.crt" \
-      -days 365 -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
+      $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "SAPGlobalSSLCA.key" -out "SAPGlobalSSLCA.crt" \
+        -days 365 -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
 
-    $ openssl dgst -sha256 -sign SAPGlobalSSLSign.crt -out .checksum.md5.sig .checksum.md5
+      $ openssl dgst -sha256 -sign SAPGlobalSSLSign.crt -out .checksum.md5.sig .checksum.md5
 
-    $ openssl dgst -sha256 -verify <(openssl x509 -in /var/tmp/dbcatTrans/zfinal/SAPGlobalSSLSing.key -pubkey -noout) \
-      -signature .checksum.md5.sig .checksum.md5.sig
+      $ openssl dgst -sha256 -verify <(openssl x509 -in /var/tmp/dbcatTrans/zfinal/SAPGlobalSSLSing.key -pubkey -noout) \
+        -signature .checksum.md5.sig .checksum.md5.sig
 
 ### Firewall
 scans each little packet of data, physical(routers) or software, can me exceptions by users
@@ -704,39 +693,44 @@ scans each little packet of data, physical(routers) or software, can me exceptio
 use Firewalld (firewall daemon), which is an alternative to the iptables service
 
 - installation
-      $ rpm -qa firewalld
-      $ sudo apt install firewalld
+
+    $ rpm -qa firewalld
+    $ sudo apt install firewalld
 
 - manage firewalld
 
-      $ sudo systemctl start firewalld	#start the service for the mean time
-      $ sudo systemctl enable firewalld	#enable the service to auto-start at boot time
+    $ sudo systemctl start firewalld	#start the service for the mean time
+    $ sudo systemctl enable firewalld	#enable the service to auto-start at boot time
 
 
 ###	iptables
 iptables is a utility that allows a system administrator to configure the IP packet filter rules of the Linux kernel firewall
 
 * Firewall open via iptables configuration
+
       $ sudo apt-get install iptables
       $ vi /etc/iptables/rules             : debian, ubuntu
       $ vi /etc/sysconf/iptables           : CentOS, Fedora
 
 * Saving Changes
+
       $ sudo /sbin/iptables-save           : debian, ubuntu
       $ /sbin/service iptables save        : CentOS, Fedora
       $ /etc/init.d/iptables save
-
       $ iptables -L -v
 
 * change policy
+
       $ iptables --policy INPUT ACCEPT    (accept, drop, reject)
       $ iptables --policy OUTPUT ACCEPT   (accept, drop, reject)
       $ iptables --policy FORWARD ACCEPT  (accept, drop, reject)
 
 * block all connections from the IP address 10.10.10.10.
+
       $ iptables -A INPUT -s 10.10.10.10 -j DROP
 
 * block a specific port
+
       $ iptables -A INPUT -p tcp --dport ssh -s 10.10.10.10 -j DROP
 
 
@@ -762,41 +756,40 @@ iptables is a utility that allows a system administrator to configure the IP pac
     IPSec (Internet Protocol Security)
     ===============================================================================================
     - IPSec
-	  provides encryption and authentication at IP level.
-	  IPsec can run on routers, firewall machines, and application servers.
-	  ESP(Encapsulating Security Payload), AH(Autehntication Header) are standard protocol
-	  IKE(Internet Key Exchange) is used to handle tunneling as a higher level protocol.
-	  In configuraiton file, you should find left and right node for IPsec connection
+    provides encryption and authentication at IP level.
+    IPsec can run on routers, firewall machines, and application servers.
+    ESP(Encapsulating Security Payload), AH(Autehntication Header) are standard protocol
+    IKE(Internet Key Exchange) is used to handle tunneling as a higher level protocol.
+    In configuraiton file, you should find left and right node for IPsec connection
 
-	  IPsec is a protocol suite for secure Internet Protocol(IP) communications that works by
-	  authenticating and encrypting each IP packet of a communication session. IPsec includes
-	  protocols for establishing mutual authentication between agents at the beginning of the
-	  session and negotiation of cryptographic keys to be used during the session. IPsec can be
-	  used in protecting data flows between a pair of hosts (host-to-host), between a pair of
-	  security gateways (network-to-network), or between a security gateway and a host
-	  (network-to-host).
+    IPsec is a protocol suite for secure Internet Protocol(IP) communications that works by
+    authenticating and encrypting each IP packet of a communication session. IPsec includes
+    protocols for establishing mutual authentication between agents at the beginning of the
+    session and negotiation of cryptographic keys to be used during the session. IPsec can be
+    used in protecting data flows between a pair of hosts (host-to-host), between a pair of
+    security gateways (network-to-network), or between a security gateway and a host
+    (network-to-host).
 
-	  IPsec uses cryptographic security services to protect communications over IP networks.
-	  IPsec supports network-level peer authentication, data origin authentication, data integrity, data confidentiality (encryption), and replay protection.
+    IPsec uses cryptographic security services to protect communications over IP networks.
+    IPsec supports network-level peer authentication, data origin authentication, data integrity, data confidentiality (encryption), and replay protection.
 
-	  IPsec is an end-to-end security scheme operating in the Internet Layer of the
-	  Internet Protocol Suite, while some other Internet security systems in widespread use,
-	  such as Transport Layer Security (TLS) and Secure Shell (SSH), operate in the upper
-	  layers at the Transport Layer (TLS) and the Application layer (SSH). Hence, only IPsec
-	  protects all application traffic over an IP network. Applications can be automatically
-	  secured by IPsec at the IP layer
+    IPsec is an end-to-end security scheme operating in the Internet Layer of the
+    Internet Protocol Suite, while some other Internet security systems in widespread use,
+    such as Transport Layer Security (TLS) and Secure Shell (SSH), operate in the upper
+    layers at the Transport Layer (TLS) and the Application layer (SSH). Hence, only IPsec
+    protects all application traffic over an IP network. Applications can be automatically
+    secured by IPsec at the IP layer
 
     - Tip:
-      do configure IPsec related program first
-	  sysctl+racoon
-	  isk_psk
-	  tcpdump
+    do configure IPsec related program first
+    sysctl+racoon
+    isk_psk
+    tcpdump
 
-	  then....do firewall setting with iptables
-
-	  iptables=netfilter=packetfilter
-	  HAProxy
-	  NAT
+    then....do firewall setting with iptables
+    iptables=netfilter=packetfilter
+    HAProxy
+    NAT
 
 
 ### VPN
@@ -819,6 +812,7 @@ iptables is a utility that allows a system administrator to configure the IP pac
 
 #### OpenVPN
 * Installation and configuration of OpenVPN
+
       $ sudo apt-get update
       $ sudo apt-get install openvpn easy-rsa
 
@@ -828,10 +822,12 @@ iptables is a utility that allows a system administrator to configure the IP pac
       | push "redirect-gateway def1 bypass-dhcp"
 
       Options for OpenVPN
+
       | Packet Forwarding ip_forward
       | ufw...or iptables
 
 * Creating a Certificate Authority and Server-Side Certificate & Key
+
       1. RSA or IPSec
       2. Generate a Certificate and Key for the Server
       3. Move the Server Certificates and Keys
@@ -845,24 +841,24 @@ iptables is a utility that allows a system administrator to configure the IP pac
     Stateless vs Stateful Firewall
     ===============================================================================================
     • Stateless firewall
-	  treats each network frame or packet individually. Such packet filters operate at the
-	  OSI Network Layer (layer 3) and function more efficiently because they only look at the
-	  header part of a packet. They do not keep track of the packet context. Such a firewall has
-	  no way of knowing if any given packet is part of an existing connection
+    treats each network frame or packet individually. Such packet filters operate at the
+    OSI Network Layer (layer 3) and function more efficiently because they only look at the
+    header part of a packet. They do not keep track of the packet context. Such a firewall has
+    no way of knowing if any given packet is part of an existing connection
 
     • A stateful firewall
-	  keeps track of the state of network connections (such as TCP streams or UDP communication)
-	  and is able to hold significant attributes of each connection in memory.  Stateful inspection
-	  monitors incoming and outgoing packets over time, as well as the state of the connection,
-	  and stores the data in dynamic state tables.
+    keeps track of the state of network connections (such as TCP streams or UDP communication)
+    and is able to hold significant attributes of each connection in memory.  Stateful inspection
+    monitors incoming and outgoing packets over time, as well as the state of the connection,
+    and stores the data in dynamic state tables.
 
-	  a stateful firewall is a network firewall that tracks the operating state and characteristics
-	  of network connections traversing it. The firewall is configured to distinguish legitimate
-	  packets for different types of connections. Only packets matching a known active connection
-	  are allowed to pass the firewall.
+    a stateful firewall is a network firewall that tracks the operating state and characteristics
+    of network connections traversing it. The firewall is configured to distinguish legitimate
+    packets for different types of connections. Only packets matching a known active connection
+    are allowed to pass the firewall.
 
-	  Stateful packet inspection (SPI), also referred to as dynamic packet filtering,
-	  Stateful firewall technology was introduced by Check Point
+    Stateful packet inspection (SPI), also referred to as dynamic packet filtering,
+    Stateful firewall technology was introduced by Check Point
 
 
 ### Malware

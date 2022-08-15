@@ -371,87 +371,87 @@ network topology is a layout of how a network communicates with different device
 
 * Generating a new SSH key
   - create ssh key
-    ```
-    $ ssh-keygen -t ed25519 -C "your_email@example.com"
-    $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-    ```
+
+      $ ssh-keygen -t ed25519 -C "your_email@example.com"
+      $ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+
   - adding your SSH key to the ssh-agent
-    ```
-    $ sudo -s -H
-    $ exec ssh-agent bash
-    $ eval "$(ssh-agent -s)"
-    ```
+
+      $ sudo -s -H
+      $ exec ssh-agent bash
+      $ eval "$(ssh-agent -s)"
+
   - for MacOS, please do modify config to update keychain automatically
-    ```
-    $ touch ~/.ssh/config
-    | Host *
-    |     AddKeysToAgent yes
-    |     UseKeychain yes
-    |     IdentityFile ~/.ssh/id_ed25519
-    ```
+
+      $ touch ~/.ssh/config
+      | Host *
+      |     AddKeysToAgent yes
+      |     UseKeychain yes
+      |     IdentityFile ~/.ssh/id_ed25519
+
   - add your SSH private key to the ssh-agent and store your passphrase in the keychain
-    ```
-    $ ssh-add -K ~/.ssh/id_ed25519
-    ```
+
+      $ ssh-add -K ~/.ssh/id_ed25519
+
   - public key goes into the target server as "authorized_keys" file
-    ```
-    ~/.ssh/id_rsa (private key)
-    ~/.ssh/id_rsa.pub (public key)
-    ```
+
+      ~/.ssh/id_rsa (private key)
+      ~/.ssh/id_rsa.pub (public key)
+
   - copy the Public Key
-    ```
-    $ ssh-copy-id demo@SERVER_IP_ADDRESS
-    ```
-    or do manually
-    ```
-    $ cat ~/.ssh/id_rsa.pub
-    | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...rggpFmu3HbXBnWSUdf localuser@machine.local
-    | ctrl + c
 
-    $ gpasswd -a demo sudo
-    $ su - demo
-    $ mkdir .ssh
-    $ chmod 700 .ssh
+      $ ssh-copy-id demo@SERVER_IP_ADDRESS
 
-    $ vi .ssh/authorized_keys
-    | ctrl + v
+      or do manually
 
-    $ chmod 600 .ssh/authorized_keys
-    ```
+      $ cat ~/.ssh/id_rsa.pub
+      | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...rggpFmu3HbXBnWSUdf localuser@machine.local
+      | ctrl + c
+
+      $ gpasswd -a demo sudo
+      $ su - demo
+      $ mkdir .ssh
+      $ chmod 700 .ssh
+
+      $ vi .ssh/authorized_keys
+      | ctrl + v
+
+      $ chmod 600 .ssh/authorized_keys
+
 
 <br/><a name="gpg"></a>
 ### GPG
 Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provide digital encryption and signing services using the OpenPGP standard.
 
 * GPG algorithms
-  ```
-  RSA
-  ElGamal
-  DSA
-  ECDH
-  ECDSA
-  EdDSA
-  ```
+
+      RSA
+      ElGamal
+      DSA
+      ECDH
+      ECDSA
+      EdDSA
+
 
 * creating a new GPG key
   - create gpg key
-    ```
-    $ gpg --full-generate-key
-    $ gpg --default-new-key-algo rsa4096 --gen-key
-    ```
+
+      $ gpg --full-generate-key
+      $ gpg --default-new-key-algo rsa4096 --gen-key
+
   - to list the long form of the GPG keys for both a public and private key
-    ```
-    $ gpg --list-secret-keys --keyid-format=long  /Users/hubot/.gnupg/secring.gpg
-    |------------------------------------
-    |sec   4096R/3AA5C34371567BD2 2016-03-10 [expires: 2050-03-10]
-    |uid                          Hubot
-    |ssb   4096R/42B317FD4BA89E7A 2016-03-10   
-    ```
+
+      $ gpg --list-secret-keys --keyid-format=long  /Users/hubot/.gnupg/secring.gpg
+      |------------------------------------
+      |sec   4096R/3AA5C34371567BD2 2016-03-10 [expires: 2050-03-10]
+      |uid                          Hubot
+      |ssb   4096R/42B317FD4BA89E7A 2016-03-10   
+
   - export the public key
-    ```
-    $ gpg --armor --export 3AA5C34371567BD2
-    # this will prints the GPG key ID in ASCII armor format
-    ```
+
+      $ gpg --armor --export 3AA5C34371567BD2
+      # this will prints the GPG key ID in ASCII armor format
+
 
 #### GPG authentication from LPIC
 
@@ -580,39 +580,37 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
         ssl.key             ; The encrypted private key (does not need to be copied to server)
         ssl.crt             ; Your new certificate
 
-
     • Converting certificates
-       - To convert a certificate or certificate chain from DER to PEM
-         $ openssl x509 -inform DER -in Certificate.der -outform PEM -out Certificate.pem
+      - To convert a certificate or certificate chain from DER to PEM
+        $ openssl x509 -inform DER -in Certificate.der -outform PEM -out Certificate.pem
 
-       - To convert a private key from DER to PEM
-         $ openssl rsa -inform DER -in PrivateKey.der -outform PEM -out PrivateKey.pem
+      - To convert a private key from DER to PEM
+        $ openssl rsa -inform DER -in PrivateKey.der -outform PEM -out PrivateKey.pem
 
-       - To decrypt an encrypted private key (remove the password or passphrase)
-         $ openssl rsa -in EncryptedPrivateKey.pem -out PrivateKey.pem
+      - To decrypt an encrypted private key (remove the password or passphrase)
+        $ openssl rsa -in EncryptedPrivateKey.pem -out PrivateKey.pem
 
-       - To convert a certificate bundle from PKCS#12 (PFX) to PEM
-         $ openssl pkcs12 -in CertificateBundle.p12 -out CertificateBundle.pem -nodes
+      - To convert a certificate bundle from PKCS#12 (PFX) to PEM
+        $ openssl pkcs12 -in CertificateBundle.p12 -out CertificateBundle.pem -nodes
 
-       - To convert a certificate bundle from PKCS#7 to PEM
-         $ openssl pkcs7 -in CertificateBundle.p7b -print_certs -out CertificateBundle.pem
-
+      - To convert a certificate bundle from PKCS#7 to PEM
+        $ openssl pkcs7 -in CertificateBundle.p7b -print_certs -out CertificateBundle.pem
 
     • How to create and verify SSL
-       - In server, generate ssl key
-         $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "general_key.key" \
-           -out "general_key.pub" -days 365 -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssdb/OU=dbcat/CN=general_key"
+      - In server, generate ssl key
+        $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "general_key.key" \
+          -out "general_key.pub" -days 365 -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssdb/OU=dbcat/CN=general_key"
 
-       - Sign the file
-         $ openssl dgst -sha256 -sign "general_key.key" -out .checksum.sha256 .checksum.md5
+      - Sign the file
+        $ openssl dgst -sha256 -sign "general_key.key" -out .checksum.sha256 .checksum.md5
 
-       - In local machine verify the signature
-         $ openssl dgst -sha256 -verify <(openssl x509 -in "general_key.pub"  -pubkey -noout) \
-           -signature dbaenv.sha256 .checksum.md5
+      - In local machine verify the signature
+        $ openssl dgst -sha256 -verify <(openssl x509 -in "general_key.pub"  -pubkey -noout) \
+          -signature dbaenv.sha256 .checksum.md5
 
-       - then will verify
-         $ openssl dgst -sha256 -verify <(openssl x509 -in "/home/c5258293/git/dbcat/certs/SAPGlobalSSLCA.crt"  \
-           -pubkey -noout) -signature /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.sha256 /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.md5
+      - then will verify
+        $ openssl dgst -sha256 -verify <(openssl x509 -in "/home/c5258293/git/dbcat/certs/SAPGlobalSSLCA.crt"  \
+          -pubkey -noout) -signature /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.sha256 /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.md5
 
 
 #### SSL/TLS authentication

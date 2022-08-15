@@ -331,33 +331,37 @@ network topology is a layout of how a network communicates with different device
 #### Wired Topologies
 
 * Star
-  all devices connected to one hub or switch
-  pro: one devices failed to connect will not affect other devices
-  con: if the central hub or switch failed, it will affect every all devices on that point. single point failure
+*
+      all devices connected to one hub or switch
+      pro: one devices failed to connect will not affect other devices
+      con: if the central hub or switch failed, it will affect every all devices on that point. single point failure
 
 * Ring
-  connected in a circle, every computer has two neighbors, every packet is sent through the ring
-  rarely used today
-  easy to install and fix
-  one point failure
+
+      connected in a circle, every computer has two neighbors, every packet is sent through the ring
+      rarely used today
+      easy to install and fix
+      one point failure
 
 * Bus
-  each device is connected to the back bone
-  the back bone is a coaxial cable, connected to the computers using BNC connector (T connectors)
-  pro: cheap and easy to implement
-  con: needs terminators at both end of back bone, if not there will be signal reflection, causing data flow disrupted
+
+      each device is connected to the back bone
+      the back bone is a coaxial cable, connected to the computers using BNC connector (T connectors)
+      pro: cheap and easy to implement
+      con: needs terminators at both end of back bone, if not there will be signal reflection, causing data flow disrupted
 
 * Mesh
-  each computer is connected to each other
-  con: high redundancy level, rare failure
-  pro: expensive
-  rarely used on LAN, mainly used on WAN(like internet)
+
+      each computer is connected to each other
+      con: high redundancy level, rare failure
+      pro: expensive
+      rarely used on LAN, mainly used on WAN(like internet)
 
 
 #### Wireless Topologies
 
 * Infrastructure
-  a wireless port connected to one of switch or hub like a star topology
+  - a wireless port connected to one of switch or hub like a star topology
 
 
 

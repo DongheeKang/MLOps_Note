@@ -322,7 +322,7 @@ network topology is a layout of how a network communicates with different device
   -- rarely used on LAN, mainly used on WAN(like internet)
 
 
-### Wireless Topologies
+#### Wireless Topologies
 
 * Infrastructure
   -- a wireless port connected to one of switch or hub like a star topology

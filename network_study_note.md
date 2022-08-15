@@ -87,53 +87,54 @@
 
 ### Domain Name System (DNS)
 * working principle: resolves domain names to IP addresses
-    1. domain name typed in
-    2. DNS server search through its database to find its matching IP address
-    3. DNS will resolve the domain name into IP addresses
+
+  1. domain name typed in
+  2. DNS server search through its database to find its matching IP address
+  3. DNS will resolve the domain name into IP addresses
 
 * DNS Types
-    ```
-    Master (Primary) DNS Server
-    Slave (Secondary) DNS Server
-    Caching (hint) DNS Server
-    Forwarding (Proxy, Client, Remote) DNS Server
-    Stealth (DMZ or Split) DNS Server
-    Authoritative Only DNS Server
-    Recursive name server = cache name server = resolving name server
-    ```
+
+      Master (Primary) DNS Server
+      Slave (Secondary) DNS Server
+      Caching (hint) DNS Server
+      Forwarding (Proxy, Client, Remote) DNS Server
+      Stealth (DMZ or Split) DNS Server
+      Authoritative Only DNS Server
+      Recursive name server = cache name server = resolving name server
+
 * DNS configuration
-    ```
-    $ cat /etc/hosts
-    $ cat /etc/hostname
-    $ cat /etc/hosts.conf
-    $ cat /etc/nsswitch.conf
-    $ cat /etc/resolv.conf
-    ```
+
+      $ cat /etc/hosts
+      $ cat /etc/hostname
+      $ cat /etc/hosts.conf
+      $ cat /etc/nsswitch.conf
+      $ cat /etc/resolv.conf
+
 
 * DNS Testing
-    ```
-    $ host         : to get host information from name server
-    $ nslookup     : tool to ask host information from name server
-    $ dig          : after finish DNS configuration,one can test DNS
-    $ whois        : a program to find domain holder
-    $ getent       : a tool for carry out the database of administrator
-    $ rndc         :   name server control utility for BIND
 
-    $ vi /etc/bind/named.conf        debian
-    $ vi /etc/named/named.conf       fedora
-    ```
+      $ host         : to get host information from name server
+      $ nslookup     : tool to ask host information from name server
+      $ dig          : after finish DNS configuration,one can test DNS
+      $ whois        : a program to find domain holder
+      $ getent       : a tool for carry out the database of administrator
+      $ rndc         :   name server control utility for BIND
+
+      $ vi /etc/bind/named.conf        debian
+      $ vi /etc/named/named.conf       fedora
+
 
 * DNS operation
     Start by systemctl, service, init.d
 
     Firewall open via iptables configuration
 
-    ```
-    $ vi /etc/iptables/rules           : debinas
-    $ vi /etc/sysconf/iptables         : CentOS, Fedora
-    ```
+      $ vi /etc/iptables/rules           : debinas
+      $ vi /etc/sysconf/iptables         : CentOS, Fedora
+
 
 * Detailed Steps
+
   1. type in the Domain Name in web browser
   2. if the computer can't find its IP address in its cache memory, it will send the query to the Resolver server(basically your ISP)
   3. Resolver will check its own cache memory, if not, it will send the query to Root server, the top or the root of the DNS hierarchy, 13 sets of root servers around the world, operated by 12 organizations. each set has its own IP address
@@ -558,29 +559,29 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
 
     • Self signed vs Let’s Encrypt vs StartSSL.com
       - You can use CA tools in SSL
-      $ cd /etc/pki/tls/misc
-      $ CA -newca   : create your private key, cakey.pem (private key)
-      $ CA -newreq  : a signing request, newreq.pem(request CSR) & newkey.pem(new private key)
-      $ CA -signreq : sign the request, newcert.pem (CA signed certificate)
+        $ cd /etc/pki/tls/misc
+        $ CA -newca   : create your private key, cakey.pem (private key)
+        $ CA -newreq  : a signing request, newreq.pem(request CSR) & newkey.pem(new private key)
+        $ CA -signreq : sign the request, newcert.pem (CA signed certificate)
 
       - you will find the list of generated files under
-      $ cd /etc/pki/CA/private/
-      $ sudo apt-get install letsencrypt
-      $ sudo letsencrypt certonly -a webroot --webroot-path=/var/www/html -d example.com -d www.example.com
+        $ cd /etc/pki/CA/private/
+        $ sudo apt-get install letsencrypt
+        $ sudo letsencrypt certonly -a webroot --webroot-path=/var/www/html -d example.com -d www.example.com
 
       - to check server certificate for example.com     
-      $ sudo ls /etc/letsencrypt/live/example.com \
-      cert.pem            : publick key, server certificate only.
-      chain.pem           : root and intermediate certificates only.
-      fullchain.pem       : full trust chain
-      privkey.pem         : private key
+        $ sudo ls /etc/letsencrypt/live/example.com \
+        cert.pem            : publick key, server certificate only.
+        chain.pem           : root and intermediate certificates only.
+        fullchain.pem       : full trust chain
+        privkey.pem         : private key
 
       - google chrome StartSSL.com
-      ca.pem              : StartSSL's Root certificate
-      private.key         : The unencrypted version of your private key (be very careful)
-      server.ca.pem       ; The intermediate certificate for StartSSL
-      ssl.key             ; The encrypted private key (does not need to be copied to server)
-      ssl.crt             ; Your new certificate
+        ca.pem              : StartSSL's Root certificate
+        private.key         : The unencrypted version of your private key (be very careful)
+        server.ca.pem       ; The intermediate certificate for StartSSL
+        ssl.key             ; The encrypted private key (does not need to be copied to server)
+        ssl.crt             ; Your new certificate
 
 
     • Converting certificates
@@ -609,7 +610,6 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
          $ openssl dgst -sha256 -sign "general_key.key" -out .checksum.sha256 .checksum.md5
 
        - In local machine verify the signature
-
          $ openssl dgst -sha256 -verify <(openssl x509 -in "general_key.pub"  -pubkey -noout) \
            -signature dbaenv.sha256 .checksum.md5
 
@@ -645,9 +645,9 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
       - Verification of signed file will be performed in the factory
         modFactoryTransferValidateSignature( ) in factoryTransfer.sh
 
-#### SSL apply
+#### SSL procedure
     ===============================================================================================
-    SSL apply
+    SSL procedure
     ===============================================================================================
     Need super user privileges
       $ sudo su -
@@ -691,16 +691,15 @@ scans each little packet of data, physical(routers) or software, can me exceptio
 
 ###	Firewalld @ CentOS
 use Firewalld (firewall daemon), which is an alternative to the iptables service
-
 - installation
 
-    $ rpm -qa firewalld
-    $ sudo apt install firewalld
+      $ rpm -qa firewalld
+      $ sudo apt install firewalld
 
 - manage firewalld
 
-    $ sudo systemctl start firewalld	#start the service for the mean time
-    $ sudo systemctl enable firewalld	#enable the service to auto-start at boot time
+      $ sudo systemctl start firewalld	#start the service for the mean time
+      $ sudo systemctl enable firewalld	#enable the service to auto-start at boot time
 
 
 ###	iptables
@@ -756,40 +755,40 @@ iptables is a utility that allows a system administrator to configure the IP pac
     IPSec (Internet Protocol Security)
     ===============================================================================================
     - IPSec
-    provides encryption and authentication at IP level.
-    IPsec can run on routers, firewall machines, and application servers.
-    ESP(Encapsulating Security Payload), AH(Autehntication Header) are standard protocol
-    IKE(Internet Key Exchange) is used to handle tunneling as a higher level protocol.
-    In configuraiton file, you should find left and right node for IPsec connection
+      provides encryption and authentication at IP level.
+      IPsec can run on routers, firewall machines, and application servers.
+      ESP(Encapsulating Security Payload), AH(Autehntication Header) are standard protocol
+      IKE(Internet Key Exchange) is used to handle tunneling as a higher level protocol.
+      In configuraiton file, you should find left and right node for IPsec connection
 
-    IPsec is a protocol suite for secure Internet Protocol(IP) communications that works by
-    authenticating and encrypting each IP packet of a communication session. IPsec includes
-    protocols for establishing mutual authentication between agents at the beginning of the
-    session and negotiation of cryptographic keys to be used during the session. IPsec can be
-    used in protecting data flows between a pair of hosts (host-to-host), between a pair of
-    security gateways (network-to-network), or between a security gateway and a host
-    (network-to-host).
+      IPsec is a protocol suite for secure Internet Protocol(IP) communications that works by
+      authenticating and encrypting each IP packet of a communication session. IPsec includes
+      protocols for establishing mutual authentication between agents at the beginning of the
+      session and negotiation of cryptographic keys to be used during the session. IPsec can be
+      used in protecting data flows between a pair of hosts (host-to-host), between a pair of
+      security gateways (network-to-network), or between a security gateway and a host
+      (network-to-host).
 
-    IPsec uses cryptographic security services to protect communications over IP networks.
-    IPsec supports network-level peer authentication, data origin authentication, data integrity, data confidentiality (encryption), and replay protection.
+      IPsec uses cryptographic security services to protect communications over IP networks.
+      IPsec supports network-level peer authentication, data origin authentication, data integrity, data confidentiality (encryption), and replay protection.
 
-    IPsec is an end-to-end security scheme operating in the Internet Layer of the
-    Internet Protocol Suite, while some other Internet security systems in widespread use,
-    such as Transport Layer Security (TLS) and Secure Shell (SSH), operate in the upper
-    layers at the Transport Layer (TLS) and the Application layer (SSH). Hence, only IPsec
-    protects all application traffic over an IP network. Applications can be automatically
-    secured by IPsec at the IP layer
+      IPsec is an end-to-end security scheme operating in the Internet Layer of the
+      Internet Protocol Suite, while some other Internet security systems in widespread use,
+      such as Transport Layer Security (TLS) and Secure Shell (SSH), operate in the upper
+      layers at the Transport Layer (TLS) and the Application layer (SSH). Hence, only IPsec
+      protects all application traffic over an IP network. Applications can be automatically
+      secured by IPsec at the IP layer
 
     - Tip:
     do configure IPsec related program first
-    sysctl+racoon
-    isk_psk
-    tcpdump
+      sysctl+racoon
+      isk_psk
+      tcpdump
 
     then....do firewall setting with iptables
-    iptables=netfilter=packetfilter
-    HAProxy
-    NAT
+      iptables=netfilter=packetfilter
+      HAProxy
+      NAT
 
 
 ### VPN
@@ -822,7 +821,6 @@ iptables is a utility that allows a system administrator to configure the IP pac
       | push "redirect-gateway def1 bypass-dhcp"
 
       Options for OpenVPN
-
       | Packet Forwarding ip_forward
       | ufw...or iptables
 
@@ -862,13 +860,13 @@ iptables is a utility that allows a system administrator to configure the IP pac
 
 
 ### Malware
-    - Virus are a little piece of code, that can copy itself to other programs when triggered. corrupt datas. Often attached to an excutable file.
-    - Malware are software crashing systems, stealing important information.
-    - Trojans are harmful software that can steal information, user are usually lead to open the software.
-    - Ransomware host pc hostage, threatening to destroy data
-    - Spyware secretly gathers private information such as passwords
-    - Worms replicate themselves and attack other devices in the network, slowing down traffic and
-    - Malware today is an conclusion of all above and more.
+    Virus are a little piece of code, that can copy itself to other programs when triggered. corrupt datas. Often attached to an excutable file.
+    Malware are software crashing systems, stealing important information.
+    Trojans are harmful software that can steal information, user are usually lead to open the software.
+    Ransomware host pc hostage, threatening to destroy data
+    Spyware secretly gathers private information such as passwords
+    Worms replicate themselves and attack other devices in the network, slowing down traffic and
+    Malware today is an conclusion of all above and more.
 
 
 ### Intrusion Detection Prevention (IDP)

@@ -1,0 +1,1501 @@
+===============================================================================================
+LPIC 101: System Architecture
+===============================================================================================
+- Alles in Unix ist eine Datei!
+
+- 1024 Cylinder Limit, Some BIOS can not read over the 1024th cylinder
+  drive can have up to 4 primary partitions and up to 512 logical
+  SCSI /dev/sda (disk1), /dev/sdb (disk2), /dev/sda1 (first partition on disk 1)
+  Logical partitions just start from 5 (/dev/sda5)
+
+- A server would keep all executable files for the workstations and share via NFS.
+  This was very used when workstation storage was an issue.
+  It also helped distributing updates
+
+- senario (old fashion)
+  . /boot 100MB, keeps kernel within the 1024cylinder
+  . swap 1GB
+  . / 500MB, minimum
+  . /usr 4GB, all executables are shared to workstations via readonly NFS
+  . /var 2GB, keeping log files in their own partition helps making sure that their size will not affect the system
+  . /tmp 500MB, same as /var
+  . /home 90GB, used to provide the /home directory to all the users
+
+- LVM special
+  . dynamically change the size of logical volumes
+  . dynamically create/delete logical volueme
+  . create snapshots
+
+- BIOS
+  1. Boot device order
+  2. Hardware configuration
+  3. System's hostname
+
+- Kernel
+  uname       : Information ueber den verwendeten Kernel
+  lsmod       : geladene Module anzeigen, Quelle ist /proc/modules
+  modinfo     : Naehere Informationnen ueber ein Modul erhalten
+  insmod      : kompletter Pfad Modul laden
+  rmmod       : Modul entladen
+  modprobe    : Laden von Modulen (Ohne Pfadlangabe) inklusive Abhaengigkeiten
+  modprobe -r : Entladen von Moulen inclusive Abhangigkeiten geht nur
+              : fuer unbenutzte Module Modulaabhaengigkeiten,
+              : stehen in /lib/modules/<Kernelversion>/modules.dep
+              : Erstellen dieser Datei mit depmod
+  depmod      : generiert Datei modules.dep
+
+  $ cat /proc/modules        : running module by current kernel
+  $ cat /etc/modprob.d       : configuration data for modprod
+
+  $ uname -r                 : print of current version of kernel
+  $ lsmod                    : print of loaded modules
+  $ lsmod | grep xfs	   : show info. about loaded xfs modules
+  $ modinfo          	   : print of loaded modules in detail (with su)
+  $ modinfo -a module	   : send an E-mail to autor of kernel module
+  $ modprobe xfs             : load xfs module
+  $ modprobe -r kvm	   : extract kvm module
+  $ depmod -n 		   : wie depmod die Datei modules.dep konfig.
+
+- Kernel location where?
+  Module des Kernels
+  $ cat /lib/modules/<kernel version>/xxx
+  $ cat /lib/modulee/<kernel version>/kernel/drivers/acpi/video.ko
+  Kernel-Quelldateien
+  $ /usr/src/linux-2.6.11.4-21.9
+
+- /proc
+  Prozessdateisystem, runtime kernel module infromation
+  $ cat /proc/cmdline        : from the bootloader to the kernel
+  $ cat /proc/interrupts     : Info. about IRQs
+  $ cat /proc/ioports        : Info. about I/O ports
+
+- IRQs serial port
+  2 keyboard
+  3 RS-232
+  4 RS-232
+  8 Real time clock
+  16 modern device
+
+- /sys
+  benutzer Treibermodell des laufendern Kernels
+  dynamische generiert wird
+
+- PCI-Bus info
+  $ lspci -v oder -vvv
+  Device IRQ information and vernder information
+
+- USB info
+  $ lsusb -t          : USB hiracy
+  usb-uhci.o 	    : for USB 1.0
+  usb-ohci.o          : for USB 1.0
+  usb-ehci.o	    : for USB 2.0
+  usb-storage.o	    : for Memory stick
+  hid.o 		    : for USB Maus, keyboard
+  usbmgr und hotplug  : USB daemon
+  hald                : hardware abstraction layer for hotplug
+  dbus 		    : daemon for moveable device
+
+- /dev
+  Primaere patition ist max. 4 moeglich in ein Disk(Platte)
+  # /dev/sr0       :  ROM-1.Zal oder 1.Optisches
+  $ sudo fdisk -l
+  $ parted -l
+
+  udev : To manage the /dev tree
+
+  /dev/mapper     : hold device files related to LVM and RAID configuration
+
+- /etc
+  Configuration files unique to the system needed at boot
+  /etc must be an ordinary directrory on the root partition, not on a separate
+  partition, if you have / in a partition and /etc in another partition,
+  then system won't be boot!
+
+- /boot
+  Konfigurationsdatei fuer GRUB Legacy :
+  $ /boot/grub/menu.lst (bei RedHat grub.conf)
+  Jetzt mit grub2, steht alles Konfigurationsdatei unter
+  $ /etc/grub.d/       (contents)
+  $ /etc/default/grub  (von Hand bearbeitbar)
+
+- Forget password as administrator !
+  In the processing of bootloader with grub, change ro single as init
+  # linux=....UUID=xxxxx ro single
+  # linux=....UUID=xxxxx init=/bin/bash
+  $ mount -o rmount,rw /dev/sda1
+  $ passwd
+  one can without root passwd boot and then set passwd after mounting
+
+- Daemon
+  Ein Daemon in Linux ist ein Hintergrunddienst, dem kein Terminal
+  als Ein/Ausgabeeinehit zugeordnet ist.
+
+- 3 Wesentliche Initialisierungsverfahren fuer den Linux-Systemstart:
+  SysVinit (wird kamm mehr benutzt)                 : linux system
+  Upstart  (Ubuntu, in zwischen night mehr aktuell) : linux system
+  Systemd  (inzwischen von allen grossen Distributionen eingesetzt)
+
+- initrd (init ram disk)
+  In der initrd befinden sich Kernel-module, die Linux beim Boot-vorgang benoetigt.
+  Die initrd wird von Kernel beim System start in den Hauptspeicher geladen
+  Die initrd muss bei jedem Kernel-Update nue erstellt werden
+
+- Hauptkonfigurationsdatei fuer SysVinit:
+  $ cat /etc/inittab       : to-do list of init process after system start
+  $ cd /etc/rc.d/          : data of init process
+  $ cd /etc/init.d/        : data of init process
+  $ /etc/init.d/atd start  : at daemon start
+  init process
+  .test of file system stucture
+  .mount file system
+  .daemon start
+  .login console
+  .after login signal, load shell
+  If it is something wrong with inittab
+  $ telinit q    : read configuration, go back previous inittab without
+  tell init to re-examine the /etc/inittab
+
+- How do I know whether SysVinit or Systemd are used in starting system?
+  $ ps -A
+  $ pstree
+
+- Runlevels
+  init erster Prozess im System als interakitver Befehl aufgerufen bewirkt init den
+  Wechsel des Runlevels. Es kann auch telinit dafur verwendet werden.
+  # runlevel 0 System halt
+  # runlevel 1 Single user
+  # runlevel 2 local multiuser without remote network
+  # runlevel 3 full multiuser with network
+  # runlevel 4 not used
+  # runlevel 5 full multiuser with network and xdm
+  # runlevel 6 system reboot
+
+  $ init 3   : wechselt in den runlevel 3
+  $ init 1   : emergency situtation, no users connect
+
+- shutdown
+  $ shutdown -f -r now      : reboot send a message
+  $ init 6 		  		  : reboot without message
+  $ shutdown -h now
+  -r reboot
+  -k konsolenmedung senden
+  -f kein fsck
+  -F fsck
+  -h halt
+  -c cancel scheduled shutdown
+  $ echo "System will be shut down" | wall : send some message to user
+
+- Systemd
+  wichtigster Befehl ist "systemctl".
+  $ Systemctl start|stop|status <Subsystem>
+  $ Systemctl isolate multi-user.target    : runlevel 3 no graphic
+  $ Systemctl isolate graphical.target     : runlevel 5 with graphic
+  $ Systemctl isolate rescue.target        : runlevel 1 rescure single mode
+  $ systemctl set-default multi-user.target: legt der Runlevel 3 als Standard fest
+  $ systemctl get-default                  : get info. about current default runlevel
+  $ systemctl enable/disable <service>     : sorgt fuer Ausfuehrung eines Dienstes
+  $ ls -l /etc/systemd/system/
+  wenn Sie systemd statt SysVinit, dann kommt journald & journalctl
+
+  At kernel command line you can change default as rescue mode by grub
+  > systemd.service=rescue.target
+
+
+
+===============================================================================================
+LPIC 102: Linux Installation and Package Management
+===============================================================================================
+- /usr
+  unix system resource - suggest read only
+
+- /var
+  temporally used system related files
+  /var/log         : system log files
+  /var/spool/mail  : grosser platz empfolen
+  /var/named       : DNS zone configuration file
+  /var/spool/cron  : cron temporal configuration data
+  /var/log/messages  : Hauptprotokolldatei in Linux
+  /var/log/syslog    : ausser bei Debian und Derivaten
+
+- Boot Manager in Master Boot Records (MBR)
+  Total 512 Byte, a partition table within the end of MBR
+  BIOS -> MBR -> LILO or GRUB(boot loader) is loaded into RAM
+  -> Launch Linux Kernel on disk -> Kernel control hardware on disk
+  0-440(bootcode)
+  446-510(partition table 4primaryx16bytes=64bytes)
+  510-512(Sign)
+
+- Grub legacy
+  altes GRUB
+  one problem for update 3rd linux in a partition,
+  one has to modify kernel update by hand in
+  /boot/grub/menu.lst
+  ---------------------------------------------------------------------------
+  #GRUB booting
+  grub> root (hd0,0)
+  grub> kernel /vmlinuz-2.4.18-14 ro root=/dev/hda2
+  grub> initrd /initrd-2.4.18-14.img
+  grub> boot
+  ---------------------------------------------------------------------------
+
+- Grub2
+  stark modularisiert und automatisiert
+  konfigurationsdatei /boot/grub/grub.cfg (nicht von Hand bearbeiten!)
+  weiere Konfigurationsdateien liegt in
+  /etc/default/grub
+  /etc/grub.d/*
+  ----------------------------------------------------------------------------
+  #GRUB2 grub.cfg (more complicated and divided accordinlgy by grub.d
+  grub2> kernel /boot/vmlinuz-3.10.00327.el7.x86_64 ro root=/dev/hda2 quiet
+  grub2> initrd /boot/initramfs-3.10.00327.el7.x86_64.img
+  ---------------------------------------------------------------------------
+
+  Wenn Sie einem System manuell einen neuen Kernel hinzugefuegt haben,
+  dann muessen Sie
+  $ update-grub2
+
+- Grub vs Grub2
+  (hd0,0) <-> (hd0,1)
+  /boot/grub/menu.lst <-> /boot/grub/grub.cfg
+
+- Tip for Grub
+  $ grub-mkconfig    : durchsucht alle Festplatten partionen Betriebsssytemen
+  und findet sie in GRUB ein, (many OS in a machine)
+  $ grub-install /dev/sda  : install grub legacy into the MBR of your first SATA
+
+- Shared Library : LD_LIBRARY_PATH
+  $ ldd /usr/bin                  : print shared library dependencies
+  $ ldd /usr/bin/grep             : print shared library dependencies of grep
+
+  $ ldconfig                      : updates the linker cache of shared libraries
+  $ ldconfig -p | less            : print the lists of libraries stored in Cache
+
+  Textdatei mit Eintraegen fuer Verzeichnisse, die dynamische Bibliotheken
+  enthalten /etc/ld.so.conf bzw Dateien in /etc/ld.so.conf.d/*.conf
+  Aus dieser Datei wird mit Hilfe des Kommandos "ldconfig" eine Binaerdatei
+  erstellt namens /etc/ld.so.cache
+  Diese Binaerdatei wird vom dynamischen Linker benutzt um Biblotheken zu finden
+
+- dynamic linker/loader shared object
+  # ld.so/ld-linux.so
+
+- Software Paket
+  ist in Linux-Distributionen in Paketen organisiert
+  Diese Paket enthalten ausser dem eigentlichen Programm meist
+  Konfigurationsdateien, Installations- und Deinstallationsskripte,
+  generelle Informationen, Dokumentation, und einiges mehr.
+  Die Pakete liegen in sogenannten "Repositories" auf Servers im Internet
+  (naeturlich auch auf Installationsmedien)
+
+- Packet verwaltung
+  dpkg     : Low-level-Werkzeug fuer die Debian-Paketverwaltung
+             beherrscht keine Aufloesung von Abhaengigkeiten
+  apt-get  : High-Level-Werkzeug fuer die Debian-Paketverwaltung
+             beherrscht die Aufloesung von Abhaengigketen
+  apt-get  : Uses package names and obtain them from an external source(CD, ftp, etc...)
+  dselect  : Uses an interactive menu (similar to aptitude)
+  aptitude : wie apt-get but interactive menu possible
+
+- dpkg (deb installation package)
+  /etc/dpkg/dpkg.cfg                 : not conf but cfg!
+  $ dpkg -i <folder/package name>    : install
+  $ dpkg -G <folder/package name>    : upgrade
+  $ dpkg -r <package name>           : remove
+  $ dpkg --purge(-P) <package name>  : purge complete remove
+  $ dpkg -l                          : list of installed package
+  $ dpkg -l | grep password          : list of installed package
+  $ dpkg -L mc                       : List files in a package
+  $ dpkg -L apt | grep '^/usr/bin'   : List files in a package
+  $ dpkg -S /bin/bash                : Search, welche packet stammt aus?
+  $ dpkg -S /usr/bin/find            : Search, welche packet stammt aus?
+  $ dpkg -S apt-get                  : Search, a package with specific files
+  $ dpkg -s mc		           	   : get status of mc (midnight command)
+  $ dpkg -s apt                      : get status information on a package
+  $ dpkg -C                          : not completely installed list
+  $ dpkg --get-selections 	       : list of all of the installed packages
+
+  /var/log/dpkg.log
+  /var/lib/dpkg/info
+  /var/lib/dpkg/status
+  /var/lib/dpkg/available
+  dpkg-reconfigure                   : reconfigure an already installed package
+
+- APT-GET
+  /etc/apt/apt.conf
+  /etc/apt/sources.list
+  $ apt-cache pkgnames vsftpd
+  $ apt-cache search vsftpd
+  $ apt-cache show netcat
+  $ apt-cache status
+  $ apt-get depends
+  $ apt-get install <package>
+  $ apt-get install packageName --only-upgrade
+  $ apt-get install vsftpd=2.3.5-3ubuntu1
+  $ apt-get remove <package>
+  $ apt-get update
+  $ apt-get purge  <package>
+  $ apt-get upgrade
+  $ apt-get dist-upgrade
+  $ aptitude install <package>       : same as apt-get
+  $ aptitude 	  	                   : interactive mode
+
+- Red Hat Package Manager (rpm package)
+  /etc/rpm/
+  /usr/lib/rpm/rpmrc
+  ~/.rpmrc
+  $ rpm -i <dependency 1> <dependency 2> <dependency 3> <desired package>
+  $ rpm -i 		              (installation)
+  $ rpm -U 	                  (installiert auch ohne vorhandenen Vorver.)
+  $ rpm -e                      (e-erase)
+  $ rpm --force --nodeps        (force and kein test fuer abhaengigkeiten)
+  $ rpm -q fortune              (quary)
+  $ rpm -qp aaa.rpm             (quary package)
+  $ rpm -V samba                (V-verifiy)
+  $ rpm -qf /usr/X11R6/startx   (which package contains startx?)
+  $ rpm -ql bzip2               (list for bzip2 package)
+  $ rpm -qa                     (list all installed rpm package in current system)
+  $ rpm -qa | grep apache
+  $ rpm -qR                     (requires abfrages, Abhaengigkeit listen)
+  $ rpm -qc                     (c-configures, zeigt nur Konfigurations Datei)
+  $ rpm -qd                     (d-docfiles, zeigt nur Doku.datei)
+  $ rpm -qi                     (i-information in details)
+  $ rpm -ql zip                 (Dateien auflisten installierten paket)
+  $ rpm -qpl zip.2.2.2.2.2.rpm  (Dateien bis jetzt nicht installierten Paket)
+  $ rpm -ivh                    (zuzaetzlich "Hashmarks" ausgeben) new packgae
+  $ rpm -Uhv                    (h-hash v-verbose) upgrade or new packgage
+  $ rpm -F  --freshen           (installiert nur vorhandenener Vorver.)
+
+  /var/lib/rpm
+
+- yum
+  /etc/yum.conf
+  /etc/yum.repos.d
+  $ yum search <fortune>
+  $ yum install <fortune-mod.i386>
+  $ yum remove <fortune-mod>
+  $ yum list <package>
+  $ yum provides <dataname>
+  $ yum upgrade 		      : upgrade and update are identical in yum
+  $ yum update <package>        : upgrade and update are identical in yum
+  $ yum check-update <package>  : possibility
+  $ yum clean <package>
+  $ yum list updates
+  $ yum list available
+  $ yumdownloader               : easy to download
+
+- alien : a program that converts between Redhat rpm, Debian deb
+  $ alien [--to-deb] [--to-rpm] [--to-tgz] [--to-slp] file
+  $ alien --to-deb foo1.2.34.i386.rpm
+
+
+
+===============================================================================================
+LPIC 103: GNU and Unix Commands I
+===============================================================================================
+- Terminal
+  $ reset
+  $ clear
+  $ ctrl + l
+
+- set & env
+  $ set : local
+  $ env : global
+  $ env TZ=Asia/Tokyo date
+  $ env -u myname 'echo $myname'
+  $ unset myname
+  $ unset PATH
+  $ echo $PATH
+  $ set -x			# activate debugging
+  # your commands go here...
+  $ set +x			# stop debugging
+
+  $ A=100       : yes
+  $ let A=100   : yes
+  $ set A=100   : No just A=100 enough
+
+- About shell
+  a) Login Shell
+  /etc/profile     -> Systemweit, erste Konfigurationsdatei, die bei Anmeldung
+  -> hier drei sind benutzerbezogen
+  .bash_profile    (Centos)
+  .bash_login
+  .profile         (Debian)
+
+  b) Interactive Shell
+  /etc/bash.bashrc -> Systemweit (Debian)
+  /etc/bashrc                    (Centos)
+  ~/.bashrc       -> benutzerbezogen
+
+- Shell expands double quotes ("), however single quotes (') are not expanded
+  $ echo "$SHELL" '$SHELL'   ->   /bin/bash  $SHELL
+  $ echo '$USER'   ->   $USER
+  $ echo "$USER"   ->   kang
+
+- Shell extention
+  $ echo $PPID : Parent process ID of the current process
+  $ echo $$    :        process ID of the current process
+
+  When passing to a child shell, double quotes are expended before passing command
+  (in the parent shell), while single quotes are expended in the child process
+  $ bash -c echo 'parent $$ $PPID'
+  >
+  $ bash -c "echo parent $$ $PPID"
+  > parent 23033 23011
+  $ bash -c 'echo child $$ $PPID'
+  > child 25798 23033
+  $ echo "$USER_/this is my user name"
+  > /this is my user name
+  $ echo "${USER}_/this is my user name"
+  > root_/this is my user name
+
+  # Runs a command that replaces the current shell
+  $ echo $$
+  > 27316
+  $ bash
+  $ echo $$
+  > 27369
+  $ exec ls
+  > anaconda-ks.cfg clearlooks.tar.gz Desktop install.log set1 um2\
+  > bluecurve.tar.gz declare1 icons install.log.syslog um1 umdois
+  $ echo $$
+  ->27316
+
+- Echo
+  $ echo $HISTSIZE
+  $ echo $HISTFILESIZE
+  $ echo $PS1 : primaeres Prompt
+  $ echo $PS2 : sekundaeres Prompt
+
+- Ruckgabewert des letzten Kommandos
+  $ echo $?
+
+- kommand wie macht man
+  option1 option2 : parameter1,2 des Befehls, parameter0 $0 ist commando
+  $ <commando> $1 $2
+  $ ba TAB TAB...
+  dann vorschlagte Kommandos mit "ba*" angezeigt wird.
+
+- history
+  $ .bash_history
+  $ echo $HISTOFILE
+  $ history
+  his> !100               : re-use command of 100 line
+  his> !echo              : re-use echo command used before
+  his> !?test             : fueht den letzten Befehl aus, in dem test vorkommt
+  his> !!                 : re-use of last command
+  his> !n			: re-use of command in line number n
+  his> ^string1^string2   : repeat the last command replacing
+  with first occurrence of string1 with string2
+  his> !xxxxx:s/$$/$PPID/ :
+  his> Ctrl + r           : find contents
+
+- PATH
+  Namen der Verzeichnisse, in denen Bash nach Befehlen sucht
+
+- kommando Ersetzung (cd command substitution)
+  $ ls -l $(which passwd)
+  Der Befehl in der Klammer wird zusert ausgefuehrt (which passwd)
+  und die Ausgabe dieses Befehls (/usr/bin/passwd) wird an der selben Position
+  in die Befehlszeile eingefuegt. Das resultierende Kommando ist dann:
+  $ ls -l /ust/bin/passwd
+  $ ls -l `which passwd`
+
+- touch
+  erzeuge ein leere Datei!
+  $ touch newfile
+
+- date
+  $ date "+DATE: %m/%d/%y%nTIME: %H:%M:%S"
+
+- manpage
+  $ man
+  > /Jahres
+  > n,N,<,>    : keyboard 'n' find contiunue next one
+
+  $ man 1 command   : utilities and commands
+  $ man 5 command   : file format and convention
+
+  path of manpage
+  $ manpath                 : show all path of manpage
+  > /usr/share/man          : classic
+  > /usr/local/share/man	  : modern
+
+- Hilfesysteme in Linux
+  1.Manuel Pages (manpages): Klassisches Unix-Hilfesystem
+  $ man <command>
+  2.Info Pages": Hilfesystem des GNU-Projekts
+  $ info apt-get
+  3.In viele Befehle eingebante kurzhilfe
+  $ <command> --help
+  4.kurzhilfe fuer interne Befehle der Bash:
+  $ help echo
+
+- Verwaltung der Kommnados
+  $ whatis <command>     : sucht Erklaerung der Befehl, search the whatis database for complete words
+  $ whereis <command>    : zeigt Pfade zu Binaer und /oder Konfigurationsdateien, Pfade der Manpages und Pfade zu Programmquellen
+  $ which <command>      : zeigt Pfade zu ausfuehrbaren Dateien.
+  $ ls -l 'which locate' : list of location indicated by 'which locate'
+
+- Wenn ich Hilfe brauche unbekannte Programm Name!
+  # search the whatis database for strings with apropos
+  $ apropos <string>
+  $ man -k <string>
+
+- Process Text Streams Using Filters
+  $ ls -li  : Inode show
+  $ ls -lS  : sort by Size
+  $ ls -lc  : sort by last modification of file status information
+
+  $ cat -n  : number all line
+  $ cat -b  : number non-blank line
+  $ tac     : wie cat but reverse print
+
+  $ head -n1                    : just first line or "head -1" is same
+  $ tail -f /var/log/messages   : -f (follow) "Live" stream
+
+  $ expand    : wandelt Tabulatorzeichen in Leerzeichen um
+  $ unexpand  : wandelt Leerzeichen in Tabstopps
+  $ expand    : Converts tabs to spaces (usually by default, 1 tab = 8 spaces)
+  $ unexpand  : Converts spaces to tab
+
+  # fmt       : a formatter for simplifying and optimizing text files
+                formatiert Text in der angegebenen Spaltenzahl, standarmaesig 75 Zeichen breite
+  $ fmt -w 35 text.txt
+  pr bereitet Textdateien fuer eine Druckansgabe vor. Es zeigt Zeit, Datum, Seiten
+  $ fmt -w 35 text.txt | pr -h "Title" -2
+
+  # nl  : numbers of lines of files
+  $ nl data1 > data2  : put number in every line
+
+  # wc : counts of bytes, characers, words and lines of a file
+  -c, --bytes
+  -m, --chars
+  -l, --lines
+  -L, --max-line-length
+  -w, --words
+
+  $ hexdump /dev/sda | head -n 32 | tail -n 5 : Hexdump(16bit) important for programmer
+  $ od -tx(-txC) /etc/passwd
+
+  $ locale : Language and local setting
+
+  # sort    : sort lines of text files alphabetically
+  $ sort -n sortiert nach numerisschen, sort reads the number and not the value
+         -o outfile
+         -r reverse file
+  $ sort -nr : displays summary and sorts the result in order of largest to smallest numeric and reversal.
+
+  $ uniq      : removes consecutive duplicate lines
+  $ uniq file : reduziert mehrere identische aufeinanderfolgende Zeilen auf eine Zeile
+
+  # split      : splits a file into different groups/files
+  $ split -b 11m README README_
+  $ split -l 1000 README README_
+  $ cat READAME_* > README
+
+  # cut
+  $ cut -d'' -f2
+  $ cut -d:  -f2
+  $ cut -d:  -f1,6 /etc/passwd
+        -d Feldtrennzeichen
+        -f Feldnummer
+  $ cat /etc/passwd | grep user | cut -f1 -d:
+
+  # paste : horizontalles cat, paste together lines on a file into vertical columns
+  $ paste file1 file2
+  $ paste test1 test2
+  >1 	a
+  >2 	b
+  >3 	s
+  $ paste -s test1 test2
+  >1 	2 	3
+  >a 	b 	s
+
+  # join : horizontalles cat, prints a pair of input lines
+  $ join -t : -j 1 file1 file2
+
+  # tr : translate or delete character
+  $ cat file | tr -s '[:blank:]' : exchange spaces as one space
+  $ cat file | tr -s e           : exchange ee/eee as e
+  $ cat file | tr n x            : exchange n as x
+  $ cat file | tr -d n           : delete n character in file
+  $ cat file | tr a-z A-Z        : exchange small to big
+  $ cat file | tr -d [:blank:]   : delete space and tap, normal case use
+  $ cat file | tr -d [:space:]   : delete all white space, only one line after this
+  $ cat file | tr -d \a          : pipeton aus
+
+  # pr      : Convertsa text file for printing few page printing
+
+- Perform basic file management
+  # cd, ls, pwd, mv, rm
+  # wichtig! : Dateien haben Metastrukturen (inodes), in denene alle
+  wichitgen Informationen Stehen ueber die jeweiligen Datei.
+  (ausser dem Dateinamen) ---- why mv very fast!
+  Der Dateiname sthet im Verzeichnis. Das Verzeichnis ist eine
+  einfache Tablelle mit Inode-Namenszuordnung.
+
+  $ cp -u    : copy only when source is newer than destination or missing file
+  $ cp -p    : preserve ownership and timestamps
+
+  $ mkdir -m 700 aaa
+  $ mkdir -p work1/work2/work3/mywork : create all subdirectory
+  $ rmdir -p work1/work2/work3/mywork : delete all work1 work2 work3 directory
+
+  $ touch file    : neue Datei
+  $ touch -m file : andert nur die letzte Anderungszeit
+  $ touch -a file : andert nur die letzte Zugriffszeit
+  $ stat file     : Status of this files who access, modify, etc
+  # change the access time, below 3 are equivalent!
+  $ touch -a
+  $ data -r
+  $ ls -lu
+
+- find
+  $ find / -name myfile1
+  $ find / -name "*.log"
+  $ find / -name "sambda*.rpm"
+  $ find / -name "samb[a-z]*"
+  $ find / -type l     : type symbolic
+  $ find / -type d     : type directory
+  $ find / -type f     : type regular file
+  $ find / -name <whatever> -exec chmod 777 {} \;
+  $ find / -name <whatever> | xargs chmod 777
+
+  # after find some options for displaying
+  -print
+  -print0      : find a file contained null character
+  -path
+  -d or -f or -l
+  -empty
+  -executable
+  -mtime or -atime
+  -maxdepth    : directory maximum depth level
+
+  # for executing
+  -exec ls -l {}\;
+  -exec cmd {}\;　
+  -exec rm -i {} ＼;
+  {} will be replaced by the file name
+  \ is used to comment out the ";"
+  ; is used to end the command
+
+  # example - change from htm to html within the folder.
+  $ find /var/www/ -name *.html -exec chmod 500 {} \;
+  $ find . -name '*.htm' -exec mv '{}' '{}l' \;
+
+- tar
+  # Tape Archiver
+  -c erstellen
+  -x entpacken
+  -t Archivinhalt auflisten
+  $ tar -cvzf backup.tar.bz2 /etc/*
+  $ tar -xvzf xm.tar.gz
+  $ tar -xvjf xm.tar.bz2
+  $ tar -tvzf xm.tar.gz
+
+- compressing
+  $ gzip -9 (--best,slow)      	: best Komprimierte Datei
+  $ gzip A.doc                    : A.doc wird geloescht
+  $ gzip -c A.doc > A.doc.gz     	: -c A.doc keep and create gz
+  $ gzip -d A.doc.gz   		: decompress
+  $ gunzip A.doc.gz               : decompress
+  $ zcat A.doc.gz         	: anzeigen list (gzip -c -d)
+  $ bzip2 B.doc                   : B.doc wird geloescht
+  $ bzip2 -c B.doc > B.doc.bz2    : -c B.doc keep and create bz2
+  $ bzip2 -d B.doc.bz2		: decompress
+  $ bunzip2 B.doc.bz2             : decompress
+  $ bzcat A.doc.bz2        	: anzeigen list (bzip2 -c -d)
+  $ xz -z  			: compress
+  $ xz -d A.xz 			: decompress
+
+- cpio
+  Archive copy and backup
+  $ cpio -i			   	    : extract
+  $ cpio -o 				    : create
+  $ cpio -d 				    : directory
+  $ cpio -p  				    : pass through
+  $ find /etc | cpio -ov > /tmp/etc.cpio      :
+  $ find /home -name *.ods | cpio -pd /backup : copy ods file into /backup
+  $ cpio -ocv > backup.cpio                   : backup all into cpio
+  $ cpio -it < backup.cpio                    : print contents backup.cpio
+  $ cpio -iv < backup.cpio                    : restore complete cpio
+  $ cpio -iv "*file" < backup.cpio	    : restore just few file from rmt
+
+- dd
+  Blockweises Daten Kopieren und Konvertieren
+  $ dd if=/dev/sda of=/dev/sdb
+  $ dd if=/dev/hda of=mbr.backup ibs=512 count=1  | MBR backup
+  $ dd if=mbr.backup of=/dev/sda
+  $ dd if=/dev/sr0 of=debian.iso bs=1M            | cd image copy
+  $ dd if=/dev/zero of=nulldatei bs=1M count=100  | create 100 MB data !
+
+- file & type
+  file zeigt den Typ eier Datei an, file show info about file
+  $ file /etc/cron.daily/backup
+
+  type zeigt fuer ausfuehrbare Dateien an, ob sie Shell-intern
+  oder als ausfuehrbare Datei im Dateisystem vorhanden sind
+  $ type (ls, echo, firefox, [)
+
+- Use streams, pipes and redirects
+  standard-eingabe und -ausgabe STDIN(0) -> STDOUT(1) -> STDERR(2)
+  Es ist moeglich, die Ein-u.ausgabekanaele umzuleiten.
+  Ausgabeumleitung geht mit > (Datei)
+  Eingabeumleitung geht mit < (Datei)
+
+  Bei Ausgabeumleitung wird eine bereits bestehande Datei des gleichen Namens
+  ueberschreiben
+  $ ls -lR /etc > etcfiles
+  $ ls -lR /etc/ 2> etcfiles.errs
+  $ ls -lR /etc 2>> etcfiles
+
+  configure ">>" meaning whether cannot overwrite or can overwrite by set!
+  $ set -o noclobber : not allow
+  $ set +o noclobber :     allow
+
+  Doppelte Ausgabeumleiungszeichen haengen die Ausgabe am eine bestehende Datei an
+  $ cat << string
+  $ >a
+  $ >b
+  $ >string
+
+  Redirection, can use "&" to send both stdout and stderr to a file (&> or &>>)
+  $ ps >  file                : create or overwrite
+  $ ps >> file                : create or append
+  $ ps &> file                : stdout and stderr into file
+  $ cmd > file 2>&1           : stdout and stderr into file
+  $ cmd 1> file1 2> file2     : stdout into 1 and stderr into 2
+  $ ls /etc >/dev/null 2>&1   : no print
+
+  Pipes with tee kann man Datenstrom in einer Textdatei ausgeben
+  Both display to monitor and also to the file, important!
+  $ grep "kernel" /var/log/messages | tee kernel_messages.txt
+
+  xargs build and execute command lines from standard input
+  xargs uebernimmt die Standadausgabe des vorhergehenden Kommandos aus einer Pipe
+  und ubergibt diese als Argumente an den naechsten Befehl
+  $ find . -name '*.mp3' | xargs rm
+  $ find . -name "*.c"   | xargs grep foo1foo2foo3
+
+- Monitor and kill processes
+  $ ps : aktuellen laufenden Prozesse anzeigen
+  $ ps -A | head -4    : Select all process
+  $ ps -aux            : To see every porcess on the system using BSD syntax
+  $ ps -C <prozess>
+  $ ps -U <benutzer>
+  $ ps -j --forest     : jobs format with forest
+  $ pstree -a          : zeigt arguemnt without PID
+  $ pstree -pn         : zeigt sortierten PID
+
+  # top
+  $ top -i     	: zeigt nur die aktiv Prozess
+  $ top           : @interative mode
+  r = renice
+  k = kill
+  q = quit
+
+  # signal
+  $ ctrl + c = inerrupt       # stop running
+  $ ctrl + d = suspend        # stop but ready to continue
+  $ ctrl + z = stop           # ready to continue
+  $ ctrl + x = kill?          #
+
+  Kill sendet eine Siganl, nicht sendet kill(nur Name)
+  $ kill -l          : list of all kill option (1,9,15)
+  -1  SIGHUP  : bei Diensten Neueeinlesen der Konfiguration
+  -2  SIGINT  : ctrl+C bewirkt Terminierung
+  -9  SIGKILL : Abbruchsignal benoetigt root-Rechte, arbeitet auf der Kernel
+  -15 SIGTERM : selbst zu beenden
+  -18 SIGCONT : fortsetzen einen Prozess durch fg and bg
+  -19 SIGSTOP : anhaelten einen Prozess
+  -20 SIGSTP  : ctrl+Z anhaelten einen Prozess
+  $ kill -15 3167
+  $ kill -s SIGTERM 3167
+  $ kill -SIGTERM 3167
+  $ kill -SIGHUP $(cat /var/run/dhcpd.pid)
+  $ kill -HUP `cat /var/run/httpd.pid'
+  $ kill $(pidof top)
+  $ killall -s 9 mc
+
+  To kill the process but allows the process to "clean up" before existing
+  $ kill -TERM 1111     : this is default signal of kill
+
+  Wie viele Prozess fuer Kang im Lauf?
+  $ pgrep -u kang -c
+  $ pkill -u kang
+
+- Hintergrund prozess
+  $ <command> &
+
+  jobs zeigt alle Hintergrund prozesse mit ihrer Job-ID [n] an
+  $ jobs -l
+
+  $ bg 1   : process to background
+  $ fg 1   : process to foreground
+  $ fg %<job-id>  : kann ein angehaltener Prozess zum Wieterarbeiten
+  in den Vordergrund geholt werden
+  $ bg %<job-id>  : ein angehaltener Prozess im Hintergrund weitergefuerhrt werden
+  $ bg %glxgears
+  $ fg %glxgears
+
+  Wenn ein Prozess Ausgaben auf dem Terminal machen mochte, kann er nicht im Hintergrund
+  ausgefuehrt werden, Deshalb kann man mit "nohup <command> &" dafuer sogen, dass dieser
+  Prozess im Hintergrund laufen kann, er macht seiner Ausgaben in die Datei "nohup.out"
+  $ nohup updatedb &
+  $ logout
+
+  # screen (remote shell)
+  # (login)-(screen)-(top)-(other ssh login)-(screen -r)-(runing now top!)
+  # one application with screen
+  (login)-(screen -S job)-(command)-(ctrl+ad)-(logout)-
+  (login again)-(screen -r job)-(job finish!)-(exit or ctrl+a\)
+
+- Quick info about total service times and users
+  $ uptime       : runing time, count user and system load
+  $ w            : who, aktuell angemeldeten Benutzer
+
+- Memory and Sway usage
+  $ free -mts (m-MByte t-Total s-automatische Aktualisierung nach x sec)
+
+- Prozessprioritaet -20(high) ~ +19(low), default is 10
+  $ nice -n  12 nano    : 12
+  $ nice -n -15 nano    : -15
+  $ nice -12 nano       : 12
+  $ nice --12 nano      : -12
+  $ renice -10 5309     : hier ist -10
+  $ renice 5 -u dominik : hier ist +5
+  * renice do NOT use "-"
+  * Users do NOT increase the priority of their own processes
+
+- Regular expression
+  [:blank:]   : all horizontal whitespace
+  [:xdigit:]  : all hexadecimal digits
+  [:alpha:]   : all letters
+  [:alnum:]   : Alphanumeric characters
+
+  $ ^      : start of line
+  $ $      : end of line
+  $ \<     : start of word
+  $ \>     : end of word
+  $ .      : match any single character, equivalent to ?
+  thus, "m.a" matches "mpa" and "mea" but not "ma" or "mppa".
+  $ ?      : any single character. "hd?" -> (hda, hdb, hdc)
+
+  # what has meaning for this?
+  $ ^[^#]  : Wenn am Zeilenanfang keine Raute # steht
+  $ $[.]   : Wenn am Zeilenende Raut . steht
+  $ \      : Maskierung, schuetzt das folgende Metazeichen vor der Interpretation
+  $ june\? : Matches June or Jun (? matches zero or an instance of e)
+  $ [a-zA-Z]      : Match any letter
+  $ [^0-9A-Za-z]  : Any non alphanumeric character
+  $ [A-Z][a-z]*   : An uppercase character followed by zero or lower case character
+  $ \$[ 0-9]*\.[0-9]\{2\} : Matches $xx.xx or $ xxx.xx,  whereas the chracters
+  following $ could be a space or number
+  $ [0-9]\{2}-[0-9]\{4\}-[0-9]\{3\} : Matches numbers on the pattern xx-xxxx-xxx
+
+- grep every '<regular expression>' can be used in vi or grep
+  $ grep -i w.lly  list 		      : willy oder WILLY egal!
+  $ grep -v [#] list    		      : without # in a line
+  $ grep '[^#]' list                    : without # in a line
+  $ grep '^[^#]' list                   : without # first position in a line
+  $ grep '^[^#]' list | grep -v ^$      : but will empty line will be disappeared!
+
+  $ grep 'Wort[1-9]*\>' Datei           : find Wort, Wort1,Wort1234 etc
+  $ grep 'Wort[1-9]\?\>' Datei          : find Wort1,Wort2
+  $ grep '^Dec 10'  /var/log/messages   : find "Dec 10" in each line
+  $ grep '1\{3,5\}' Datei               : find 1111 oder 11111
+  $ grep '[0-9]\{3\}' Datei             : find any numbers 258 389
+  $ grep '[A-Z]\{3\}' Datei	      : find any string  ACB UIC
+  $ grep '\$[0-9]\{3,\}\>' Datei        : find more than 3 digits $123 or $12345
+  $ grep '\/var\/log\/' Datei           : find "/var/log" in the data
+  $ grep 'c:\\windows\\' Datei          : find "c:\windows\"
+  $ grep '[A-Z]\+' Datei                : find line contain any Capital character
+
+  $ grep '^Linux' file                  : Displays all lines that start with Linux
+  $ grep '$x' file                      : Displays all lines that end with an x
+  $ grep -c '^$' file                   : Displays the number of empty lines
+  $ grep '^null$' file                  : containing the word null by itself
+  $ grep '[Ll]inux' file                : containing Linux, turbolinux, LinuxOS
+  $ grep '[0-9][0-9][0-9]' file         : files that contain 3 consecutive digits
+  $ grep '^[^0-9]' file                 : lines that do no begin with a numeral
+  $ grep '\<[Ll]inux\>' file            : Linux, linux but not turbolinux, LinuxOS
+  $ grep '.....' file                   : Matches a line with 5 or more characters
+  $ grep '.' file                       : Displays all non blank lines
+  $ grep '\.' file                      : Displays all lines that have a period
+
+- sed
+  Der Stream-Editor arbeitet nach dem Texfilter-Prizip, die zu bearbeitende Datei kann als
+  Befelszeilen-Argument angegeben werden, die Ausgabe erfolgt an der Standardausgabe
+  $ sed 's/rumba/samba/g' data1 > data2         : rumba to samba then save
+  $ sed -i 's/rumba/samba/g' data               : in-place, open->substitute->save
+  $ set 'y/,/;/'   commadata > semicommadata    : commadata to semicommadata
+  $ sed -e '/^$/d' -e '/^#/d' /etc/insserv.conf : del. containing number and empty line
+  $ sed '25,47d' data1 > data2                  : del. line 25 upto 47
+  $ sed 's/ue/uee/' data                        : substitue one time e to ee
+  $ sed 's/ue/uee/g' data                       : whole sentence check
+  $ sed -f sed-script umltext > htmltext        : -f allow to use script
+
+  $ sed '2d;s/a/A/g' data            : Delete line 2 and substitue a for A
+  $ sed '2,3s/a/A/g' data            : Substitute a for A on lines 2 to 3
+  $ sed '2{ s/r/R/g; s/e/E/g }' data : do two substitutions for line 2
+  $ sed '=' data | sed 'N;s/\n//g'   : print number then number put the line
+  $ sed '3,5d' file         	   : delete lines 3 throug 5
+  $ sed '^# ' file         	   : delete lines that start wit #
+  $ sed 'y/abc/xyz/' file  	   : translate characters; a->x, b->y and c->z
+  $ sed 's/^$/@/' file      	   : writes @ to all empty lines
+  $ sed 's/"//g' file      	   : removes all double quotation
+
+  $ sed '/^$/d' file             : delete blank lines
+  $ sed '/#keepme/!d' file       : delete lines that doesn't have #keepme
+  $ sed '/^[ tab]*$/d' file      : delete lines that contain white space or tab
+  $ sed '/^[[:blank:]]*$/d' file : delete lines that contain white space or tab
+  $ sed '/^[\.#]/d' file         : delete lines beginning with . or #
+  $ sed 's/ */ /g' file          : substitute multiple spaces for a single space
+  $ sed 's/ \{2,\}/ /g' file     : substitute multiple spaces for a single space
+  $ sed '1,4s/abc/def/g' file    : substitutes abc for def on lines 1 to 4
+  $ sed '11,20y/abc/@@@/' file   : translate a,b,or c on lines 11 through 20 for @
+  $ sed '/123/{s/ab/AB/g}' file  : replaces ab for AB only on lines that have 123
+  $ sed '/@#%/{ s/.*//g }' file  : remove nonblank line(.*) when lines contain @#%
+
+- vi editor
+  $ vi> :[range]s[ubstitute]/{pattern}/{string}/[flags] [count]
+  $ vimtutor
+  $ vi text1 +/Pinguin             : start vi with start line of Pinguin
+  $ vi>:%s/.$//                    : exchange all "." in the sentence
+  $ vi>:s/I/We/gi                  : substitution of a text within a single line
+  $ vi>:1,10s/helo/hello/g         : substitution of a text within a range of lines
+  $ vi>:'<,'>s/helo/hello/g        : crtl+V then select then substitute
+  $ vi>:s/helo/hello/g 4           : substitution of a text only 1st 4 number of lines
+  $ vi>:%s/\(good\|nice\)/best/g   : good or nice replace with best
+  $ vi>:s/\<his\>/her/		 : substitute only the whole word
+  $ vi>:%s/\<\(hey\|hi\)\>/hai/g   : but they or this will not change
+  $ vi>:%s/awesome/wonderful/gc    : interactive find and replace in vim
+  $ vi>:%s/^/\=line(".") . ". "/g  : substitute all lines with its line number
+  $ vi>:set repetition=4           : repeats every subsequent command 4 times
+  $ vi>:4,$s/\d\+/\=submatch(0)+1/ : Alter sequence number while inserting a new item
+  $ vi>:%s!\~!\= expand($HOME)!g   : subst. special character with its equivalent value
+  $ vi>:%s/\.\s*\w/\=toupper(submatch(0))/g : start beginning with upper case
+
+
+===============================================================================================
+LPIC 104: Devices, Linux Filesystems, Filesystem Hierarchy Standard
+===============================================================================================
+- check current partition
+  $ cat /proc/paritions
+  $ fdisk -l
+
+- create new partion
+  $ fdisk /dev/sdb  : MBR partition (4 Primary, 4T total and limit 2.2TB/partition)
+  $ gdisk /dev/sdc  : GPT partion   (128 Primary, GUID partition, nur Primary)
+  $ parted          : nice method
+
+  $ fdisk -l           : to view all available partitions
+  $ fdisk -s /dev/sda7 : go to special partition
+  $ fdisk -l /dev/sda/ : to do partitioning!
+  ...inside the terminal, type one of following commends
+  Command : d Deletes partition
+  Command : n Add a new partition.
+  Prompt follows as primary or extended;
+  partition number; first cylinder; last cylinder.
+  Swap partitions can be created with the t option.
+  Command : p Displays partition table in the memory (not yet applied)
+  Command : q Quit without saving
+  Command : w write and exit
+
+  Displaying supported filesystem types
+  $ ll /sbin/mk* | awk '{ print $8 $9 $10 }'
+
+  Possible and famous file systems are
+  ReiserFS, Btrfs ,msdos, vfat, ntfs, xfs, cramfs, jfs
+
+- Formatting/Creating filesystems 
+    After partitioning, it's needed to add a filesystem to the partition.
+  Format will be
+  $ mkfs -t ext2 -L system -cv /dev/hda3 : make ext2 labeled "sytem" on hda3
+  $ mkfs -t ext3 -l /dev/sdb1		   : make ext3 on sdb1
+  $ mkfs.ext4 /dev/sdb1			   : make ext4 on sdb1
+  $ mke2fs -j /dev/sda1			   : make ext3 on sdb1 -j is ext3
+
+- Tip about partitions
+  something wrong for mkfs(mke2fs) then
+  $ mv /sbin/mkfs.ext2 /sbin/mkfs.ex2
+  $ mv /sbin/mkfs.ext3 /sbin/mkfs.ex3
+
+- Swap fundamental
+  To see information about swap disk
+  $ cat /proc/swaps
+
+  Make a swap disk
+  $ dd if=/dev/zero of=/swapfile bs=1024 count=524288
+  $ mkswap /swapfile
+  $ swapon /swapfile
+  or
+  $ gdisk /dev/sdb
+  $ mkswap /dev/sdb2
+  $ swapon -v /dev/sdb2
+  $ swapoff -f /dev/sdb2
+  then control below file to fit during start
+  $ cat /etc/fstab
+
+- fsck chceking filesystems
+  check and repair a Linux file system
+  available checking command of fsck
+  $ ls -1i /sbin/*fsck* | sort -n
+
+  Standard way of disk check/test
+  normally one can perform below for main partition after LINUX CD booting
+  $ umount /dev/sda1
+  $ fsck -f -c /dev/sda1
+  $ shutdown -hf now
+
+  fsck options
+  $ fsck -f : force
+  $ fsck -A : alle Dateisysteme
+  $ fsck -c : defekte Bloecke suchen
+  $ fsck -b : Blocknummer alternativer Superblock
+  $ fsck -y : Voreingestelltes "yes" fuer Fragen
+
+  Part of the information that describes the filesystem is the superblock and it is
+  saved on block 1 of the partitions. If this bock becomes corrupted the filesystem is
+  unaccessible. By default filesystem makes copies of the superblock every 8192 blocks
+  (1, 8193, 16385, ...) which can then be used by fsck to restore the main superblock
+
+  fsck runs at boot on the filesystems configured at /etc/fstab. The sixth field(dump)
+  provides information of which filesystems should be checked and in what order.
+
+- Modyfying, Checking And Repairing Filesystems
+  debugfs - ext2/ext3 file system debugger, test and restore deleted inodes
+  $ umount /dev/sdb1
+  $ debugfs /dev/sdb1
+  > lsdel
+  > dump <inode #> /tmp/restored
+
+  more detail information about partition
+  # dumpe2fs   :  dump ext2/ext3 filesystem information
+  $ dumpe2fs /dev/hda1 | less
+
+  To check a linux ext2/ext3/ext4 file system
+  $ e2fsck  -l /dev/sda1
+
+  To save critical ext2/ext3 filesystem metadata to a file
+  $ e2image
+
+  Integritaet test with format program
+  $ mke2fs -c /dev/sdb1     : do format and then goes to test
+
+  tune2fs is a utility used to modify existing extX filesystem
+  after converting from ext2 to ext3, then need a format with mkfs at frontend
+  $ tune2fs -j /dev/hdb3    : ext3 journal
+  $ mkfs -t ext3 /dev/sdb1  : format
+  through a full filesystem check while booting, that make changing number of days
+  $ tune2fs -c 200 /dev/sda1
+  converting from ext3 to ext4 using tune2fs
+  $ tune2fs -0 extents,unint_bg,dir+index /dev/sdb1
+
+- ext file systems
+  ext2 and ext3 has a fixed number of inodes
+  ext4 supports online defragmentaiton
+
+- reiserfs file systems
+  support journaling most likely for server
+  # reiserfstune  - Displays and adjusts filesystem parameters
+  # debugreiserfs - Similar to dumpe2fs and debugfs
+
+- xfs (eXtended) file system,
+  64 bit environment, used in centos means quite modern system, support journaling
+  xfs_info   Filesystem information
+  xfs_growfs Expandsan xfs filesystem
+  xfs_admin  Changes the parameters of an xfs filesystem
+  xfs_repair Repairsfilesystem when mount checks are not sufficient
+  xfs_db     Examines or debugs an xfs filesystem
+
+- vfat (virtual) file system
+  optimal for shared file system  (Ext2 + MSDOS), not support journaling
+
+- Disk free (df)  : Displays information on mounted filesystems
+  $ df -i   : zeigt mit Inode nicht mit Block
+  $ df -m   : zeigt die Bloecke in Mega
+  $ df -h   : human readable
+  $ df -a   : all list
+
+- Disk utilization (du) : esimate file space usage
+  $ du -a   : all
+  $ du -m   : Mega
+  $ du -h   : human readable
+  $ du -s   : summary
+  $ du -sch : c=summenbildung
+  $ du -sh /home/kang/* | less
+  $ du -s /etc   : include subdirectories and displays only the summary
+  $ du -Ss /etc  : do not include subdirectories and display a summary
+  $ du -csh /etc : displays a summary of all subdirectories with human readable
+  $ du -cs | sort -nr : displays summary and sorts result by reverse numerical number
+
+- To display mounted filesystems
+  $ fdisk -l
+  $ df                : simple and easy
+  $ cat /etc/mtab     : check mount option from data table
+  $ cat /proc/mounts  : mounted device in current process/session
+  $ mount             : list all mounted device currently
+
+- Mounting and Unmounting
+  # CD mount
+  $ mount -t iso9660 -o ro /dev/cdrom /mnt
+  $ mount -t iso9660 -o loop pdf_collections.iso /mnt
+  $ mount -o loop,ro /download/debian.iso /mnt
+  $ mount -t iso9660 /dev/hdc /media/cdrom0
+  $ umount /mnt
+
+  # For network drive
+  # one need to have an extra package "cifs-utils" in debian-sambda case
+  $ mount -t smbfs -o username=kang,password=pa$$w0rd //kang/daten /mnt
+  $ mount -t cifs -o user=student //10.2.11.16/share /mnt/share
+  $ mount -t nfs archangel:/storage /daten
+
+  # Standatd
+  $ mount -a     :   mount all device in the /etc/fstab
+  $ umount -a    : unmount all device in the /etc/fstab
+  $ mount -t ext3 /dev/sdb1 /mnt      : to mount ext3 file system
+  $ mount -v -o remount,rw /datein    : remount the mounted filesystem
+  $ umount /media/usb          : to unmount of usb-storage
+  $ mount /dev/sda1 /home	     : to mound /home directory
+  $ mount /dev/sda6 /mydata -r : to mound read only
+  $ mount -B /mydata /mnt      : bind mount points to a new directory
+  $ mount -M /mydata /mnt      : access contents from new mount point
+  $ mount -n /dev/sda6 /mydata : mount without writing entry into /etc/mtab
+
+- Automatische Mounten via /etc/fstab (6 fields)
+  /etc/fstab is static file system information.
+  fstab is checked at every boot and mounts any filesystem listed there
+  swap has no mount point that are not assiciated with swap partitions!
+  nfs file system can also export
+  $ cat /etc/fstab
+  > <device> <mount point> <type> <options> 		     <dump> <pass>
+  > <device> <mount point> <type> <options> 		     <dump> <fsck>
+  > proc 	/proc 	proc 	defaults 			0	0
+  > /dev/sda1 	/ 	ext3  	defaults,errors=remount-ro 	0	1
+  > /dev/sda6 	/home 	ext3 	defaults 			0	2
+  > /dev/sda5 	none 	swap 	sw 				0	0
+  > UUID=...  	/	ext4	errors=remount-ro   		0       1
+  > /dev/hda1 	/	ext4	acl,user_xattr      		1       1
+  > /usr/demo 	/demo	nfs	ro,bg      			0       0
+
+  here are some important mount options
+  .auto
+  .usrquota   : after compile kernel with this option, quotaon has to be done
+  .grpquota   : after compile kernel with this option, quotaon has to be done
+  .suid
+  .user  : attach by one, umount by one
+  .users : attach by one, umount by anyone
+  .nouser
+  .nosuid
+  .default=rw,suid,dev,exec,auto,nouser,async
+
+  $ vi /etc/fstab
+  > device    mountpoint datatype   mountoption      dump   fsck
+  > UUID=...  /data	ext4	    default	     0      0
+  $ mount -a      : mount all device in the /etc/fstab
+  $ df
+
+  Mit blkid lassen sich wichtige Informationen
+  wie Gerätedatei, Identifikationsnummer, Name und Dateisystem
+  ex) Find UUID to put into /etc/fstab directly
+  $ blkid /dev/sdb1 | cut -d'' -f2 | tr -d '"' >> /etc/fstab
+
+- Set and View Disk Quotas
+  Disk quota can be assigned based on:
+  . filesystems listed on /etc/fstab;
+  . users listed on /etc/passwd;
+  . groups listed on /etc/group;
+
+  Do write explictly "usrquota, grpquota" (not userquota and groupquota) in /etc/fstab
+
+  Die Ueberschleitung des "Soft-Limits" ist nur fuer eienen festgelegten Zeitraum
+  ('Grace Period' Gnadesfrist) moegliche, das Hard-Limit darf nie ueberschnitten werden
+
+  Displaying quota
+  $ quota 	   //see your quota
+  $ quota -uv root   //for  root
+  $ quota -uv kang   //for  user kang
+  $ quota -gv kang   //for group kang
+
+  scan a filesystem for disk usage, create, check and repair quota files
+  $ quotacheck -augv        : all user group verbose
+  $ quotacheck -vu /datein  : directory quota
+
+  Turn on & off quota
+  $ quotaon  -avug       : all user group verbose
+  $ quataoff -avug       : all user group verbose
+  $ quotaon  -vug /data  : for directory
+  $ quataoff -vug /data  : for directory
+
+  Edit user quotas
+  It looks like nano editor, one can edit size of file by soft and hard normaly
+  soft(0->5000) and hard(0->7000) also one can exchange Inode part
+  Inode hard 10 mean that will be limited by file number 10 in quota postion
+  $ edquota -u root 			: for root
+  $ edquota -u kang                       : for user
+  $ edquota -f /data -u kang              : edit standard
+  $ edquota -p user1 -u user2 user3 user4 : prototype fuer anderen Benutzer
+
+  How to check Block size
+  $ dumpe2fs -h /dev/sdb1 | grep "Block size"
+
+  Generates quota reports
+  $ repquota -v /home
+
+  warnquota - Usually run under cron
+
+  Step 1  Add the option 'usrquota' and/or 'grpquota' to the filesystem
+  $ vi /etc/fstab
+  > /dev/sda3 /home ext2 defaults,usrquota,grpquota 1 2
+  $ shutdown -r now
+
+  Step 2  Create the proper configuration files (quota.user and/or quota.group)
+  in the root of the file system.
+  Add the proper permissions (set quota.group 644
+  if you want users to be able to examine quotas on groups they belong to)
+  $ touch /home/quota.user
+  $ touch /home/quota.group
+  $ chmod 600 /home/quota.*
+
+  Step 3  Initialize the database with 'quotacheck'
+  $ quotacheck -avug
+  > Scanning /dev/sda9 [/home] done
+  > Checked 236 directories and 695 files
+  > Using quotafile /home/quota.user
+  > Using quotafile /home/quota.group
+
+  Step 4  Verify that database was created, whether file size is big enough
+  $ ls -l /home/quota.*
+  > -rw------- 1 root root 16192 Dec 27 19:53 /home/quota.group
+  > -rw------- 1 root root 16192 Dec 27 19:53 /home/quota.user
+
+  Step 5  Enable quota
+  $ quotaon -avug
+
+  Step 6  Add quota to the desired runlevel(shell or login? need to check!)
+  if [ -x /sbin/quotacheck ]; then
+  echo "Checking quotas."
+  /sbin/quotacheck -avug
+  echo " Done."
+  fi
+  if [ -x /sbin/quotaon ]; then
+  echo "Turning on quotas."
+  /sbin/quotaon -avug
+  fi
+
+  Step 7  Add quotacheck to a script on
+  $ vi /etc/cron.weekly/0anacron (preferably weekly)
+  > #!/bin/bash
+  > exec /sbin/quotacheck -avug
+  or
+  $ vi /etc/crontab (run quotacheck weekly)
+  > 0 3 * * 0 root /sbin/quotacheck -avug
+
+- Identifying User And Groups
+  $ id
+  $ groups
+
+  # Generates a compact listing of all the users on the system.
+  $ cut -d: -f < /etc/passwd | sort | xargs echo
+
+  Zugriffsrechte, changing access mode by chmod
+  # 4-read(100) 2-write(010) 1-execute(001)
+  # '+'permission, '-'divesture, '='keep.
+  # 0644 (rw-r--r--)
+  # 0770 (rwxrwx---)
+  # 0660 (rw-rw----)
+
+  $ chmod -Rv 755 /adir
+  $ chmod -R -v o-rwx /adir
+  $ chmod -v u=rw,go=r /afile
+  $ chmod -v o= file4
+  $ chmod a+x script
+  $ chmod u+x,g+x,o+x script
+  $ chmod g-rwx,o-rwx /adir -R
+
+  - SUID(Set User ID)
+  Spezille Zugriffsrechte fuer Dateien und Verzeichnisse gesetzt auf manche
+  Programme, bewirkt, dass das  Program nicht mit den Rechten des Aufrufenden
+  ausgefuehrt wird, sondern mit den Rechten des Besitzers des Programms
+  - SGID(Set Gruop ID)
+  Auf ausfuehrbare Dateien gesetzt bewirkt es, dass dei Datei mit den Rechten
+  der Gruppe ausgefuehrt wird (egal, wer es aufruft)
+  Auf Verzeichnisse gesetzt bewirkt es, dass in diesem Verzeichnes angelegte
+  Dateien die Gruppenmitgliedschaft des Verzeichnisses "erben"
+  - Sticky Bit (/tmp)
+  wird normalerwiese auf Verzeichnisse gesetzt, in denen others Schreibrecht hat
+  Mit dem Sticky-Bit wird erreicht, dass Dateien in solchen Verzeichnissen nur
+  vom jeweiligen Datei eigentuemer geloescht werden koennen.
+
+  SUID   : -rwsr-xr-x   -> s or S(nicht ausfuehrbar) 4XXX
+  SGID   : -rwxr-sr-x   -> s or S(nicht ausfuehrbar) 2XXX
+  Sticky : -rwxr-xr-t   -> t or T(nicht ausfuehrbar) 1XXX
+
+  SUID allow to access file and process temporally
+  (passwd crontab sudo)
+  SGID allow to access file by group user
+  (sh, bash, python, doveconf, sendmail)
+
+  $ chmod 4755 script
+  $ chmod u+s script
+  $ chmod g+s /dir/script
+  $ chmod o+t /group
+
+  chown - change file owner and group
+  $ chown kang:kang myfile     : group and owner
+  $ chown kim myfile           : just owner
+  $ chown :kim myfile          : just group
+  $ chown kang /home/kang -R   : recusive all files under kang
+
+  chgrp - change group ownership
+  $ chgrp kim myfile           : nur gruppe aendern
+  $ chgrp -R users /adir
+
+  Setting access mode by umask
+  umask will be shown one of this number 002, 007, 020, 070, 022
+  # umask 022  : we can interpret like this
+  file   666 - 022 = 644
+  folder 777 - 022 = 755
+  Fuer Datien gilt : es wird zusaetzlich zur umask noch 111 abgezogen,
+  damit eine neue Datei nicht automatsch Ausfuehrungsrechte bekommt Ausfuehrtungsrecht
+  muss immer explizit gesetzt werden.
+  # umask 077  : more security and equivalant file/folder view 600/700
+  to change default umask then have a look /etc/profile
+
+- Attribute of directory
+  $ lsattr     			: list of attribute
+  $ chattr -aAS dir1 dir2  	: change of attribute
+  $ chattr -V +u dir1 dir2	: change of attribute
+  a-append only (add possible but no delete)
+  u-undeletable
+  i-no change, no delete
+  A-no atime updates
+  D-synchronous directory updates
+
+- Create and Change Hard and Symbolic Links
+  Hardlinks sind nur innerhalb eines Daeisystems (Partition) moeglic wegen der
+  eindeutigen Inode. Auf Verzeichnisse Koennen Keine Hardlinks gesetzt werden
+  $ ln file hardlink1
+  $ ln file hardlink2
+
+  Softlinks wird ein neuer Inode erstllt, der auf die selben Datenbloecke zeigt
+  wie das Ziel des Links, und Koennen dateisystemuebergrefend sein, d.h. Link und
+  "Originaldatei" Koennen auf verschiedenen Partitionen liegen
+  Es kann auch Symlinks auf Verzeichnisse geben
+  $ ln -s file softlink
+  $ stat file
+
+- find (extend)
+  The command 'ls -l' will also provide a total number of pointers to that file
+  $ find . -inum 421422 -exec ls -li {} \;
+  -> 421422 -rwxr-xr-x 3 root root 47288 May 24 2008 ./mkfs.ext3
+  -> 421422 -rwxr-xr-x 3 root root 47288 May 24 2008 ./mkfs.ext2
+  -> 421422 -rwxr-xr-x 3 root root 47288 May 24 2008 ./mke2fs
+
+  Finding links to a file
+  -> lrwxrwxrwx 1 root root 5 Feb 7 15:36 saran-l -> saran
+  $ find . -lname saran
+  $ find . -samefile mke2fs
+  $ find . -inum 421422
+
+  $ find /home -name '*.sxw'
+  $ find /home -amin 10  : zugegriffenen Datei vor n Min
+  $ find /home -cmin 20  : geaendertene Datei
+  $ find /home -mtime 1  : vor n mal 24 Stunden gmodifiziert
+  $ find / -ctime -2     : vor weniger als 24 Stunden geaendert
+  $ find / -user kang    : ownership by kang
+  $ find / -perm +4000   : Document with SUID-bit format
+  $ find / -size +500M | xargs ls -l : Datei grosser als 500M
+
+- Simple find using internal data base
+  # similar find but light version and use databank
+  $ locate *.sxw
+
+  # Database can be created and updated via the 'updatedb' command
+  # Database location can vary with systems
+  # /var/lib/mlocate/mlocate.db
+  # /var/lib/slocate/slocate.db  : debian, centos
+
+  # configuration file
+  # /etc/updatedb.conf
+  $ updatedb &
+
+- Programme zum Auffinden von Datein
+  $ whatis <name>
+  $ whereis <command>
+  $ which <command>
+  $ apropos <string>
+  $ man -k <string>
+
+- Directories
+  # Essenstial directories
+  /bin    Contains essentials executable commands that may be needed in a problem
+  /dev    Device files
+  /etc    Configuration files unique to the system needed at boot
+  /lib    Sharedlibraries
+  /mnt    Provides a centralized mount point to system administrators
+  /root   Recommended root's home
+  /sbin   Essential system administration utilities (fsck, fdisk, mkfs)
+  /proc   kernel or process information
+  /media  cdrom
+
+  # Nonessential directories
+  /boot   Contain files for the boot loader. also contains the kernel.
+  /home   User personal directory
+  /opt    Software that is not packaged with system (3rd party software)
+  /tmp    temporary files (recommended to be deleted after system reboot)
+  /usr    Executable programs that are not needed on boot
+  (or not needed to recover systems).
+  Contains user and system administration commands and daemons
+  that are only used under normal operation of the OS
+  Usually mounted as read only via NFS from a network location
+  Large software packages cannot place a directory directly
+  under /usr/ (except X11)
+  /var    Data that varies over time (web sites, ftp, logs, mail, spool)
+  Because data keeps growing and changing, this directory is usually
+  not included with / to prevent the / partition from filling
+  /srv    www-root, ftp-root
+
+  # Important directories
+  /dev/null     Data will be passed through without any action
+  /dev/zero     generate 0 bit
+  /dev/tty      represent Terminal, which is runing in the process
+  /usr/X11R6    Contains directories for XFree86
+  /usr/bin      User commands that are not necessary for emergency maintenance
+  /usr/include  Standard location for header files used for C and C++
+  /usr/lib      Shared libraries for various programs. Creation of subfolders is
+  also allowed (eg: /usr/lib/vlc/)
+  /usr/local    A top level of a second hierarchy. Contains subdirectories
+  with same name as found in /usr/
+  /usr/sbin     System administration commands that are not essential for emergency
+  /usr/share    Datafiles that are independent of hardware architecture and
+  operating system versions
+  /usr/src      Optional directory on newer gibcbased systems. Older libc4 and
+  libc5 systems required it to have a copy of the kernel source or
+  include/asm and include/linux for kernel header files
+  /var/account  Processaccounting data
+  /var/cache    Used by programs to store intermediate date. Programs should be
+  able to regenerate the date so the system admin can delete files
+  as needed. this folder does not need to be backed up
+  /var/crash/   Crash dumps
+  /var/games/   Saves game data like state information, scores, etc..
+  /var/lock/    Used by applications to signal their existence to other processes
+  File are usually empty
+  /var/log/     System log files
+  /var/mail/    System mailbox. Replacement for /var/spool/mail/
+  /var/opt/     Location for temporary files created by programs in /opt/
+  /var/run/     Contains various files describing present state of the system
+  (like pid files)
+  /var/spool/   Queued information (like cron, printer, etc...)
+  /var/state/   Information that helps applications maintain state
+  across multiple instances
+  /var/tmp/     Same as /tmp/, owever data here is more persistent
+  and may not be deleted after system boot
+  /var/yp/      Database files for NIS Network Information Service
+
+
+
+=====================================================================================================
+End of Study
+=====================================================================================================

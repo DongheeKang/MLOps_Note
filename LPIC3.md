@@ -4,20 +4,22 @@
 ## Contents
   * [X.509 Certificates and Public Key Infrastructures](#X509_certificates)  
   * [X.509 Certificates for Encryption, Signing and Authentication](#X509_certificates_2)
-  
-  * [Encrypted File Systems]
-  * [DNS and Cryptography]
-  * [Host Hardening]
-  * [Host Intrusion Detection	]
-  * [User Management and Authentication]
-  * [FreeIPA Installation and Samba Integration	]
-  * [Discretionary Access Control]
-  * [Mandatory Access Control]
-  * [Network File Systems]
-  * [Network Hardening]
-  * [Network Intrusion Detection]
-  * [Packet Filtering]
-  * [Virtual Private Networks]
+
+  * [are not covered yet](#willbeupdated)
+    * [Encrypted File Systems]
+    * [DNS and Cryptography]
+    * [Host Hardening]
+    * [Host Intrusion Detection	]
+    * [User Management and Authentication]
+    * [FreeIPA Installation and Samba Integration	]
+    * [Discretionary Access Control]
+    * [Mandatory Access Control]
+    * [Network File Systems]
+    * [Network Hardening]
+    * [Network Intrusion Detection]
+    * [Packet Filtering]
+    * [Virtual Private Networks]
+
 
   * [Virtualization Concepts and Theory](#virtualization)
   * [Xen](#xen)
@@ -137,7 +139,9 @@
       mod_ssl
       openssl
 
+<br/><a name="willbeupdated"></a>
 
+### not available yet
     ===============================================================================================
     will be updated
     ===============================================================================================

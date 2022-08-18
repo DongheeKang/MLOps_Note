@@ -6,6 +6,8 @@
 <br/><a name="contents"></a>
 ## Contents
 
+  * [Linux fundamental](./LPIC1.md)
+  * [Linux advanced](./LPIC2.md)
   * [Python study notes](./python_study_note.md)
   * [Network study notes](./network_study_note.md)
   * [API study notes](./api_study_note.md)

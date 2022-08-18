@@ -11,7 +11,7 @@
     * [Host Hardening]
     * [Host Intrusion Detection	]
     * [User Management and Authentication]
-    * [FreeIPA Installation and Samba Integration	]
+    * [FreeIPA Installation and Samba Integration]
     * [Discretionary Access Control]
     * [Mandatory Access Control]
     * [Network File Systems]
@@ -19,7 +19,6 @@
     * [Network Intrusion Detection]
     * [Packet Filtering]
     * [Virtual Private Networks]
-
 
   * [Virtualization Concepts and Theory](#virtualization)
   * [Xen](#xen)
@@ -171,6 +170,7 @@
 
     328.4 Virtual Private Networks	
     ===============================================================================================
+
 
 
 

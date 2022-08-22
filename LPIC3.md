@@ -34,7 +34,6 @@
   * [Clustered File Systems](#clustered_filesystem)
 
 
-
 <br/><a name="X509_certificates"></a>
 
 ### X.509 Certificates and Public Key Infrastructures
@@ -170,8 +169,6 @@
 
     328.4 Virtual Private Networks	
     ===============================================================================================
-
-
 
 
 <br/><a name="virtualization"></a>

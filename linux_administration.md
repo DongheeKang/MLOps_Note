@@ -28,7 +28,7 @@
       Kernel location? Module des Kernels
       $ cat /lib/modules/<kernel version>/xxx
 
-      ernel-Quelldateien
+      kernel-Quelldateien
       $ /usr/src/linux-2.6.11.4-21.9
       Patch of kernel
       $ bzip2 -dc patch-2.6.39-rc4.bz2 | patch -p1 --dry-run

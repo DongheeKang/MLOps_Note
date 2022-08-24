@@ -2,16 +2,22 @@
 
 
 ### Contents
-  * [Users](#user)
-  * [Administration](#Administration)
-  * [High Availability](#HA)
+  * [Users](#users)
+  * [Security](#Security)
+  * [Networking](#Networking)
   * [Service](#Service)
-  * [Storage](#Storage)
+  * [Processes and Monitoring](#Processes)
+  * [Utility](#Utility)
+  * [File systens](#Filesystens)
+  * [Shell](#Shell)
+  * [Files and Directories](#Files)
+  * [Logging](#Logging)
+
 
 
 <br/><a name="Users"></a>
 
-### Users
+## Users
 
 * Running Script or Command as Another User in Linux
     - visudo will touch /etc/sudoers and show 
@@ -116,10 +122,88 @@
 
           sudo -E myscript
 
-#### Security
-#### Networking
 
-#### Service
+
+
+<br/><a name="Security"></a>
+
+## Security
+
+<br/><a name="Networking"></a>
+
+## Networking
+* Mapping Hostnames with Ports in /etc/hosts
+
+      $ vi /etc/hosts
+      127.0.0.1    baeldung.com                     : this is ok
+      127.0.0.1:8080    baeldung.com                : port 8080 does not work!!!
+
+      For Nginx, one can deal port!
+      $ vi /etc/nginx/conf.d/baeldung.conf
+      server {
+          listen 80;
+
+          server_name baeldung.com;
+
+          location / {
+              proxy_pass http://127.0.0.1:8080/;
+          }
+      }
+
+
+
+* SSH Tunneling and Proxying
+
+    * Server configuration ! SSHD
+
+
+
+    * Forward
+        * Single-Port
+        * Dynamic or Multi-Port
+    * Reversed
+        * Single-Port
+        * Dynamic or Multi-Port
+    * X window turnnel
+
+    * Multiple Tunnels and Multiple Host Hopping
+
+
+
+    * configuration for above
+        /etc/ssh/ssh_config
+
+
+    * Persistent 
+
+* Monitoring Network Usage in Linux 
+
+
+    * nload
+    * speedometer
+    * iftop
+    * nethogs
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br/><a name="Service"></a>
+
+## Service
 
 * Run a script on startup in Linux
     
@@ -284,29 +368,54 @@
           RuntimeMaxSec=180s
           Restart=always
           
-    - run by crontab  
+    * run by crontab  
 
           $ crontab -e
           30 10 * * 1-5 /usr/bin/systemctl restart my-service.service
 
 
-#### Processes and Monitoring
+
+<br/><a name="Processes"></a>
+
+## Processes and Monitoring
+
+* Find Out the Total Physical Memory (RAM) on Linux
+
+        $ free -h -s 5
+
+
+<br/><a name="Utility"></a>
+
+## Utility
 
 
 
 
-#### Utility
+<br/><a name="Filesystens"></a>
 
-#### File systens
-
-#### Shell 
-
-#### Files & Directory 
+## File systens
 
 
 
 
-#### log
+<br/><a name="Shell"></a>
+
+## Shell 
+
+
+
+
+
+<br/><a name="Files"></a>
+
+## Files & Directory 
+
+
+
+
+<br/><a name="Logging"></a>
+
+## Logging
 
     - journal 
   
@@ -324,6 +433,14 @@
         $ journalctl --no-pager
         $ journalctl --vacu­um-­tim­e=2­weeks
         $ journalctl -b -u docker -o json
+
+
+
+
+
+
+
+
 
 <div><br/>
 &raquo; Back to <a href="#contents">Contents</a> | <a href="../docs/README.md">Docs</a>

@@ -20,71 +20,90 @@
 ## Users
 
 * Running Script or Command as Another User in Linux
-    - visudo will touch /etc/sudoers and show 
-          
+    
+  * visudo 
+    
+    will touch /etc/sudoers and show 
+    
+        $ visudo 
           root  ALL=(ALL:ALL) ALL
           user hostname=(runas-user:runas-group) command
 
-          usermod -aG sudo hope
+    add 'hope' user account to the super user / admin group
 
-    - su 
+        usermod -aG sudo hope
+        usermod -aG admin hope
 
-          $ cat > /home/annie/annie-script.sh <<EOF
-            echo "Running annie-script.sh as user $(whoami)"
-            EOF
-          $ chmod u+x /home/annie/annie-script.sh
+  * su (substitue user)
 
-          login as donghee 
-          $ su -c '/home/annie/annie-script.sh' annie    : Running annie-script.sh as user annie
-          $ su -c 'echo I am $(whoami)'                  : Running annie-script.sh as user root
+    compare 
 
-          Disabling the Password Prompt+
-          $ vi /etc/pam.d/su
-            auth  [success=ignore default=1] pam_succeed_if.so user = annie
-            auth  sufficient                 pam_succeed_if.so use_uid user = dave
+        $ su - 
+          root@server:~# pwd 
+          /root 
+        $ su  
+          root@server:/home/test# pwd 
+          /home/test      
 
 
-          $ su -c /home/annie/annie-script.sh annie
-            Running annie-script.sh as user annie
+    command
 
-    - sudo 
-          To edit the /etc/sudoers file
-          $ echo 'dave ALL=(annie) /home/annie/annie-script.sh' | EDITOR='tee -a' visudo
+        $ cat > /home/annie/annie-script.sh <<EOF
+          echo "Running annie-script.sh as user $(whoami)"
+          EOF
+        $ chmod u+x /home/annie/annie-script.sh
+
+        login as donghee 
+        $ su -c '/home/annie/annie-script.sh' annie    : Running annie-script.sh as user annie
+        $ su -c 'echo I am $(whoami)'                  : Running annie-script.sh as user root
+
+        Disabling the Password Prompt+
+        $ vi /etc/pam.d/su
+          auth  [success=ignore default=1] pam_succeed_if.so user = annie
+          auth  sufficient                 pam_succeed_if.so use_uid user = dave
+
+
+        $ su -c /home/annie/annie-script.sh annie
+           Running annie-script.sh as user annie
+
+  * sudo (Super User DO))
+
+        To edit the /etc/sudoers file
+        $ echo 'dave ALL=(annie) /home/annie/annie-script.sh' | EDITOR='tee -a' visudo
     
-          $ sudo -u annie /home/annie/annie-script.sh
+        $ sudo -u annie /home/annie/annie-script.sh
           [sudo] password for donghee:                 : with sudo, it requests for the current user’s password
           Running annie-script.sh as user annie
 
-          To allow execute script by root i.e. system  
-          $ echo 'dave ALL=(ALL) /home/annie/annie-script.sh' | EDITOR='tee -a' visudo
+        To allow execute script by root i.e. system  
+        $ echo 'dave ALL=(ALL) /home/annie/annie-script.sh' | EDITOR='tee -a' visudo
 
-          Now it should work!
-          $ sudo -u root /home/annie/annie-script.sh
+        Now it should work!
+        $ sudo -u root /home/annie/annie-script.sh
           [sudo] password for donghee:
           Running annie-script.sh as user root
 
-          Skipping Password Prompt
-          dave ALL=(ALL) NOPASSWD: /home/annie/annie-script.sh
+        Skipping Password Prompt
+        dave ALL=(ALL) NOPASSWD: /home/annie/annie-script.sh
 
-          $ sudo -u annie /home/annie/annie-script.sh
+        $ sudo -u annie /home/annie/annie-script.sh
           Running annie-script.sh as user annie
-          $ sudo -u root /home/annie/annie-script.sh
+        $ sudo -u root /home/annie/annie-script.sh
           Running annie-script.sh as user root
-
 
 
 * How to Change the Default Home Directory of a User
           $ sudo useradd -m baeldung   
           $ sudo useradd -m -d /home/baeldung baeldung
 
-          nive tge existing content to the new location 
+          move the existing content to the new location, has to use -m option 
           $ sudo usermod -m -d /usr/baeldung baeldung
 
-
-
-
 * List All Groups in Linux
-        $ vi /etc/group
+
+  * standard method
+
+       $ vi /etc/group
         group_name : password(encrypted) : GID : user_list
 
         root:x:0:root
@@ -96,33 +115,52 @@
         disk:x:6:root
         lp:x:7:cups,daemon,kent
 
-        or
+    
+    getent
+
         $ getent group
 
         only user print out! 
         $ cut -d: -f1 /etc/group
         $ getent group | cut -d: -f1
 
-        kent$ groups
-        lp wheel dbus network video audio optical storage input users vboxusers docker kent
-        kent$ groups root
+    group
+
+        $ groups
+        lp wheel dbus network video audio optical storage input users vboxusers docker donghee
+        $ groups root
         root bin daemon sys adm disk wheel log
 
+    id
 
         id -Gn
         id -Gn root
 
+
 * Fixing the “Command Not Found” Error When Using Sudo 
-    - “Permission Denied” When Running Script
-          chmod +x ./myscript 
+  
+  “Permission Denied” When Running Script
 
-    - Fixing the Error for a Single Command
+      chmod +x ./myscript 
 
-      We can pass the -E flag to sudo to make it preserve the current environment variables:
+  Fixing the Error for a Single Command. We can pass the -E flag to sudo to make it preserve the current environment variables:
 
-          sudo -E myscript
+      sudo -E myscript
 
+* Modify user
 
+  Update Account’s Username
+
+      usermod -l old new
+
+  Lock and unlock    
+
+      usermod -L user
+      usermod -U user 
+      
+  extend expire date
+  
+      usermod -e 2025-09-01 user
 
 
 <br/><a name="Security"></a>
@@ -154,30 +192,97 @@
 
 * SSH Tunneling and Proxying
 
-    * Server configuration ! SSHD
+  * Server side configuration ! SSHD
+
+        /etc/ssh/sshd_config 
+
+        AllowStreamLocalForwarding   : Allows Unix domain sockets to be forwarded. 
+        AllowTcpForwarding           : Allows TCP port forwarding. 
+        DisableForwarding            : Disables all kinds of forwarding.
+        GatewayPorts                 : Allows to use the ports forwarded to a client 
+        PermitListen                 : Specifies the addresses and ports (‘127.0.0.1’)
+        PermitOpen                   : Specifies the address and ports
+        PermitTunnel                 : Specifies whether tun device forwarding is allowed. 
+        X11Forwarding                : Specifies whether X11 forwarding is allowed. 
+        X11UseLocalhost              : Forces X11 forwarding to be allowed from the SSH server host loopback address. 
+
+    need to be confirmed
+    firewalls must allow the SSH traffic, usually on port TCP/22, since some host firewall configurations might limit the ability to connect to and from external services 
+
+    iptables needs to be touched.
+
+  * Forward
+    * Single-Port
+
+      A forward or direct TCP tunnel is the one that follows the direction of the SSH connection from the client to the SSH server. 
+
+          ssh -L [bind_address:]port:host:hostport [user@]remote_ssh_server
+          ssh -L 0.0.0.0:8022:10.1.4.100:22 user@10.1.4.20
+               
+          possible this as well. 
+          ssh -L local_socket:host:hostport [user@]remote_ssh_server
+          ssh -L local_socket:remote_socket [user@]remote_ssh_server
+
+    * Dynamic or Multi-Port
+
+      A special case of the forward TCP tunnels is the Socks proxy capability. Using these options, the SSH client listens on a specified binding port and acts as a SOCKS 4 or 5 proxy server.
+
+          ssh -D [bind_address:]port [user@]remote_ssh_server
+          ssh -D 8080 user@10.1.4.100
 
 
+  * Reversed
+    * Single-Port
 
-    * Forward
-        * Single-Port
-        * Dynamic or Multi-Port
-    * Reversed
-        * Single-Port
-        * Dynamic or Multi-Port
-    * X window turnnel
+      The reverse or callback proxies allow us to do tricks similar to the one above but in the reverse direction. We can open services on our own local networks to hosts on the remote side of the SSH session.
 
-    * Multiple Tunnels and Multiple Host Hopping
+            ssh -R [bind_address:]port:host:hostport [user@]remote_ssh_server
+              
+            optional possible 
+            ssh -R remote_socket:host:hostport [user@]remote_ssh_server
+            ssh -R remote_socket:local_socket [user@]remote_ssh_server
+            ssh -R [bind_address:]port:local_socket [user@]remote_ssh_server         
 
+    
 
+    * Dynamic or Multi-Port
 
-    * configuration for above
+      Finally, we can expose a SOCKS proxy server on the remote host directed to the client’s network as we can do with direct forwarding. 
+
+          ssh -R [bind_address:]port [user@]remote_ssh_server
+
+  * X window turnnel
+
+        ssh -X [user@]remote_ssh_server
+        ssh -Y [user@]remote_ssh_server
+
+  * Multiple Tunnels and Multiple Host Hopping
+
+        ssh -X -L 5432:<DB server IP>:5432 -R 873:<local RSYNC server>:873 [user@]remote_ssh_server
+
+        server1 -> server2 -> server3 
+        ssh -L 8022:<server2>:22 user@server1
+        ssh -L 8023:<server3>:22 -p 8022 user@localhost
+        ssh -p 8023 user@localhost
+
+  * configuration for above
+
         /etc/ssh/ssh_config
 
+        host 10.1.4.100
+            ForwardX11 yes
+            LocalForward 0.0.0.0:5432 10.1.4.200:5432
+            RemoteForward localhost:8022 localhost:22
+            user baeldung
 
-    * Persistent 
+  * Persistent 
 
+        autossh [-V] [-M port[:echo_port]] [-f] [SSH_OPTIONS]
+
+        autossh -X -L 5432:<DB server IP>:5432 -R 873:<local RSYNC server>:873 [user@]remote_ssh_server
+        autossh -f [host]
+  
 * Monitoring Network Usage in Linux 
-
 
     * nload
     * speedometer
@@ -204,6 +309,15 @@
 <br/><a name="Service"></a>
 
 ## Service
+
+
+* Shutdown linix
+
+      shutdown -r now              : reboot
+ 
+      shutdown +30                 : after 30 mins completely shutdown!  
+
+      poweroff                     : power off 
 
 * Run a script on startup in Linux
     
@@ -375,13 +489,127 @@
 
 
 
+
+
+
+
+
+
+
+
 <br/><a name="Processes"></a>
 
 ## Processes and Monitoring
+* The Linux Process States
+  
+  * Running or Runnable (R)
+  * Uninterruptible Sleep (D)
+  * Interruptable Sleep (S)
+  * Stopped (T)
+  * Zombie (Z)
+
+* standard processes
+
+      $ ps -a 
+      $ top
+      $ cat /proc/{pid}/status | grep State
+
+* sysstat
+
+      sudo apt-get install sysstat
+
+      iostat     : reports CPU statistics and input/output statistics for block devices and partitions.
+      mpstat     : reports individual or combined processor related statistics.
+      pidstat    : reports statistics for Linux tasks (processes) : I/O, CPU, memory, etc.
+      tapestat   : reports statistics for tape drives connected to the system.
+      cifsiostat : reports CIFS statistics.
+
+      vmstat is for virtual memory, but cover CPU, memory, and I/O
 
 * Find Out the Total Physical Memory (RAM) on Linux
+      $ free -h -t          : to know the amount of RAM and swap used/free memory combined
+      $ free -h -s 5        : useful if we want to monitor the RAM usage at a specified interval
 
-        $ free -h -s 5
+      $ vmstat -w 
+      $ vmstat -s 
+      $ vmstat -s | grep -i 'total memory' | sed 's/ *//'
+      $ vmstat 2 6                                   : every 2 secs for 6 intervals
+
+      $ dmidecode --type 19
+
+      $ cat /proc/cpuinfo |grep core
+
+      nice tool for memory monitoring
+      $ ksysguard
+
+      one liner log for memory
+      $ while true; do date >> memory.log; free >> memory.log; sleep 1; done
+
+* Overall CPU Usage on Linux
+      $ uptime
+      $ vmstat 3 4
+      $ vmstat 1 2|tail -1|awk '{print $15}'
+         
+      $ vi /proc/stat
+
+      $ cat /proc/stat |grep cpu |tail -1|awk '{print ($5*100)/($2+$3+$4+$5+$6+$7+$8+$9+$10)}'|awk '{print "CPU Usage: " 100-$1 "%"}'
+      CPU Usage: 2.4219 %
+
+      $ top -bn2 | grep '%Cpu' | tail -1 | grep -P '(....|...) id,'|awk '{print "CPU Usage: " 100-$8 "%"}'
+      CPU Usage: 2.2%
+
+* RAM informantion (virtual file)
+
+      $ vi /proc/meminfo
+
+      $ cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*'
+      
+
+* CPU informantion
+  The /proc/cpuinfo virtual file contains information about the CPUs currently available in our system’s motherboard.
+
+      $ vi /proc/cpuinfo
+
+      lm              : whether 64-bit support? 
+      vmx             : CPU has hardware support for virtual machines. 
+
+* strace (diagnostic tool)
+
+  syscalls that result in error will have their error exit code and a description displayed
+
+      $ sh -c 'echo $$; exec sleep 60'                      : Attaching strace to Running Process
+      $ strace -p {PID}
+
+      $ strace -c whoami                                    : To get a summary of the command, we can use the flag -c
+      $ strace -t whoami                                    : Obtaining Timing Information
+      $ strace -e trace=fstat whoami                        : Filtering With Expression
+      $ strace -e status=!successful whoami                 : Filtering Output by Return Status
+
+
+* How to Monitor Disk IO in a Linux System (sysstat, iotop)
+
+  Report Disk I/O Statistics
+
+      $ iostat -d 
+      $ iostat -d -p sda                                    : specified device.
+      $ iostat -N                                           : Display LVM Statistics  
+ 
+  identify which process or thread is causing heavy I/O activities.
+
+      $ egrep '(CONFIG_VM_EVENT_COUNTERS|TASK_IO_ACCOUNTING|CONFIG_TASKSTATS|TASK_DELAY_ACCT)' /boot/config-$(uname -r)
+      $ sudo iotop -o                                       : threads actually performing I/O activity
+
+  Generate Disk I/O Statistics Over a Period of Time
+
+      $ sar  -b 1                                  : to report details about the disk activities:
+      $ sar -p -d -b 1                             : identify devices by using -p, for each block device using -d 
+      $ sar 2 5 -o /tmp/data_io > /dev/null 2>&1   : saved file is in a binary format
+      $ sar -f /tmp/data_io                        : to read the report generated by the sar command saved in the file
+
+  Measure Disk I/O Usage With vmstat
+      
+      $ vmstat -d 1                                : to display individual disk statistics:
+      $ vmstat -p /dev/sda2 1                      : -p to obtain detailed performance statistics about a partition
 
 
 <br/><a name="Utility"></a>
@@ -395,8 +623,29 @@
 
 ## File systens
 
+* Where Disk Space Has Gone on Linux
+      
+  First do check disk partition
+
+      df -h                  : human readabel
+
+  then do check disk usage 
+
+      du /var
+      du -BM --max-depth=1 /var | sort -n | tail -n 5 
+      du -BM --max-depth=<strong>2</strong> /var | sort -n | tail -n 5
+      du -BM --max-depth=1 <strong>/var/log</strong> | sort -n | tail -n 5
 
 
+  via find command
+
+      find /var -size +100M -printf '%s %p\n' | sort -n
+
+  via lsof command: deleted files still using space: the system does not report space used by deleted files as free
+
+      lsof | grep -E '^COM|deleted'
+     
+  ncdu            : this is really nice tool for checking disk usage!   
 
 <br/><a name="Shell"></a>
 
@@ -417,27 +666,67 @@
 
 ## Logging
 
-    - journal 
+* journal 
   
-        $ journalctl --list­-boots                   : To get a list of boots
-        $ journalctl -b                             : to get the all the logs for the current boot,
-        $ journalctl -b -1                          : to get the previous boots
-        $ journalctl --sinc­e="2­021­-01-30 18:17:16"  : specific time using --since and --until
-        $ journalctl --since "20 min ago"   
-        $ journalctl -u systemd-*
-        $ journalctl --user-unit my-application
-        $ jour­nalctl _UID=100
-        $ journalctl -p err..alert
-        $ journalctl -u apache -n 10
-        $ journalctl -f -u nginx
-        $ journalctl --no-pager
-        $ journalctl --vacu­um-­tim­e=2­weeks
-        $ journalctl -b -u docker -o json
+      $ journalctl --list­-boots                   : To get a list of boots
+      $ journalctl -b                             : to get the all the logs for the current boot,
+      $ journalctl -b -1                          : to get the previous boots
+      $ journalctl --sinc­e="2­021­-01-30 18:17:16"  : specific time using --since and --until
+      $ journalctl --since "20 min ago"   
+      $ journalctl -u systemd-*
+      $ journalctl --user-unit my-application
+      $ jour­nalctl _UID=100
+      $ journalctl -p err..alert                  : Priority
+      $ journalctl -u apache -n 10
+      $ journalctl -f -u nginx
+      $ journalctl --no-pager
+      $ journalctl --vacu­um-­tim­e=2­weeks
+      $ journalctl -b -u docker -o json
 
 
+* logrotate
 
+      /var/lib/logrotate.status       : Default state file.
+      /etc/logrotate.conf             : Configuration options.
+      /etc/logrotate.d                : stores application-specific log settings
+   
+      $ logrotate log-rotation.conf                    : configure
+      $ logrotate -f log-rotation.conf                 : run it
+      $ logrotate -d /etc/logrotate.d/apache2.conf
 
+      --------------------------------------------
+      <global directive 1>
+      <global directive 2>
+      <file path matchers 1> {
+          <directive 1>
+          <directive 2>
+          ...
+          <directive n>
+      }
 
+      <file path matchers 2a> <file path matchers 2b> {
+          <directive 1>
+          <directive 2>
+          ...
+          <directive n>
+      }    
+      --------------------------------------------
+
+      --------------------------------------------
+      compress
+      /var/log/nginx/* {
+          rotate 3
+          daily
+      }
+      /var/log/nginx/error.log {
+          rotate 3
+          size 1M
+          lastaction
+              /usr/bin/killall -HUP nginx
+          endscript
+          nocompress
+      }
+      --------------------------------------------
 
 
 

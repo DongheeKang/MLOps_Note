@@ -101,40 +101,42 @@
 
 * List All Groups in Linux
 
-  * standard method
+  standard method
 
-       $ vi /etc/group
-        group_name : password(encrypted) : GID : user_list
+      $ vi /etc/group
+      group_name : password(encrypted) : GID : user_list
+      root:x:0:root
+      bin:x:1:root,bin,daemon
+      daemon:x:2:root,bin,daemon
+      sys:x:3:root,bin
+      adm:x:4:root,daemon
+      tty:x:5:
+      disk:x:6:root
+      lp:x:7:cups,daemon,kent
 
-        root:x:0:root
-        bin:x:1:root,bin,daemon
-        daemon:x:2:root,bin,daemon
-        sys:x:3:root,bin
-        adm:x:4:root,daemon
-        tty:x:5:
-        disk:x:6:root
-        lp:x:7:cups,daemon,kent
+      only user print out! 
+      $ cut -d: -f1 /etc/group
 
+
+  getent
+
+      $ getent group
+
+      only user print out! 
+      $ getent group | cut -d: -f1
+
+  group
+
+      $ groups
+      lp wheel dbus network video audio optical storage input users vboxusers docker donghee
     
-    getent
+      $ groups root
+      root bin daemon sys adm disk wheel log
 
-        $ getent group
+  id
 
-        only user print out! 
-        $ cut -d: -f1 /etc/group
-        $ getent group | cut -d: -f1
-
-    group
-
-        $ groups
-        lp wheel dbus network video audio optical storage input users vboxusers docker donghee
-        $ groups root
-        root bin daemon sys adm disk wheel log
-
-    id
-
-        id -Gn
-        id -Gn root
+      id -Gn
+      id -Gn root
 
 
 * Fixing the “Command Not Found” Error When Using Sudo 
@@ -159,7 +161,7 @@
       usermod -U user 
       
   extend expire date
-  
+
       usermod -e 2025-09-01 user
 
 
@@ -659,7 +661,24 @@
 
 ## Files & Directory 
 
+* “No such file or directory” Error When Executing a Binary
 
+  Two cases: 
+
+      $ ./binaryfile
+      ./binaryfile: error while loading shared libraries: libbooster.so.0: cannot open shared object file: No such file or directory
+
+      $ ./binaryfile
+      -bash: ./binaryfile: No such file or directory         : missing a Program Interpreter while above is missing Libraries
+
+  Solution:
+
+      $ objdump -p binaryfile | grep NEEDED
+
+      $ ldd binaryfile
+
+      $ readelf -a binaryfile | grep NEEDED
+      $ readelf -a binaryfile | grep interpreter
 
 
 <br/><a name="Logging"></a>

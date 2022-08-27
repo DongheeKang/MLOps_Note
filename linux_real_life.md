@@ -28,6 +28,8 @@
 
 * standard processes
 
+  ps
+
       $ ps -e -f                    : all process
 
       $ ps -a                       : current shall
@@ -37,8 +39,25 @@
       $ ps -C gedit -L -f           : thread by -L
       $ ps -e -H                    : child process by -H 
 
-      $ top
+  top  
+
+      top -p 23584,22011
+      top -u root
+
+      us – user processes
+      sy – kernel processes
+      ni – niced user processes
+      id – kernel idle handler
+      wa – I/O completion
+      hi – hardware interrupts
+      si – software interrupts
+      st – time stolen from this VM by the hypervisor
+
+
+  /proc
+
       $ cat /proc/{pid}/status | grep State
+
 
 * sysstat
 
@@ -137,7 +156,7 @@
       $ vmstat -d 1                                : to display individual disk statistics:
       $ vmstat -p /dev/sda2 1                      : -p to obtain detailed performance statistics about a partition
 
-+ How to know runnning child processes
+* How to know runnning child processes?
   
       $ pgrep -lP 6245
       $ pstree -p 6245
@@ -147,7 +166,71 @@
   Have a look find_child_process.sh (github)
 
 
+* How to kill a process standard way?
 
+      $ pgrep -fa dummy_process                : find and list for certain process name, if you want to filter
+
+      $ pkill -f dummy_process                 : kill matches the given process name.
+      $ killall dd                             : Kill Multiple Processes Using killall
+
+      $ pidof dummy_process | xargs -r kill    : find pid and kill it
+
+* How to kill backgournd process?
+
+      $ ps -eaf                     : find pid
+      $ pgrep chrome                : program name (firefox)
+      $ jobs                        : to list job (& is background)
+
+      $ sudo kill -9 733
+      $ sudo pkill rabbitmq
+      $ killall chrome
+      $ killall firefox
+
+      $ fg 1                        : bring first into foreground
+      $ kill %1                     : kill id=1 process
+
+* How to kill Running on a Specific Port?
+
+  creat three processes using port 9999 and the protocols SCTP, TCP, and UDP respectively.
+
+      $ socat sctp-listen:9999,bind=127.0.0.1 stdout &
+      [1] 6424
+      $ socat tcp-listen:9999,bind=127.0.0.1 stdout &
+      [2] 6431
+      $ socat udp-listen:9999,bind=127.0.0.1 stdout &
+      [3] 6438
+
+  fuser
+
+      $ fuser -k 9999/tcp
+      9999/tcp: 6431
+
+  kill
+
+      kill -9 6431
+
+  lsof
+      
+      $ lsof -i udp:9999 | awk '/9999/{print $2}' | xargs kill
+
+  ss or netstat(deprecated)
+
+      $ ss -Slp | grep -Po ':9999\s.*pid=\K\d+(?=,)' | xargs kill
+      $ netstat -Slp | grep -Po ':9999\s.*LISTEN.*?\K\d+(?=/)' | xargs kill
+
+
+
+
+
+
+
+
+
+
+
+
+
+       
 <br/><a name="Users"></a>
 
 ## Users
@@ -322,7 +405,20 @@
               proxy_pass http://127.0.0.1:8080/;
           }
       }
+  
+  for checking port
 
+      $ netstat -ltnup | grep ':22'
+      $ ss -ltnup 'sport = :22'
+      $ lsof -i :22 -i :68
+      $ fuser -v 22/tcp 68/udp
+
+      
+      l – show only listening sockets
+      t – show TCP connections
+      n – show addresses in a numerical form
+      u – show UDP connections
+      p – show process id/program name
 
 
 * SSH Tunneling and Proxying

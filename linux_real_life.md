@@ -3,10 +3,10 @@
 
 ### Contents
   * [Processes and Monitoring](#Processes)
-
-  * [Users](#users)
-  * [Security](#Security)
+  * [User Management](#Users)
   * [Networking](#Networking)
+  * [Security](#Security)
+
   * [Service](#Service)
   * [Utility](#Utility)
   * [File systens](#Filesystens)
@@ -41,8 +41,8 @@
 
   top  
 
-      top -p 23584,22011
-      top -u root
+      $ top -p 23584,22011
+      $ top -u root
 
       us – user processes
       sy – kernel processes
@@ -163,8 +163,7 @@
       $ ps --ppid 6245
       $ cat /proc/6245/task/6245/children
       
-  Have a look find_child_process.sh (github)
-
+  please have a look dedicated script find_child_process.sh in github
 
 * How to kill a process standard way?
 
@@ -189,53 +188,46 @@
       $ fg 1                        : bring first into foreground
       $ kill %1                     : kill id=1 process
 
-* How to kill Running on a Specific Port?
-
-  creat three processes using port 9999 and the protocols SCTP, TCP, and UDP respectively.
-
-      $ socat sctp-listen:9999,bind=127.0.0.1 stdout &
-      [1] 6424
-      $ socat tcp-listen:9999,bind=127.0.0.1 stdout &
-      [2] 6431
-      $ socat udp-listen:9999,bind=127.0.0.1 stdout &
-      [3] 6438
-
-  fuser
-
-      $ fuser -k 9999/tcp
-      9999/tcp: 6431
-
-  kill
-
-      kill -9 6431
-
-  lsof
-      
-      $ lsof -i udp:9999 | awk '/9999/{print $2}' | xargs kill
-
-  ss or netstat(deprecated)
-
-      $ ss -Slp | grep -Po ':9999\s.*pid=\K\d+(?=,)' | xargs kill
-      $ netstat -Slp | grep -Po ':9999\s.*LISTEN.*?\K\d+(?=/)' | xargs kill
 
 
 
+* How long a linux process has been running?
+
+      $ ps -p 1234 -o etime                      :  03:24:30
+      $ ps -p 1234 -o etimes                     :  timestemp 123445
 
 
+* Finding out Who Killed the Process
+
+      $ (echo "li = []" ; echo "for r in range(9999999999999999): li.append(str(r))") | python
+
+      $ sudo dmesg | tail -7
+
+      $ journalctl --list-boots | \
+        awk '{ print $1 }' | \
+        xargs -I{} journalctl --utc --no-pager -b {} -kqg 'killed process' -o verbose --output-fields=MESSAGE
+
+
+* Find the Current Working Directory of a Running Process
+
+      $ pgrep sleep
+        5620                               : this is a pid
+
+      $ pwdx 5620                          : use now pwdx
+        5620: /home/pi                     : can find directory!
+
+      $ lsof -p 5620 | grep cwd            : or also possible with lsof
+
+      $ readlink -e /proc/23217/cwd        : or readlink
 
 
 
 
-
-
-
-
-       
 <br/><a name="Users"></a>
 
-## Users
+## User Management
 
-* Running Script or Command as Another User in Linux
+* Running Script or Command as another user in Linux
     
   * visudo 
     
@@ -315,7 +307,7 @@
           move the existing content to the new location, has to use -m option 
           $ sudo usermod -m -d /usr/baeldung baeldung
 
-* List All Groups in Linux
+* List all groups in linux
 
   standard method
 
@@ -381,9 +373,8 @@
       usermod -e 2025-09-01 user
 
 
-<br/><a name="Security"></a>
 
-## Security
+
 
 <br/><a name="Networking"></a>
 
@@ -391,34 +382,84 @@
 * Mapping Hostnames with Ports in /etc/hosts
 
       $ vi /etc/hosts
-      127.0.0.1    baeldung.com                     : this is ok
-      127.0.0.1:8080    baeldung.com                : port 8080 does not work!!!
+      127.0.0.1         dongheekang.com                : this is ok
+      127.0.0.1:8080    dongheekang.com                : port 8080 does not work!!!
 
       For Nginx, one can deal port!
-      $ vi /etc/nginx/conf.d/baeldung.conf
+      $ vi /etc/nginx/conf.d/dongheekang.conf
       server {
           listen 80;
 
-          server_name baeldung.com;
+          server_name dongheekang.com;
 
           location / {
               proxy_pass http://127.0.0.1:8080/;
           }
       }
   
-  for checking port
+  To check port
 
       $ netstat -ltnup | grep ':22'
       $ ss -ltnup 'sport = :22'
       $ lsof -i :22 -i :68
       $ fuser -v 22/tcp 68/udp
 
+      options (netstat & ss)
+        l – show only listening sockets
+        t – show TCP connections
+        n – show addresses in a numerical form
+        u – show UDP connections
+        p – show process id/program name
+
+
+* How to kill Running on a Specific Port?
+
+  creat three processes using port 9999 and the protocols SCTP, TCP, and UDP respectively.
+
+      $ socat sctp-listen:9999,bind=127.0.0.1 stdout &
+      [1] 6424
+      $ socat tcp-listen:9999,bind=127.0.0.1 stdout &
+      [2] 6431
+      $ socat udp-listen:9999,bind=127.0.0.1 stdout &
+      [3] 6438
+
+  fuser
+
+      $ fuser -k 9999/tcp
+      9999/tcp: 6431
+
+  kill
+
+      $ kill -9 6431
+
+  lsof
       
-      l – show only listening sockets
-      t – show TCP connections
-      n – show addresses in a numerical form
-      u – show UDP connections
-      p – show process id/program name
+      $ lsof -i udp:9999 | awk '/9999/{print $2}' | xargs kill
+
+  ss or netstat
+
+      $ ss -Slp | grep -Po ':9999\s.*pid=\K\d+(?=,)' | xargs kill
+      $ netstat -Slp | grep -Po ':9999\s.*LISTEN.*?\K\d+(?=/)' | xargs kill
+
+
+
+* Freeing up a TCP/IP Port
+
+      $ fuser -k 8000/tcp
+      $ fuser -i -TERM -k 8000/tcp                 : use SIGTERM to do more carefully!
+
+      $ lsof -i :8000
+      $ ss -apt 'sport = :8000'
+        Netid  State      Recv-Q Send-Q Local  Address:Port  Peer Address:Port                
+        tcp    LISTEN     0      128    *:ssh                *:*                 users:(("sshd",pid=1226,fd=3))
+        ......
+        tcp    TIME-WAIT  0      0      192.168.0.4:56886    192.168.0.5:https
+
+      TIME-WAIT: the process closed the connection, and the port is waiting for a timeout without any process using it.
+      
+      Sometimes there isn’t any process using the port and, even so, the system tells us the port is busy or in use. 
+      This is usually because of the TIME-WAIT state. If this is the case, we only have to wait until the system frees it up, 
+      by default the timeout is 2 minutes.
 
 
 * SSH Tunneling and Proxying
@@ -461,7 +502,6 @@
           ssh -D [bind_address:]port [user@]remote_ssh_server
           ssh -D 8080 user@10.1.4.100
 
-
   * Reversed
     * Single-Port
 
@@ -473,8 +513,6 @@
             ssh -R remote_socket:host:hostport [user@]remote_ssh_server
             ssh -R remote_socket:local_socket [user@]remote_ssh_server
             ssh -R [bind_address:]port:local_socket [user@]remote_ssh_server         
-
-    
 
     * Dynamic or Multi-Port
 
@@ -508,10 +546,10 @@
 
   * Persistent 
 
-        autossh [-V] [-M port[:echo_port]] [-f] [SSH_OPTIONS]
+        $ autossh [-V] [-M port[:echo_port]] [-f] [SSH_OPTIONS]
 
-        autossh -X -L 5432:<DB server IP>:5432 -R 873:<local RSYNC server>:873 [user@]remote_ssh_server
-        autossh -f [host]
+        $ autossh -X -L 5432:<DB server IP>:5432 -R 873:<local RSYNC server>:873 [user@]remote_ssh_server
+        $ autossh -f [host]
   
 * Monitoring Network Usage in Linux 
 
@@ -520,12 +558,113 @@
     * iftop
     * nethogs
 
+* netcat(nc) 
+    
+  * reading and writing data across the network, through TCP or UDP 
+
+        $ nc -z -v -w 1 google.com 442-444      : Scanning for Open Ports
+
+        $ nc -lv 1234                           : listen to port 1234 (server node)
+        $ nc -v localhost 1234                  : open up a netcat process that connects to localhost at port 1234 (client node)
+
+        $ nc -l -v -k localhost 1234            : server and client netcat processes will return whenever the connection is terminated  
+
+  * A netcat process 
+      
+      first constructs a legitimate HTTP response using echo and process substitution, 
+      listens to port 1234 and serves the file whenever a client connects to our server:
+
+        $ echo -e "HTTP/1.1 200 OK\n\n$(cat index.html)" | nc -l 1234
+
+  * Improvement
+
+      we wrapped the command into a while loop. In consequence, whenever the command terminates, it’ll restart the process 
+      and using -w flag allows us to specify the timeout value
+
+        $ while true; do echo -e "HTTP/1.1 200 OK\n\n$(cat index.html)" | nc -l -w 1 1234; done
+
+      How do create index.html?
+      
+        cat - > index.html <<<EOF
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Simple Netcat Server</title>
+          </head>
+          <body>
+            <h1>Welcome to simple netcat server!<h1>
+          </body>
+          </body>
+        <html>
+        EOF
+
+
+  *  Reserve shell connection: 
+
+      set server node
+
+          $ nc -lv 1234
+          $ mkfifo /tmp/rs
+          $ cat /tmp/rs | /bin/bash 2>&1 | nc -v client 1234 > /tmp/rs
+
+      Listening on 0.0.0.0 1234
+      Connection received on server.baeldung 36170
+
+          $ hostname
+          $ server
+
+      any text sent by the client node will then be piped to /tmp/rs
+
+  *  Reserve proxy connection: 
+
+      set server node
+  
+          $ mkfifo /tmp/rp
+          $ nc -lv 1234 < /tmp/rp | nc localhost 4321 > /tmp/rp
+
+      the first process the external router and the second process the internal router.
+      When there is incoming traffic on port 1234, the external router pipes the traffic to the internal router.
+      when there’s outgoing traffic from port 4321, the internal router will pipe it to the pipe /tmp/rp. 
+      Then, the external router(server) will read and send the content of /tmp/rp to the client (outside).
+
+
+* Two dockers for network testing 
+
+
+
+* How to List All Connected SSH Sessions
+
+      $ who
+      $ w
+      $ sudo last | grep 'still logged in'  
+      $ sudo netstat -atnp | grep 'ESTABLISHED.*sshd'
+      $ ss | grep ssh
+      $ ps axfj | grep sshd
+
+* Find the IP Address of the Client in an SSH Session 
+
+      $ who
+      $ w
+      $ finger
+      $ pinky  
+      $ last | head
+      $ sudo netstat -tpn | grep "ESTABLISHED.*sshd"
+      $ sudo ss -tp | grep "ESTAB.*sshd"
+      $ sudo lsof -i TCP -s tcp:established -n | grep ssh
 
 
 
 
 
 
+
+
+
+<br/><a name="Security"></a>
+
+## Security
+
+* iptables
 
 
 

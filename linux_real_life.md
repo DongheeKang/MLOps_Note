@@ -6,19 +6,19 @@
   * [User Management](#Users)
   * [Networking](#Networking)
   * [Security](#Security)
-
   * [Service](#Service)
   * [Utility](#Utility)
   * [File systens](#Filesystens)
   * [Shell](#Shell)
   * [Files and Directories](#Files)
   * [Logging](#Logging)
-
+  * [Docker](#Docker)
 
 <br/><a name="Processes"></a>
 
 ## Processes and Monitoring
-* The Linux Process States
+
+#### The Linux Process States
   
   * Running or Runnable (R)
   * Uninterruptible Sleep (D)
@@ -26,24 +26,22 @@
   * Stopped (T)
   * Zombie (Z)
 
-* standard processes
-
-  ps
+* ps
 
       $ ps -e -f                    : all process
-
       $ ps -a                       : current shall
       $ ps -C systemd               : filter by systemd
       $ ps -u root                  : filter by user(effective)
       $ ps -p 1, 293                : filter by pid
       $ ps -C gedit -L -f           : thread by -L
       $ ps -e -H                    : child process by -H 
-
-  top  
+* top  
 
       $ top -p 23584,22011
       $ top -u root
 
+      keys 
+      -------------------------------------------------
       us – user processes
       sy – kernel processes
       ni – niced user processes
@@ -52,37 +50,39 @@
       hi – hardware interrupts
       si – software interrupts
       st – time stolen from this VM by the hypervisor
-
-
-  /proc
+      -------------------------------------------------
+* /proc
 
       $ cat /proc/{pid}/status | grep State
-
 
 * sysstat
 
       sudo apt-get install sysstat
 
+      commands 
+      --------------------------------------------------------------------------------------------------
       iostat     : reports CPU statistics and input/output statistics for block devices and partitions.
       mpstat     : reports individual or combined processor related statistics.
       pidstat    : reports statistics for Linux tasks (processes) : I/O, CPU, memory, etc.
       tapestat   : reports statistics for tape drives connected to the system.
       cifsiostat : reports CIFS statistics.
+      --------------------------------------------------------------------------------------------------
 
       vmstat is for virtual memory, but cover CPU, memory, and I/O
 
 * Find Out the Total Physical Memory (RAM) on Linux
+
       $ free -h -t          : to know the amount of RAM and swap used/free memory combined
       $ free -h -s 5        : useful if we want to monitor the RAM usage at a specified interval
 
       $ vmstat -w 
       $ vmstat -s 
       $ vmstat -s | grep -i 'total memory' | sed 's/ *//'
-      $ vmstat 2 6                                   : every 2 secs for 6 intervals
+      $ vmstat 2 6           : every 2 secs for 6 intervals
 
       $ dmidecode --type 19
 
-      $ cat /proc/cpuinfo |grep core
+      $ cat /proc/cpuinfo | grep core
 
       nice tool for memory monitoring
       $ ksysguard
@@ -91,6 +91,7 @@
       $ while true; do date >> memory.log; free >> memory.log; sleep 1; done
 
 * Overall CPU Usage on Linux
+
       $ uptime
       $ vmstat 3 4
       $ vmstat 1 2|tail -1|awk '{print $15}'
@@ -119,8 +120,7 @@
       vmx             : CPU has hardware support for virtual machines. 
 
 * strace (system call)
-  strace is a diagnistic tool for 
-  system calls that result in error will have their error exit code and a description displayed
+  strace is a diagnistic tool for system calls that result in error will have their error exit code and a description displayed
 
       $ sh -c 'echo $$; exec sleep 60'                      : Attaching strace to Running Process
       $ strace -p {PID}
@@ -139,7 +139,7 @@
       $ iostat -d -p sda                                    : specified device.
       $ iostat -N                                           : Display LVM Statistics  
  
-  identify which process or thread is causing heavy I/O activities.
+  Identify which process or thread is causing heavy I/O activities.
 
       $ egrep '(CONFIG_VM_EVENT_COUNTERS|TASK_IO_ACCOUNTING|CONFIG_TASKSTATS|TASK_DELAY_ACCT)' /boot/config-$(uname -r)
       $ sudo iotop -o                                       : threads actually performing I/O activity
@@ -163,7 +163,7 @@
       $ ps --ppid 6245
       $ cat /proc/6245/task/6245/children
       
-  please have a look dedicated script find_child_process.sh in github
+      please have a look dedicated script find_child_process.sh in github
 
 * How to kill a process standard way?
 
@@ -188,14 +188,10 @@
       $ fg 1                        : bring first into foreground
       $ kill %1                     : kill id=1 process
 
-
-
-
 * How long a linux process has been running?
 
       $ ps -p 1234 -o etime                      :  03:24:30
       $ ps -p 1234 -o etimes                     :  timestemp 123445
-
 
 * Finding out Who Killed the Process
 
@@ -206,7 +202,6 @@
       $ journalctl --list-boots | \
         awk '{ print $1 }' | \
         xargs -I{} journalctl --utc --no-pager -b {} -kqg 'killed process' -o verbose --output-fields=MESSAGE
-
 
 * Find the Current Working Directory of a Running Process
 
@@ -221,8 +216,6 @@
       $ readlink -e /proc/23217/cwd        : or readlink
 
 
-
-
 <br/><a name="Users"></a>
 
 ## User Management
@@ -231,7 +224,7 @@
     
   * visudo 
     
-    will touch /etc/sudoers and show 
+    will show /etc/sudoers
     
         $ visudo 
           root  ALL=(ALL:ALL) ALL
@@ -252,7 +245,6 @@
         $ su  
           root@server:/home/test# pwd 
           /home/test      
-
 
     command
 
@@ -301,11 +293,12 @@
 
 
 * How to Change the Default Home Directory of a User
-          $ sudo useradd -m baeldung   
-          $ sudo useradd -m -d /home/baeldung baeldung
+
+          $ sudo useradd -m dongheekang   
+          $ sudo useradd -m -d /home/dongheekang dongheekang
 
           move the existing content to the new location, has to use -m option 
-          $ sudo usermod -m -d /usr/baeldung baeldung
+          $ sudo usermod -m -d /usr/dongheekang dongheekang
 
 * List all groups in linux
 
@@ -343,43 +336,48 @@
 
   id
 
-      id -Gn
-      id -Gn root
+      $ id -Gn
+      $ id -Gn root
 
 
 * Fixing the “Command Not Found” Error When Using Sudo 
   
   “Permission Denied” When Running Script
 
-      chmod +x ./myscript 
+      $ chmod +x ./myscript 
 
   Fixing the Error for a Single Command. We can pass the -E flag to sudo to make it preserve the current environment variables:
 
-      sudo -E myscript
+      $ sudo -E myscript
 
 * Modify user
 
   Update Account’s Username
 
-      usermod -l old new
+      $ usermod -l old new
 
-  Lock and unlock    
+  to lock and unlock    
 
-      usermod -L user
-      usermod -U user 
+      $ usermod -L user
+      $ usermod -U user 
       
-  extend expire date
+  to extend expire date
 
-      usermod -e 2025-09-01 user
-
-
-
+      $ usermod -e 2025-09-01 user
 
 
 <br/><a name="Networking"></a>
 
 ## Networking
+
+* Gateway, Router, Load balance
+
+      Gateway is a IP address of the router
+      Router does a load balancing for requests
+
 * Mapping Hostnames with Ports in /etc/hosts
+
+  Look into /tec/hosts
 
       $ vi /etc/hosts
       127.0.0.1         dongheekang.com                : this is ok
@@ -405,12 +403,13 @@
       $ fuser -v 22/tcp 68/udp
 
       options (netstat & ss)
-        l – show only listening sockets
-        t – show TCP connections
-        n – show addresses in a numerical form
-        u – show UDP connections
-        p – show process id/program name
-
+      -------------------------------------------
+      l – show only listening sockets
+      t – show TCP connections
+      n – show addresses in a numerical form
+      u – show UDP connections
+      p – show process id/program name
+      -------------------------------------------
 
 * How to kill Running on a Specific Port?
 
@@ -441,8 +440,6 @@
       $ ss -Slp | grep -Po ':9999\s.*pid=\K\d+(?=,)' | xargs kill
       $ netstat -Slp | grep -Po ':9999\s.*LISTEN.*?\K\d+(?=/)' | xargs kill
 
-
-
 * Freeing up a TCP/IP Port
 
       $ fuser -k 8000/tcp
@@ -466,8 +463,8 @@
 
   * Server side configuration ! SSHD
 
-        /etc/ssh/sshd_config 
-
+        $ vi /etc/ssh/sshd_config 
+        -------------------------------------------------------------------------------------------------------------
         AllowStreamLocalForwarding   : Allows Unix domain sockets to be forwarded. 
         AllowTcpForwarding           : Allows TCP port forwarding. 
         DisableForwarding            : Disables all kinds of forwarding.
@@ -477,77 +474,77 @@
         PermitTunnel                 : Specifies whether tun device forwarding is allowed. 
         X11Forwarding                : Specifies whether X11 forwarding is allowed. 
         X11UseLocalhost              : Forces X11 forwarding to be allowed from the SSH server host loopback address. 
+        -------------------------------------------------------------------------------------------------------------
 
-    need to be confirmed
+    need to be confirmed that 
     firewalls must allow the SSH traffic, usually on port TCP/22, since some host firewall configurations might limit the ability to connect to and from external services 
 
-    iptables needs to be touched.
+    iptables needs to be touched further
 
   * Forward
     * Single-Port
 
       A forward or direct TCP tunnel is the one that follows the direction of the SSH connection from the client to the SSH server. 
 
-          ssh -L [bind_address:]port:host:hostport [user@]remote_ssh_server
-          ssh -L 0.0.0.0:8022:10.1.4.100:22 user@10.1.4.20
+          $ ssh -L [bind_address:]port:host:hostport [user@]remote_ssh_server
+          $ ssh -L 0.0.0.0:8022:10.1.4.100:22 user@10.1.4.20
                
           possible this as well. 
-          ssh -L local_socket:host:hostport [user@]remote_ssh_server
-          ssh -L local_socket:remote_socket [user@]remote_ssh_server
+          $ ssh -L local_socket:host:hostport [user@]remote_ssh_server
+          $ ssh -L local_socket:remote_socket [user@]remote_ssh_server
 
     * Dynamic or Multi-Port
 
       A special case of the forward TCP tunnels is the Socks proxy capability. Using these options, the SSH client listens on a specified binding port and acts as a SOCKS 4 or 5 proxy server.
 
-          ssh -D [bind_address:]port [user@]remote_ssh_server
-          ssh -D 8080 user@10.1.4.100
+          $ ssh -D [bind_address:]port [user@]remote_ssh_server
+          $ ssh -D 8080 user@10.1.4.100
 
   * Reversed
     * Single-Port
 
       The reverse or callback proxies allow us to do tricks similar to the one above but in the reverse direction. We can open services on our own local networks to hosts on the remote side of the SSH session.
 
-            ssh -R [bind_address:]port:host:hostport [user@]remote_ssh_server
+            $ ssh -R [bind_address:]port:host:hostport [user@]remote_ssh_server
               
             optional possible 
-            ssh -R remote_socket:host:hostport [user@]remote_ssh_server
-            ssh -R remote_socket:local_socket [user@]remote_ssh_server
-            ssh -R [bind_address:]port:local_socket [user@]remote_ssh_server         
+            $ ssh -R remote_socket:host:hostport [user@]remote_ssh_server
+            $ ssh -R remote_socket:local_socket [user@]remote_ssh_server
+            $ ssh -R [bind_address:]port:local_socket [user@]remote_ssh_server         
 
     * Dynamic or Multi-Port
 
       Finally, we can expose a SOCKS proxy server on the remote host directed to the client’s network as we can do with direct forwarding. 
 
-          ssh -R [bind_address:]port [user@]remote_ssh_server
+          $ ssh -R [bind_address:]port [user@]remote_ssh_server
 
   * X window turnnel
 
-        ssh -X [user@]remote_ssh_server
-        ssh -Y [user@]remote_ssh_server
+        $ ssh -X [user@]remote_ssh_server
+        $ ssh -Y [user@]remote_ssh_server
 
   * Multiple Tunnels and Multiple Host Hopping
 
-        ssh -X -L 5432:<DB server IP>:5432 -R 873:<local RSYNC server>:873 [user@]remote_ssh_server
+        $ ssh -X -L 5432:<DB server IP>:5432 -R 873:<local RSYNC server>:873 [user@]remote_ssh_server
 
         server1 -> server2 -> server3 
-        ssh -L 8022:<server2>:22 user@server1
-        ssh -L 8023:<server3>:22 -p 8022 user@localhost
-        ssh -p 8023 user@localhost
+        $ ssh -L 8022:<server2>:22 user@server1
+        $ ssh -L 8023:<server3>:22 -p 8022 user@localhost
+        $ ssh -p 8023 user@localhost
 
   * configuration for above
 
-        /etc/ssh/ssh_config
+        $ vi /etc/ssh/ssh_config
 
-        host 10.1.4.100
+          host 10.1.4.100
             ForwardX11 yes
             LocalForward 0.0.0.0:5432 10.1.4.200:5432
             RemoteForward localhost:8022 localhost:22
-            user baeldung
+            user dongheekang
 
   * Persistent 
 
         $ autossh [-V] [-M port[:echo_port]] [-f] [SSH_OPTIONS]
-
         $ autossh -X -L 5432:<DB server IP>:5432 -R 873:<local RSYNC server>:873 [user@]remote_ssh_server
         $ autossh -f [host]
   
@@ -584,7 +581,7 @@
         $ while true; do echo -e "HTTP/1.1 200 OK\n\n$(cat index.html)" | nc -l -w 1 1234; done
 
       How do create index.html?
-      
+
         cat - > index.html <<<EOF
         <!DOCTYPE html>
         <html>
@@ -599,7 +596,7 @@
         EOF
 
 
-  *  Reserve shell connection: 
+  * Reserve shell connection: 
 
       set server node
 
@@ -608,14 +605,14 @@
           $ cat /tmp/rs | /bin/bash 2>&1 | nc -v client 1234 > /tmp/rs
 
       Listening on 0.0.0.0 1234
-      Connection received on server.baeldung 36170
+      Connection received on server.dongheekang 36170
 
           $ hostname
           $ server
 
       any text sent by the client node will then be piped to /tmp/rs
 
-  *  Reserve proxy connection: 
+  * Reserve proxy connection: 
 
       set server node
   
@@ -626,10 +623,6 @@
       When there is incoming traffic on port 1234, the external router pipes the traffic to the internal router.
       when there’s outgoing traffic from port 4321, the internal router will pipe it to the pipe /tmp/rp. 
       Then, the external router(server) will read and send the content of /tmp/rp to the client (outside).
-
-
-* Two dockers for network testing 
-
 
 
 * How to List All Connected SSH Sessions
@@ -652,8 +645,86 @@
       $ sudo ss -tp | grep "ESTAB.*sshd"
       $ sudo lsof -i TCP -s tcp:established -n | grep ssh
 
+* ifconfig
+
+  inspect and reconfigure network interfaces on a Linux machine
+
+      $ ifconfig -a                       : list all
+      $ ifconfig -s                       : short for programming
+      $ ifconfig ens33                    : specific interface 
+      
+      $ sudo ifconfig ens33 down          : interface up or down 
+
+      set 
+      $ sudo ifconfig ens33 192.168.91.200
+      $ sudo ifconfig ens33 netmask 255.255.0.0
+      $ sudo ifconfig ens33 broadcast 10.2.255.255
+      $ sudo ifconfig ens33 10.2.1.101 netmask 255.255.0.0 broadcast 10.2.255.255
+
+* nslookup
+
+  to query domain name servers (DNS) and is available for operating systems
+
+      $ nslookup                                 : this is interactive 
+      $ nslookup dongheekang.com                 : Lookup a Domain
+      $ nslookup -type=a dongheekang.com         : get all DNS entries
+      $ nslookup -type=soa dongheekang.com       : look at the authoritative (SOA) information about the domain
+      $ nslookup -type=ns dongheekang.com        : look at the name server information
+
+* tracert
+
+  To track the exact route a given packet takes, since network traffic doesn’t go directly to the desired machine.
+
+       $ traceroute dongheekang.com
+       $ traceroute -m 3 dongheekang.com               : upto 3 hops
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+* Obtaining an SSL Certificate from the Server
+  * Use a browser Firefox or Chrome, find the PEM 
+      
+        access connect security from the address bar, and download PEM 
+
+  * No browser way, use command line 
+
+        $ openssl s_client -connect dongheekang.com:443
+        $ openssl s_client -showcerts -connect dongheekang.com:443
+        $ openssl s_client -showcerts -connect dongheekang.com:443 </dev/null | sed -n -e '/-.BEGIN/,/-.END/ p' > certifs.pem
+
+  * Servers Behind Reverse Proxies
+
+    In some situations, our server might sit behind a reverse proxy for load-balancing purposes.
+
+        $ nslookup dongheekang.com                       : find the server IP address first!
+
+          Server:		192.168.0.1
+          Address:	192.168.0.1#53
+
+          Non-authoritative answer:
+          Name:	baeldung.com
+          Address: 172.64.104.34
+
+          .......  some more output
+
+        $ openssl s_client -showcerts -connect 172.64.104.34:443                               : this will not work
+        $ openssl s_client -servername dongheekang.com -showcerts -connect 172.64.104.34:443   : need option --servername
+
+
+
+* SSL example from DBcat!
 
 
 
@@ -664,7 +735,113 @@
 
 ## Security
 
+* Firewall
+
+  Set of passive rules to protect network from unauthorized access 
+  scans each little packet of data, physical(routers) or software, can me exceptions by users
+
+    
+* Uncomplicated Firewall(UFW)
+      $ sudo apt-get install ufw
+      $ sudo ufw status
+
+      $ sudo ufw allow ssh                : to configure your firewall policies
+      $ sudo ufw allow 4444/tcp           : extra SSH 2222
+      $ sudo ufw allow 80/tcp             : HTTP
+      $ sudo ufw allow 443/tcp            : SSL/TLS
+      $ sudo ufw allow 25/tcp             : SMTP
+      $ sudo ufw allow 21/tcp             : ftp
+      $ sudo ufw show added               : finalized
+      $ sudo ufw enable                   : confirm then type "y"
+
+      $ sudo ufw allow from 192.168.255.255
+
+      $ sudo ufw default deny incoming
+      $ sudo ufw default deny outgoing
+
+      $ sudo ufw delete allow 80/tcp
+      $ sudo ufw delete allow 1000:2000/tcp    
+
+
+  Firewalld (firewall daemon) is an alternative to the iptables service
+
+      $ sudo apt install firewalld
+
+  manage firewalld vis systemctl
+
+      $ sudo systemctl start firewalld	   :start the service for the mean time
+      $ sudo systemctl enable firewalld	   :enable the service to auto-start at boot time
+
 * iptables
+
+  iptables is a utility that allows a system administrator to configure the IP packet filter rules of the Linux kernel firewall
+  filters connections based on user-defined rules
+
+      $ iptables -L -v                     : look up 
+      $ iptables -t nat -L -v              : 3 types of tables (NAT, Filter, Mangle)
+
+  * tables
+
+        FILTER – kernel will search for rules in this table for every input packet. Based on the rule, the packet is either accepted or dropped
+        NAT – The kernel uses this table for NATing rules. THis allows us to change the source or destination IP address in a packet. iptables can do this for both incoming and outgoing packets
+        MANGLE – This table allows us to alter IP headers. For example, we can change the TTL value in the input packet
+      
+  * chains 
+        (INPUT, OUTPUT, FORWARD) 
+
+  * targets
+        (ACCEPT, DROP, REJECT)
+      
+  * To add a new policy:
+
+        $ iptables --policy FORWARD DROP
+
+  * To drop all packets from a particular IP:
+
+        $ iptables -A INPUT -s 10.1.2.3 -j DROP
+
+  * To block all connections from the IP address 10.10.10.10.
+
+        $ iptables -A INPUT -s 10.10.10.10 -j DROP
+
+  * To drop all packets to a specific port:
+
+        $ iptables -A INPUT -p tcp --dport 8080 -s 10.1.2.3 -j DROP
+
+  * To drop all packets on a particular protocol:
+
+        $ iptables -A INPUT -p tcp --dport 22 -j DROP
+
+  * To change policy
+
+        $ iptables --policy INPUT ACCEPT    (accept, drop, reject)
+        $ iptables --policy OUTPUT ACCEPT   (accept, drop, reject)
+        $ iptables --policy FORWARD ACCEPT  (accept, drop, reject)
+
+  * block a specific port
+
+        $ iptables -A INPUT -p tcp --dport ssh -s 10.10.10.10 -j DROP
+  
+  * Saving IP Tables Rules
+
+        $ /sbin/iptables-save                : debian case
+        $ /sbin/service iptables save        : CentOS, Fedora
+        $ /etc/init.d/iptables save 
+
+  * Firewall rules 
+
+        $ vi /etc/iptables/rules             : debian, ubuntu
+        $ vi /etc/sysconf/iptables           : CentOS, Fedora   
+
+
+* OpenID
+  authentication
+  입증, 증명, 인증
+
+
+* OAuth 2.0
+  authorization
+  (공식적인) 허가[인가], 허가[인가]증
 
 
 
@@ -680,192 +857,178 @@
 
 ## Service
 
-
 * Shutdown linix
 
       shutdown -r now              : reboot
- 
       shutdown +30                 : after 30 mins completely shutdown!  
-
       poweroff                     : power off 
 
 * Run a script on startup in Linux
     
-    - create a script for reboot message
+  * create a script for reboot message
           
-          $ vi reboot_message.sh
-          | #!/bin/sh \
-          | echo "Last reboot time: $(date)" > /etc/motd
+        $ vi reboot_message.sh
+        | #!/bin/sh \
+        | echo "Last reboot time: $(date)" > /etc/motd
 
-          $ chmod +x reboot_message.sh
+        $ chmod +x reboot_message.sh
 
-    - using cron
+  * using cron
 
-          $ crontab -e
-          | @reboot sh /root/reboot_message.sh 
+        $ crontab -e
+        | @reboot sh /root/reboot_message.sh 
 
-    - using rc.local 
+  * using rc.local 
 
-          vi /etc/rc.local 
-          |  sh /home/ec2-user/reboot_message.sh
-          chmod +x /etc/rc.local
+        $ vi /etc/rc.local 
+        |  sh /home/ec2-user/reboot_message.sh
+        chmod +x /etc/rc.local
         
-        caution. some distribution has another location for rc.local 
+        caution) some distribution has another location for rc.local 
         /etc/rc.d/rc.local and one need to care rc0.d, rc1.d and so on.
 
-    - using init.d
+  * *using init.d
 
-          $ vi etc/init.d
-            #! /bin/sh 
-            # chkconfig: 345 99 10
-            case "$1" in
-            start)
-              # Executes our script
-              sudo sh /home/ec2-user/reboot_message.sh
-              ;; 
-            *)
-              ;;
-            esac
-            exit 0 
+        $ vi etc/init.d
+          #! /bin/sh 
+          # chkconfig: 345 99 10
+          case "$1" in
+          start)
+            # Executes our script
+            sudo sh /home/ec2-user/reboot_message.sh
+            ;; 
+          *)
+            ;;
+          esac
+          exit 0 
 
-          $ cd etc/init.d
-          $ chkconfig --add service_wrapper.sh        # not in debian
-          $ update-rc.d service_wrapper.sh defaults   # use this for debina case
+        $ cd etc/init.d
+        $ chkconfig --add service_wrapper.sh        # not in debian
+        $ update-rc.d service_wrapper.sh defaults   # use this for debina case
 
-    - using systemd
+  * using systemd
   
-          $ vi etc/systemd/system
-            [Unit]
-            Description=Reboot message systemd service.
-            [Service]
-            Type=simple
-            ExecStart=/bin/bash /home/ec2-user/reboot_message.sh
-            [Install]
-            WantedBy=multi-user.target
+        $ vi etc/systemd/system
+          [Unit]
+          Description=Reboot message systemd service.
+          [Service]
+          Type=simple
+          ExecStart=/bin/bash /home/ec2-user/reboot_message.sh
+          [Install]
+          WantedBy=multi-user.target
 
-          $ chmod 644 /etc/systemd/system/reboot_message.service
-          $ systemctl enable reboot_message.service
+        $ chmod 644 /etc/systemd/system/reboot_message.service
+        $ systemctl enable reboot_message.service
 
 
 * Run an Application as a Service on Linux
 
-    - you have a service as like java/python application 
-
-    - Registering and Running the Service
+  you have a service as like java/python application, do registering and then running the service
         
-    - config service file xxx.service 
+  * config service file xxx.service 
 
-          $ vi /etc/systemd/system/javasimple.service
-          $ vi /etc/systemd/system/javaforking.service
-          [Unit]
-          Description=My Java forking service
-          After=syslog.target network.target
-          [Service]
-          SuccessExitStatus=143
-          User=appuser
-          Group=appgroup
-          Type=forking
-          ExecStart=/path/to/wrapper
-          ExecStop=/bin/kill -15 $MAINPID
-          [Install]
-          WantedBy=multi-user.target
+        $ vi /etc/systemd/system/javasimple.service
+        $ vi /etc/systemd/system/javaforking.service
+        [Unit]
+        Description=My Java forking service
+        After=syslog.target network.target
+        [Service]
+        SuccessExitStatus=143
+        User=appuser
+        Group=appgroup
+        Type=forking
+        ExecStart=/path/to/wrapper
+        ExecStop=/bin/kill -15 $MAINPID
+        [Install]
+         WantedBy=multi-user.target
 
-    - use systemctl, start service. 
+  * use systemctl, start service. 
   
-          $ sudo systemctl daemon-reload
-          $ sudo systemctl start javasimple.service
-          $ sudo systemctl enable javasimple.service
-          $ sudo systemctl status javasimple.service
+        $ sudo systemctl daemon-reload
+        $ sudo systemctl start javasimple.service
+        $ sudo systemctl enable javasimple.service
+        $ sudo systemctl status javasimple.service
 
 
 * How to load environment variables in a cron job and, and How to Run a Script at a Certain Time on Linux? 
 
-    - where is the cron? 
+  * where is the cron? 
 
-          $ ls -l /var/spool/cron/crontabs/              : user-wide
-          $ cat /etc/crontab                             : system-wide
+        $ ls -l /var/spool/cron/crontabs/              : user-wide
+        $ cat /etc/crontab                             : system-wide
           /etc/cron.allow
           /etc/cron.deny
 
-    - how to 
+  * how to 
 
-          $ crontab -l
-          $ crontab -e 
+        $ crontab -l
+        $ crontab -e 
       
-          * * * * *    ---->     min hour day month week
-          wrapping and define  
+        * * * * *    ---->     min hour day month week
+        wrapping and define  
 
-          * * * * * printenv > /tmp/print_envs_result
-          * * * * * BASH_ENV=/etc/profile bash -c "printenv > /tmp/print_envs_result"
-          * * * * * bash -l -c "printenv > /tmp/print_envs_result"
-          * * * * * BASH_ENV=~/.bashrc bash -l -c "printenv > /tmp/print_envs_result"
-          * * * * * /home/baeldung/backup.sh > /dev/null 2>&1
-          @reboot (cd /home/baeldung/monitoring-scripts; bash monitor-memory.sh)
+        * * * * * printenv > /tmp/print_envs_result
+        * * * * * BASH_ENV=/etc/profile bash -c "printenv > /tmp/print_envs_result"
+        * * * * * bash -l -c "printenv > /tmp/print_envs_result"
+        * * * * * BASH_ENV=~/.bashrc bash -l -c "printenv > /tmp/print_envs_result"
+        * * * * * /home/dongheekang/backup.sh > /dev/null 2>&1
+        @reboot (cd /home/dongheekang/monitoring-scripts; bash monitor-memory.sh)
 
 
-* Configure a Systemd Service to Restart Periodically 
-    - where is it
-          /etc/systemd/system
+* Configure a Systemd Service to Restart Periodically
 
-    - write 
+  * where is it
+        /etc/systemd/system
 
-          $ sudo vi my-service.service 
-          [Unit]
-          Description=Simple service
-          [Service]
-          Type=simple
-          ExecStart=/usr/bin/logger hello
-          [Install]
-          WantedBy=multi-user.target
+  * write 
 
-          $ sudo vi oneshot.service 
-          [Unit]
-          Description=One shot service
-          [Service]
-          Type=oneshot
-          ExecStart=/usr/bin/systemctl restart my-service.service
-          [Install]
-          WantedBy=multi-user.target    
+        $ sudo vi my-service.service 
+        [Unit]
+        Description=Simple service
+        [Service]
+        Type=simple
+        ExecStart=/usr/bin/logger hello
+        [Install]
+        WantedBy=multi-user.target
 
-          $ sudo vi my-service.timer 
-          [Unit]
-          Description=Run oneshot service periodically
-          [Timer]
-          Unit=oneshot.service
-          OnCalendar=Mon..Fri 10:30
-          [Install]
-          WantedBy=timers.target
+        $ sudo vi oneshot.service 
+        [Unit]
+        Description=One shot service
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/systemctl restart my-service.service
+        [Install]
+        WantedBy=multi-user.target    
 
-    - run  
+        $ sudo vi my-service.timer 
+        [Unit]
+        Description=Run oneshot service periodically
+        [Timer]
+        Unit=oneshot.service
+        OnCalendar=Mon..Fri 10:30
+        [Install]
+        WantedBy=timers.target
 
-          $ systemctl enable --now my-service.timer
-          $ systemctl list-timers 
-          $ journalctl --since "5 minutes ago"
+  * run  
 
-    - run by RuntimeMaxSec and the Restart Options
+        $ systemctl enable --now my-service.timer
+        $ systemctl list-timers 
+        $ journalctl --since "5 minutes ago"
 
-          $ sudo vi my-service1.service 
-          [Unit]
-          Description=Simple service
-          [Service]
-          ExecStart=/usr/bin/python3 /root/app.py
-          RuntimeMaxSec=180s
-          Restart=always
+  * run by RuntimeMaxSec and the Restart Options
+
+        $ sudo vi my-service1.service 
+        [Unit]
+        Description=Simple service
+        [Service]
+        ExecStart=/usr/bin/python3 /root/app.py
+        RuntimeMaxSec=180s
+        Restart=always
           
-    * run by crontab  
+  * run by crontab  
 
-          $ crontab -e
-          30 10 * * 1-5 /usr/bin/systemctl restart my-service.service
-
-
-
-
-
-
-
-
-
-
+        $ crontab -e
+        30 10 * * 1-5 /usr/bin/systemctl restart my-service.service
 
 
 
@@ -904,6 +1067,8 @@
      
   ncdu            : this is really nice tool for checking disk usage!   
 
+
+
 <br/><a name="Shell"></a>
 
 ## Shell 
@@ -940,8 +1105,8 @@
 
 ## Logging
 
-* journal 
-  
+* journal
+    
       $ journalctl --list­-boots                   : To get a list of boots
       $ journalctl -b                             : to get the all the logs for the current boot,
       $ journalctl -b -1                          : to get the previous boots
@@ -1002,6 +1167,43 @@
       }
       --------------------------------------------
 
+
+<br/><a name="Docker"></a>
+
+## Docker
+
+* Setup two dockers for network testing
+
+   ?
+
+
+* Connecting from Docker Containers to Resources in the Host
+
+  our goal is to make the host and the containers (DB & API) share the same networking!
+
+  * Let's check 
+
+        $ ifconfig                  : network interfaces list for a host with Docker installed
+
+        docker0   Link encap:Ethernet  HWaddr 02:42:A7:6A:EC:A9  
+                  inet addr:172.17.0.1  Bcast:172.17.255.255  Mask:255.255.0.0
+        ...
+        eth0      Link encap:Ethernet  HWaddr 00:15:5D:40:01:0C
+        ...  
+        lo        Link encap:Local Loopback
+        ...  
+     
+  * DB will be connected with docker in the same network, DB configuration will have bind-address
+
+        bind-address = 172.17.0.1
+        $ mariadb -h 172.17.0.1
+
+  * docker setup
+
+        By default, Docker will create a bridge network. This default network doesn’t allow the containers to connect to the host. So, we’ll need to use '--network host'. Now, the localhost address (127.0.0.1) will be referencing the localhost interface of the host, instead of the one of the container. Therefore, we can access our MariaDB – from the container – just by connecting to localhost:
+
+        $ docker run --rm -it --network host alpine sh                          : 
+        $ mariadb -h 127.0.0.1
 
 
 

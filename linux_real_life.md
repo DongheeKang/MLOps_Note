@@ -135,7 +135,7 @@ strace is a diagnistic tool for system calls that result in error will have thei
     $ strace -e trace=fstat whoami                        : Filtering With Expression
     $ strace -e status=!successful whoami                 : Filtering Output by Return Status
 
-### How to Monitor Disk IO in a Linux System
+### How to monitor disk I/O in a Linux system
 
 * Report Disk I/O Statistics
 
@@ -501,10 +501,6 @@ strace is a diagnistic tool for system calls that result in error will have thei
   |  8080  |         | extended HTTP port
 
 
-
-
-
-
 ### Mapping hostnames with ports in /etc/hosts
 Look into /etc/hosts first
 
@@ -622,7 +618,7 @@ by default the timeout is 2 minutes.
       $ dig          : after finish DNS configuration,one can test DNS
       $ whois        : a program to find domain holder
       $ getent       : a tool for carry out the database of administrator
-      $ rndc         :   name server control utility for BIND
+      $ rndc         : name server control utility for BIND
 
       $ vi /etc/bind/named.conf        debian
       $ vi /etc/named/named.conf       fedora
@@ -735,28 +731,19 @@ by default the timeout is 2 minutes.
       $ autossh [-V] [-M port[:echo_port]] [-f] [SSH_OPTIONS]
       $ autossh -X -L 5432:<DB server IP>:5432 -R 873:<local RSYNC server>:873 [user@]remote_ssh_server
       $ autossh -f [host]
-  
-### Monitoring Network Usage in Linux (extended)
-
-      nload
-      speedometer
-      iftop
-      nethogs
-
-
-
-
 
 ### netcat(nc) 
     
 * reading and writing data across the network, through TCP or UDP 
 
-      $ nc -z -v -w 1 google.com 442-444   : Scanning for Open Ports
+      $ nc -z -v -w 1 google.com 442-444  : Scanning for Open Ports
 
-      $ nc -lv 1234                        : listen to port 1234 (server node)
-      $ nc -v localhost 1234               : open up a netcat process that connects to localhost at port 1234 (client node)
+      server node
+      $ nc -lv 1234                       : listen to port 1234 
+      client node
+      $ nc -v localhost 1234              : open up a netcat process that connects to localhost at port 1234 
 
-      $ nc -l -v -k localhost 1234         : server and client netcat processes will return whenever the connection is terminated  
+      $ nc -l -v -k localhost 1234        : server and client netcat processes will return whenever the connection is terminated  
 
 * A netcat process 
   
@@ -818,7 +805,45 @@ by default the timeout is 2 minutes.
   when there’s outgoing traffic from port 4321, the internal router will pipe it to the pipe /tmp/rp. 
   Then, the external router(server) will read and send the content of /tmp/rp to the client (outside).
 
-### How to List All Connected SSH Sessions (possible commands)
+* To test the correlation between two computers without firewall
+  bidirectional interactive text-oriented communication facility
+
+      $ server1> nc -l 4444
+      $ server2> nc server1.com 4444
+
+
+### iperf
+We need to install iPerf on both the client and the server
+
+* Server
+
+      $ iperf -s 
+      $ iperf -s -u -p 5003                 : let'S make the server use UDP and listen on port 5003
+
+* Client: 
+      
+      Connecting to the Server From the Client
+
+      $ iperf -c 5.182.18.49
+      $ iperf -c 5.182.18.49 -i 5 -t 15 -w 416K -p 5003
+      $ iperf -c 5.182.18.49 -u -b 1000M 
+
+      * i specifies the interval time in seconds. 10 is the default
+      * t specifies the time to run the test in seconds
+      * p specifies the port. 5001 is the default
+      * w specifies the TCP window size. 85 KB is the default
+      * u upd
+      * b limits the bandwidth for UDP to 1Mbits/sec by default
+
+### Port scaning for UDP
+
+      $ nmap -sU -v 172.16.38.137
+      $ nc -vz -u 8.8.8.8 443
+
+      $ iperf3 -s
+      $ iperf3 -u -c 172.16.38.137
+
+### How to list all connected SSH sessions (possible commands)
 
       $ who
       $ w
@@ -838,26 +863,152 @@ by default the timeout is 2 minutes.
       $ sudo ss -tp | grep "ESTAB.*sshd"
       $ sudo lsof -i TCP -s tcp:established -n | grep ssh
 
+### Find primary IP address of a linux
+* Primary active interface first
 
-### ip-route : routing table management
+      $ ip address show
+      $ route
 
-* Routing
+* Primary IP address
 
-      $ ip monitor                                                : live monitoring for connection of MAC and IP
-      $ ip route add 10.10.20.0/24 via 192.168.50.100 dev eth0    : add static router
-      $ ip route add default gw 20.14.5.65                        : result of routing table of network
+      $ ip address show dev ens33 
+      $ ip address show dev ens33 | grep -w inet | awk '{print $2}'   
+      $ ip route get 1.1.1.1
+        1.1.1.1 via 192.168.207.2 dev ens33 src 192.168.207.128 uid 1000           : primary = 192.168.207.128
+      $ ifconfig ens33 | grep -w inet | awk '{print $2}'
+      $ nmcli 
+      $ curl ifconfig.me
 
-* MAC address access
+# Get external IP address in a shell script
+* Network interface first
+
+      $ ip address show
+      $ ip address show eif0 | grep 'inet'
+        169.254.6.66
+      $ ip address show eif0 | grep 'inet'
+        2001:db8:666:666::10
+
+* External IP Checks
+
+      $ ssh user@server-router 'ip address show eif0'
+
+      $ curl --user USERNAME:PASSWORD http://router/
+      $ ssh sshmyip.com
+      $ telnet telnetmyip.com
+      $ wget -qO- telnetmyip.com
+
+* DNS IP query
+
+      $ dig +short myip.opendns.com @resolver1.opendns.com
+      $ host myip.opendns.com resolver1.opendns.com
+      $ dig +short txt ch whoami.cloudflare @1.1.1.1
+      $ dig +short txt o-o.myaddr.test.l.google.com @ns1.google.com
+
++ unnpc 
+
+      $ UPNP_DATA = $(upnpc -s | grep ^ExternalIPAddress | cut -c21-)
+      $ echo "${UPNP_DATA}"
+
+
+### Translate DNS to IP
+
+      $ ping dongheekang.com
+      $ host dongheekang.com
+      $ host -t a dongheekang.com
+      $ nslookup dongheekang.com
+      $ dig dongheekang.com A +short
+      $ dig dongheekang.com AAAA +short
+      $ nmap -sn dongheekang.com
+
+### Route specific subnet to a particular interface
+
+* ip-route : routing table management
+
+      $ ip monitor                                      : live monitoring for connection of MAC and IP
+      $ ip rule list                                    : To look up the route table and rule
+
+      $ ip route get 194.168.23.132                   
+
+        194.168.23.132 via 194.168.23.1 dev enp1s0 src 194.168.23.120 uid 1000 
+        cache  
+
+        gateway      : 194.168.23.1 
+        destination  : 194.168.23.132
+
+      test 
+      $ traceroute 172.23.1.100  
+
+      add 
+      $ ip route add 100.1.1.0/24 via 192.168.221.142 dev enp7s0     : add static router
+      $ ip route add 10.10.20.0/24 via 192.168.50.100 dev eth0       : add static router
+      $ ip route add default gw 20.14.5.65               : result of routing table of network
+
+* To make the routes persistent (nmcli)
+
+  Destnation-based
+
+      $ systemctl status NetworkManager
+      $ nmcli connection modify enp7s0 +ipv4.routes "100.1.1.0/24, 8.8.8.8 192.168.221.142"
+
+      $ cat /etc/sysconfig/network-scripts/route-enp7s0 
+        ADDRESS0=100.1.1.0
+        NETMASK0=255.255.255.0
+        ADDRESS1=8.8.8.8
+        NETMASK1=255.255.255.255
+        GATEWAY1=192.168.221.142
+
+  Source-based
+      
+      IP Masquerading
+      $ firewall-cmd --change-interface=enp7s0 --zone=external --permanent
+      $ firewall-cmd --change-interface=enp8s0 --zone=external --permanent
+      $ firewall-cmd --change-interface=enp1s0 --zone=internal --permanent
+      $ firewall-cmd --zone=external --add-masquerade --permanent
+
+      create the custom routing table and rule
+      $ nmcli connection modify enp8s0 +ipv4.routes "100.1.1.0/24 10.20.1.1 table=400, 8.8.8.8 10.20.1.1 table=400"
+      $ nmcli connection modify enp8s0 +ipv4.routing-rules "priority 200 from 192.168.221.0/24 table 400"
+      $ cat /etc/sysconfig/network-scripts/ifcfg-enp8s0
+      $ nmcli device reapply enp8s0                 : start table
+      $ ip route show table 400                     : validation
+
+      test
+      $ ping 100.1.1.100
+      $ tcpdump -i enp8s0 host 100.1.1.100 -n 
+
+* MAC address access via ip
 
       $ ip neighbour show
       $ arp -a                     :  address resolution protocol(arp) using IP one can access MAC address
 
-### Wireless information
 
-      $ iwconfig wlan0   : show WLAN adapter/interface
-      $ iwlist wlan0     : show an information about WLAN cards
-      $ iw dev wlan0 	   : show wireless devices and their configuration
+### Configure network settings using network manager in Linux
+* nmcli
 
+      $ sudo apt-get install network-manager
+      $ systemctl status NetworkManager
+
+      $ nmcli device                            : Displaying the List of All Network Devices
+      $ nmcli device show wlp5s0                : Displaying the IP Address of a Device
+      $ nmcli connection                        : Displaying the List of Existing Connections
+      $ nmcli connection show id my-ethernet    : Displaying the Properties of a Connection
+      $ nmcli radio                             : Displaying the Status of Wireless Adapters
+
+* Configuring an Ethernet Adapter With a Static IP Address
+
+      $ nmcli connection add type ethernet ifname enp7s8 con-name my_ethernet ip4 192.168.2.138/24 gw4 192.168.2.1
+
+* Configuring an Ethernet Adapter With a Dynamic IP Address
+
+      $ sudo nmcli connection add type ethernet ifname enp7s8 con-name my_ethernet
+
+* Modifying connection
+
+      $ sudo nmcli connection modify my_ethernet ipv4.DNS 192.168.2.1
+
+* Enable and disable
+      $ nmcli connection down my_ethernet
+      $ nmcli connection up my_ethernet
 
 ### Netwrok interface configuration
 
@@ -951,20 +1102,56 @@ by default the timeout is 2 minutes.
 
 * tcpdump
   
-  will be discussed!
+  analyzing the network interface traffic on Linux Systems
+
+      § sudo tcpdump
+        listening on ens160, link-type EN10MB (Ethernet), capture size 262144 bytes
+        04:47:21.629831 IP 27.57.7.242.32917 > sandbox1.ssh: Flags [P.], seq 639116254:639116462, ack 
+        1982486691, win 501, length 208
+        04:47:21.757924 ARP, Request who-has 10.87.34.12 tell _gateway, length 46
+        06:47:21.880039 IP sandbox1 > 104.26.11.14: ICMP echo request, id 20418, seq 1, length 64
+        06:47:21.914808 IP 104.26.11.14 > sandbox1: ICMP echo reply, id 20418, seq 1, length 64
+
+      ------------------------------------------------------------------------------------
+      * 04:47:21.629831 – IP Packet’s timestamp in microseconds
+      * IP – protocol type such as IP {Internet Protocol}, ARP {Address Resolution Protocol}, ICMP {Internet Control Message Protocol}
+      * 27.57.7.242.32917 – source IP address and port. Usually, the source port is taken randomly from the registered unknown port ranges
+      * sandbox1.ssh – destination IP address and port. {well-known port number 22 gets converted as ssh}
+      * Flags[P.] – Any TCP flags {P – PUSH}; a period indicates an ACK
+      * seq 639116254:639116462 – sequence ranges with starting and ending sequence numbers. The difference is the amount carried in Bytes which is the field length
+      * ack 1982486691 – TCP packet’s acknowledgment number
+      * win 501 – source machine TCP window size
+      * length 208 – TCP data length or payload size. Here, it’s 639116462 – 639116254 = 208
+      ------------------------------------------------------------------------------------
+
+  Monitoring the Interface using tcpdump
+
+      $ ping -c 1 localhost
+      $ sudo tcpdump -i lo                     : capture the SSH packets from the loopback interface
+
+      tcpdump host dongheekang.com -i any -c10
+      tcpdump host 104.26.12.74 -i any -c10
+
+      tcpdump -i any "host dongheekang.com and (port 22 or port 443)"
+      tcpdump -i any -n "src net 192.168.0.0/16 and not dst net 10.0.0.0/8" -c4
+      
 
 * nmap
-  
-  will be discussed!
+
+  Network Mapper (shortened to nmap) is a network exploration tool
+
+      $ nmap -p $PORT_OPEN,$PORT_CLOSED,$PORT_STEALTH $IP
+        [...]
+        PORT    STATE    SERVICE
+        22/tcp  open     ssh
+        111/tcp closed   rpcbind
+        137/tcp filtered netbios-ns
+        [...]
 
 * telnet
 
-  To test the correlation between two computers without firewall
-  bidirectional interactive text-oriented communication facility
-
-      $ server1> nc -l 4444
-      $ server2> nc server1.com 4444
-      $ telnet impa.lpic.de 143      <--- telnet also possible! this is a great tip!
+      $ telnet impa.lpic.de 143          <--- telnet also possible for checking port connection! this is a great tip!
+      $ telnet -l donghee 5.182.18.49
 
 
 ### Connectivity test (standard)
@@ -981,6 +1168,63 @@ by default the timeout is 2 minutes.
       $ lsof /tmp              : prozesse, die auf einen Netzwerk-Socket zugreifen
       $ tcpdump -i eth0        : show network flow into the screen using dump
 
+
+### Network failures simulation in Linux
+* tc (traffic control command-line tool) and qdisc (queuing discipline)
+
+  tc can control traffic in the Linux kernel network stack and qdisc is a scheduler that manages the scheduling of packets queue
+
+      $ sudo apt-get install -y iproute2              : install
+      $ sudo tc qdisc show                            : Listing the Qdiscs
+
+* Let's simulation
+
+      $ sudo tc qdisc add dev eth0 root netem delay 100ms
+      $ ping -c 5 google.com                          : testing 
+      $ sudo tc qdisc delete dev eth0 root            : delete after testing
+      $ sudo tc qdisc show eth0                       : check 
+
+* Simulating normally distributed delays
+
+      $ sudo tc qdisc add dev eth0 root netem delay 100ms 50ms distribution normal
+      $ ping -c 240 -q google.com
+
+* Simulating Packet Loss
+      $ sudo tc qdisc add dev eth0 root netem loss 30%          : dropping packets randomly with a 30% probability
+      $ sudo tc qdisc add dev eth0 root netem loss 30% 50%      : 50% of the probability that the next packet is dropped
+      $ ping -q -c 60 google.com
+
+* Simulating Packet Duplication
+      $ sudo tc qdisc add dev eth0 root duplicate 50%
+      $ ping -c 2 google.com
+
+* Simulating Packet Corruption
+      $ sudo tc qdisc add dev eth0 root netem corrupt 30%
+      $ ping -q -c 240 google.com
+
+* Limiting the Transfer Rate
+      $ sudo tc qdisc add dev eth0 root netem rate 10Mbit
+      $ iperf3 -c 172.18.0.3 -p 8080
+
+### Monitoring Network Usage in Linux (extended)
+
+      $ nload
+      $ speedometer
+      $ iftop
+      $ nethogs
+
+### Wireless information
+* standard command
+
+      $ iwconfig wlan0   : show WLAN adapter/interface
+      $ iwlist wlan0     : show an information about WLAN cards
+      $ iw dev wlan0 	   : show wireless devices and their configuration
+
+* Configuring a Wireless Device vis nmcli
+
+      $ nmcli device wifi list
+      $ nmcli device wifi connect MY_WIRELESS_NET password 8ehdxhre5kkhb6g6
+
 ### Questions
 
 *  Q) tools to check for open ports on a local computer?     
@@ -994,6 +1238,7 @@ by default the timeout is 2 minutes.
 * Q) What program uses local system calls to locate local ports that are currentl open?
 
       netstat is a scanner just for local Ports, nmap & nessus is a scanner for local ports and also for other computers in networks
+
 
 
 <br/><a name="Security"></a>
@@ -1057,10 +1302,30 @@ the server must have sshd installed and running
 
 ### How to login without password?  Passwordless
 
+* using sshpass
+      use -p option (standard)
+      § sshpass -p 'Bael@123' ssh tools@10.149.20.11 -p4455 'hostname; df -h | grep sd; tail -2 /var/log/dpkg.log';
+        
+      use -e option 
+      $ export SSHPASS="PASSWORD"                        :password in the variable farm
+      $ echo $SSHPASS
+        PASSWORD
+      $ sshpass -e ssh tools@10.149.20.11 -p4455 'hostname; df -h | grep sd; tail -2 /var/log/dpkg.log';
 
+      use -f option
+      $ echo 'PASSWORD' > .sshpasswd                     :into the home or root directory
+      $ cat .sshpasswd
+          PASSWORD
+      $ sshpass -f .sshpasswd ssh tools@10.149.20.11 'hostname; df -h | grep sd; tail -2 /var/log/dpkg.log';
 
+* using ssh
+      $ ssh-keygen -t rsa
+      $ ssh-copy-id tools@10.149.20.11 -p4455
+      $ ssh -p '4455' 'tools@10.149.20.11’
+      server$ exit
 
-
+      this is the way of passwordless ssh option
+      $ ssh tools@10.149.20.11 'hostname; df -h | grep sd; tail -2 /var/log/dpkg.log'; 
 
 
 ### GPG standard
@@ -1198,7 +1463,7 @@ Uncomplicated Firewall(UFW)
     $ sudo ufw allow ssh                : to all ssh 
     $ sudo ufw allow 4444/tcp           : extra 4444
     $ sudo ufw allow 80/tcp             : HTTP
-    $ sudo ufw allow 443/tcp            : SSL/TLS
+    $ sudo ufw allow 443/tcp            : HTTPS
     $ sudo ufw allow 25/tcp             : SMTP
     $ sudo ufw allow 21/tcp             : ftp
     $ sudo ufw show added               : finalized
@@ -1288,15 +1553,6 @@ How to work?
         $ vi /etc/sysconf/iptables           : CentOS, Fedora   
 
 
-### OpenID & OAuth 2.0
-* OpenID
-  authentication
-  입증, 증명, 인증
-
-* OAuth 2.0
-  authorization
-  (공식적인) 허가[인가], 허가[인가]증
-
 
 ### Obtaining an SSL certificate from the server
 * Use a browser Firefox or Chrome, find the PEM 
@@ -1317,7 +1573,7 @@ How to work?
         Server:		192.168.0.1
         Address:	192.168.0.1#53
         Non-authoritative answer:
-        Name:	baeldung.com
+        Name:	dongheekang.com
         Address: 172.64.104.34
         .......  some more output
 
@@ -1789,9 +2045,9 @@ our goal is to make the host and the containers (DB & API) share the same networ
       By default, Docker will create a bridge network. This default network doesn’t allow the containers to connect to the host. So, we’ll need to use '--network host'. Now, the localhost address (127.0.0.1) will be referencing the localhost interface of the host, instead of the one of the container. Therefore, we can access our MariaDB – from the container – just by connecting to localhost:
 
       $ docker run --rm -it --network host alpine sh                          : 
-        $ mariadb -h 127.0.0.1
+      $ mariadb -h 127.0.0.1
 
-
+https://www.dongheekang.com/linux/nginx-docker-container
 
 <div><br/>
 &raquo; Back to <a href="#contents">Contents</a> | <a href="../docs/README.md">Docs</a>

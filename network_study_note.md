@@ -624,7 +624,7 @@ Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). It is a tool to provi
 
       - Create a certificate for the landscape's domain
         $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 \
-          --keyout "SAPGlobalSSLSign.crt" \
+          -keyout "SAPGlobalSSLSign.crt" \
           -out "SAPGlobalSSLSign.key" \
           -days 365 \
           -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"

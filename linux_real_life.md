@@ -2015,6 +2015,14 @@ this is really nice tool for checking disk usage!
 
 # Docker
 
+### Doker fundamental
+
+* why chrooot? 
+      $ apt-get install coreutils
+
+      $ chroot /tmp/new_root /bin/bash
+      $ ldd /bin/bash      
+
 ### Setup two dockers for network testing
 
    ?

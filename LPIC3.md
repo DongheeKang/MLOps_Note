@@ -2,24 +2,8 @@
 
 
 ## Contents
-  * [X.509 Certificates and Public Key Infrastructures](#X509_certificates)  
-  * [X.509 Certificates for Encryption, Signing and Authentication](#X509_certificates_2)
 
-  * [are not covered yet](#willbeupdated)
-    * [Encrypted File Systems]
-    * [DNS and Cryptography]
-    * [Host Hardening]
-    * [Host Intrusion Detection	]
-    * [User Management and Authentication]
-    * [FreeIPA Installation and Samba Integration]
-    * [Discretionary Access Control]
-    * [Mandatory Access Control]
-    * [Network File Systems]
-    * [Network Hardening]
-    * [Network Intrusion Detection]
-    * [Packet Filtering]
-    * [Virtual Private Networks]
-
+  Virtualization and High Availability
   * [Virtualization Concepts and Theory](#virtualization)
   * [Xen](#xen)
   * [KVM](#kvm)
@@ -33,142 +17,23 @@
   * [DRBD / cLVM (Cluster Storage)](#drbd)
   * [Clustered File Systems](#clustered_filesystem)
 
-
-<br/><a name="X509_certificates"></a>
-
-### X.509 Certificates and Public Key Infrastructures
-
-    ===============================================================================================
-    325.1 X.509 Certificates and Public Key Infrastructures				 
-    ===============================================================================================
-    Description:
-      Candidates should understand X.509 certificates and public key infrastructures.
-      They should know how to configure and use OpenSSL to implement certification authorities and
-      issue SSL certificates for various purposes.
-
-      Key Knowledge Areas:
-      Understand X.509 certificates, X.509 certificate lifecycle,
-      X.509 certificate fields and X.509v3 certificate extensions
-      Understand trust chains and public key infrastructures
-      Generate and manage public and private keys
-      Create, operate and secure a certification authority
-      Request, sign and manage server and client certificates
-      Revoke certificates and certification authorities
-
-      The following is a partial list of the used files, terms and utilities:
-      openssl, including relevant subcommands
-      OpenSSL configuration
-      PEM, DER, PKCS
-      CSR
-      CRL
-      OCSP
-
-
-    - X.509
-      In cryptography, X.509 is an important standard for a public key infrastructure (PKI) to
-      manage digital certificates and public-key encryption and a key part of the TLS (Transport
-      Layer Security) protocol used to secure web and email communication.
-      .pem
-      .cer, .crt
-      .p7b
-      .p12
-      .pfx
-
-    - Public Key Infrastructure (PKI)
-      PKI refers to the technical mechanisms, procedures and policies that collectively provide
-      a framework for addressing the security, authentication, confidentiality and access control
-      PKI utilises two core elements; Public Key Cryptography and Certification Authorities.
-
-    - PKI standards for X.509
-      PKCS7    — 	Cryptographic Message Syntax Standard, public keys with proof of identity for
-      signed and/or encrypted message for PKI)
-      TLS/SSL  — 	cryptographic protocols for Internet secure communications
-      OCSP/CRL    Online Certificate Status Protocol / certificate revocation list,
-      this is to check certificate revocation status
-      PKCS12   —  Personal Information Exchange Syntax Standard, used to store a private key
-      with the appropriate public key certificate
-
-    - Digital Certificate (DA)
-      A Digital Certificate is a digital file used to cryptographically bind an entity's Public
-      Key to specific attributes relating to its identity.
-      Digital Certificates are issued by Certification Authorities (CA) and under the technical
-      recommendations of the x.509 Digital Certificate format.
-
-    - Certificate Authority (CAs)
-      CAs are characteristic of many public key infrastructure (PKI) schemes.[
-      CA provides a Certification Practice Statement (CPS) that clearly states its policies and
-      practices regarding the issuance and maintenance of Certificates within the PKI. The CPS
-      contains operational information and legal information on the roles and responsibilities of
-      all entities involved in the Certificate lifecycle (from the day it is issued to the day
-      it expires).
-
-    - Distributing Digital Certificates
-      A's private -> CA( A's public + B's public ) -> B's Private
-      As well as Digital Certificates being available in public repositories, they may also be
-      distributed through the use of Digital Signatures. For example, when Alice Digitally signs
-      a message for Bob she also attaches her Certificate to the outgoing message. Therefore,
-      upon receiving the signed message Bob can verify the validity of Alice's Certificate.
-      If it is successfully verified, Bob now has Alice's Public Key and can verify the validity
-      of the original message signed by Alice.
-
-
-<br/><a name="X509_certificates_2"></a>
-
-### X.509 Certificates for Encryption, Signing and Authentication
-    ===============================================================================================
-    325.2 X.509 Certificates for Encryption, Signing and Authentication		
-    ===============================================================================================
-      Description: Candidates should know how to use X.509 certificates for both server and
-      client authentication. Candidates should be able to implement user and server authentication
-      for Apache HTTPD. The version of Apache HTTPD covered is 2.4 or higher.
-
-      Key Knowledge Areas:
-      Understand SSL, TLS and protocol versions
-      Understand common transport layer security threats, for example Man-in-the-Middle
-      Configure Apache HTTPD with mod_ssl to provide HTTPS service, including SNI and HSTS
-      Configure Apache HTTPD with mod_ssl to authenticate users using certificates
-      Configure Apache HTTPD with mod_ssl to provide OCSP stapling
-      Use OpenSSL for SSL/TLS client and server tests
-
-      Terms and Utilities:
-      Intermediate certification authorities
-      Cipher configuration (no cipher-specific knowledge)
-      httpd.conf
-      mod_ssl
-      openssl
-
-<br/><a name="willbeupdated"></a>
-
-### not available yet
-    ===============================================================================================
-    will be updated
-    ===============================================================================================
-    325.3 Encrypted File Systems				
-
-    325.4 DNS and Cryptography										
-
-    326.1 Host Hardening													
-
-    326.2 Host Intrusion Detection									
-
-    326.3 User Management and Authentication								
-
-    326.4 FreeIPA Installation and Samba Integration			
-
-    327.1 Discretionary Access Control			
-
-    327.2 Mandatory Access Control				
-
-    327.3 Network File Systems				
-
-    328.1 Network Hardening				
-
-    328.2 Network Intrusion Detection			
-
-    328.3 Packet Filtering			
-
-    328.4 Virtual Private Networks	
-    ===============================================================================================
+  Security 
+  * [X.509 Certificates and Public Key Infrastructures](#X509_certificates)  
+  * [X.509 Certificates for Encryption, Signing and Authentication](#X509_certificates_2)
+  * [currently not covered ](#willbeupdated)
+    * [Encrypted File Systems]
+    * [DNS and Cryptography]
+    * [Host Hardening]
+    * [Host Intrusion Detection	]
+    * [User Management and Authentication]
+    * [FreeIPA Installation and Samba Integration]
+    * [Discretionary Access Control]
+    * [Mandatory Access Control]
+    * [Network File Systems]
+    * [Network Hardening]
+    * [Network Intrusion Detection]
+    * [Packet Filtering]
+    * [Virtual Private Networks]
 
 
 <br/><a name="virtualization"></a>
@@ -521,10 +386,10 @@
       | iface lo inet loopback
       |
       | auto eth0
-      | iface eth0 inet manual
+      | iface eth0 inet manual                 : manual !
       |
       | auto xenbr0
-      | iface xenbr0 inet dhcp
+      | iface xenbr0 inet dhcp                 : dhcp !
       | bridge_ports eth0
       then you can install guest OS by xen-tools(xl) or virt-manager(libvirt) or XAPI
 
@@ -539,19 +404,19 @@
       |
       # you shuold also use
       | ramdisk     	path to initrd for the initial ramdisk
-      | nic 		number of network interface cards for a domain (default is 1)
+      | nic 		      number of network interface cards for a domain (default is 1)
       | vif           arrays of virtual interface stanzas
-      |		(each stanza represents a set of name=value operations)
-      | builder	Determines the builder that constructs the domain (default is linux)
-      | cpu		CPU count for the domain to start on. 0 indicates the first CPU
-      | cpus		which CPUs the domain's VCPU are executable
-      | extra   	the additional information to append to end of the kernel parameter line
-      | nef_server 	the NFS server IP address
-      | nft_root	the root directory as a path for the NFS server
-      | vcpus		the number of virtual CPUs to allocate to a domain (default is 1)
+      |	            	(each stanza represents a set of name=value operations)
+      | builder	      Determines the builder that constructs the domain (default is linux)
+      | cpu		        CPU count for the domain to start on. 0 indicates the first CPU
+      | cpus		      which CPUs the domain's VCPU are executable
+      | extra       	the additional information to append to end of the kernel parameter line
+      | nef_server 	  the NFS server IP address
+      | nft_root	    the root directory as a path for the NFS server
+      | vcpus		      the number of virtual CPUs to allocate to a domain (default is 1)
       | on_shutdown   shutdown parameter to trigger a graceful shutdown
-      | on_reboot	shutdown parameter to trigger a graceful reboot
-      | on_crash	shutdown parameter that trigger DomU crashes.
+      | on_reboot	    shutdown parameter to trigger a graceful reboot
+      | on_crash	    shutdown parameter that trigger DomU crashes.
 
       ---------------------------------------------------------------------------------------
       Configure Domain 0 Memory
@@ -4345,3 +4210,141 @@
       GPFS breaks files up into small blocks. Hadoop HDFS likes blocks of 64 MB or more,
       as this reduces the storage requirements of the Namenode. Small blocks or many small
       files fill up a filesystem's indices fast, so limit the filesystem's size.
+
+
+
+<br/><a name="X509_certificates"></a>
+
+### X.509 Certificates and Public Key Infrastructures
+
+    ===============================================================================================
+    325.1 X.509 Certificates and Public Key Infrastructures				 
+    ===============================================================================================
+    Description:
+      Candidates should understand X.509 certificates and public key infrastructures.
+      They should know how to configure and use OpenSSL to implement certification authorities and
+      issue SSL certificates for various purposes.
+
+      Key Knowledge Areas:
+      Understand X.509 certificates, X.509 certificate lifecycle,
+      X.509 certificate fields and X.509v3 certificate extensions
+      Understand trust chains and public key infrastructures
+      Generate and manage public and private keys
+      Create, operate and secure a certification authority
+      Request, sign and manage server and client certificates
+      Revoke certificates and certification authorities
+
+      The following is a partial list of the used files, terms and utilities:
+      openssl, including relevant subcommands
+      OpenSSL configuration
+      PEM, DER, PKCS
+      CSR
+      CRL
+      OCSP
+
+
+    - X.509
+      In cryptography, X.509 is an important standard for a public key infrastructure (PKI) to
+      manage digital certificates and public-key encryption and a key part of the TLS (Transport
+      Layer Security) protocol used to secure web and email communication.
+      .pem
+      .cer, .crt
+      .p7b
+      .p12
+      .pfx
+
+    - Public Key Infrastructure (PKI)
+      PKI refers to the technical mechanisms, procedures and policies that collectively provide
+      a framework for addressing the security, authentication, confidentiality and access control
+      PKI utilises two core elements; Public Key Cryptography and Certification Authorities.
+
+    - PKI standards for X.509
+      PKCS7    — 	Cryptographic Message Syntax Standard, public keys with proof of identity for
+      signed and/or encrypted message for PKI)
+      TLS/SSL  — 	cryptographic protocols for Internet secure communications
+      OCSP/CRL    Online Certificate Status Protocol / certificate revocation list,
+      this is to check certificate revocation status
+      PKCS12   —  Personal Information Exchange Syntax Standard, used to store a private key
+      with the appropriate public key certificate
+
+    - Digital Certificate (DA)
+      A Digital Certificate is a digital file used to cryptographically bind an entity's Public
+      Key to specific attributes relating to its identity.
+      Digital Certificates are issued by Certification Authorities (CA) and under the technical
+      recommendations of the x.509 Digital Certificate format.
+
+    - Certificate Authority (CAs)
+      CAs are characteristic of many public key infrastructure (PKI) schemes.[
+      CA provides a Certification Practice Statement (CPS) that clearly states its policies and
+      practices regarding the issuance and maintenance of Certificates within the PKI. The CPS
+      contains operational information and legal information on the roles and responsibilities of
+      all entities involved in the Certificate lifecycle (from the day it is issued to the day
+      it expires).
+
+    - Distributing Digital Certificates
+      A's private -> CA( A's public + B's public ) -> B's Private
+      As well as Digital Certificates being available in public repositories, they may also be
+      distributed through the use of Digital Signatures. For example, when Alice Digitally signs
+      a message for Bob she also attaches her Certificate to the outgoing message. Therefore,
+      upon receiving the signed message Bob can verify the validity of Alice's Certificate.
+      If it is successfully verified, Bob now has Alice's Public Key and can verify the validity
+      of the original message signed by Alice.
+
+
+<br/><a name="X509_certificates_2"></a>
+
+### X.509 Certificates for Encryption, Signing and Authentication
+    ===============================================================================================
+    325.2 X.509 Certificates for Encryption, Signing and Authentication		
+    ===============================================================================================
+      Description: Candidates should know how to use X.509 certificates for both server and
+      client authentication. Candidates should be able to implement user and server authentication
+      for Apache HTTPD. The version of Apache HTTPD covered is 2.4 or higher.
+
+      Key Knowledge Areas:
+      Understand SSL, TLS and protocol versions
+      Understand common transport layer security threats, for example Man-in-the-Middle
+      Configure Apache HTTPD with mod_ssl to provide HTTPS service, including SNI and HSTS
+      Configure Apache HTTPD with mod_ssl to authenticate users using certificates
+      Configure Apache HTTPD with mod_ssl to provide OCSP stapling
+      Use OpenSSL for SSL/TLS client and server tests
+
+      Terms and Utilities:
+      Intermediate certification authorities
+      Cipher configuration (no cipher-specific knowledge)
+      httpd.conf
+      mod_ssl
+      openssl
+
+<br/><a name="willbeupdated"></a>
+
+### not available yet
+    ===============================================================================================
+    will be updated
+    ===============================================================================================
+    325.3 Encrypted File Systems				
+
+    325.4 DNS and Cryptography										
+
+    326.1 Host Hardening													
+
+    326.2 Host Intrusion Detection									
+
+    326.3 User Management and Authentication								
+
+    326.4 FreeIPA Installation and Samba Integration			
+
+    327.1 Discretionary Access Control			
+
+    327.2 Mandatory Access Control				
+
+    327.3 Network File Systems				
+
+    328.1 Network Hardening				
+
+    328.2 Network Intrusion Detection			
+
+    328.3 Packet Filtering			
+
+    328.4 Virtual Private Networks	
+    ===============================================================================================

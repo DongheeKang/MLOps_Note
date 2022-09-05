@@ -2057,6 +2057,21 @@ our goal is to make the host and the containers (DB & API) share the same networ
 
 https://www.dongheekang.com/linux/nginx-docker-container
 
+
+
+### Starting a Shell in the Alpine Docker Container
+
+docker run — will start up a new container and run a process within that new container.
+docker exec — will execute a command in a container is already running.
+
+      $ docker run -it --rm --name myubuntu ubuntu:latest
+      $ docker run -it -d --name myubuntu -e OS_ENV=container ubuntu:latest
+      $ docker run -it alpine /bin/sh
+      $ docker exec -it <container-name> /bin/sh
+      $ docker exec -it myubuntu /bin/bash
+
+
+
 <div><br/>
 &raquo; Back to <a href="#contents">Contents</a> | <a href="../docs/README.md">Docs</a>
 </div>

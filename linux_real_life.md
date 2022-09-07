@@ -850,22 +850,70 @@ In DHCP server,  editing the configurations
 ### Linux TCP/IP Connections Limit
 the limits on the number of concurrent TCP connections
 
-howto
+via Kernel-Level
 
       $ cat /proc/sys/fs/file-max
       $ sysctl fs.file-max=65536
 
-
       $ vi /etc/sysctl.conf 
         fs.file-max=65536  # Limits the number of open files to 65536
 
-      # cat /proc/sys/fs/file-nr
-        1952    0       2147483647                    1952 is used from total 214783647 
+      $ cat /proc/sys/fs/file-nr
+        1952    0       2147483647        1952 is used from total 214783647 
 
+via Processes and Threads
+
+      $ sysctl -w kernel.threads-max=120000 >> /etc/sysctl.conf
+      kernel.pid_max
+      kernel.threads-max
+
+via network stack kernel parameters
+
+      $ sysctl -w knet.netfilter.nf_conntrack_max=100 >> /etc/sysctl.conf
+
+      net.netfilter.nf_conntrack_max
+      nf_conntrack_tcp_timeout_*
+      net.core.netdev_max_backlog
+      ...... many other parameters
 
 User-Level Descriptors Limits
 
+      $ ulimit -u 
+      $ ulimit -s 
 
+      $ /etc/security/limits.conf
+        #<domain>      <type>  <item>         <value>
+        oracle          hard    nofile         8192
+        nproc
+        
+via iptables
+      $ /sbin/iptables  -A INPUT -p tcp --syn --dport 22 -m connlimit --connlimit-above 3 -j REJECT
+
+
+# Maximum number of threads per process in Linux (move to the processes)
+
+      $ cat /proc/sys/kernel/threads-max
+      $ sysctl -a | grep threads-max
+      $ cat /proc/sys/kernel/pid_max 
+      $ cat /proc/sys/vm/max_map_count
+      65530
+      $ grep -i "^UserTasksMax" /etc/systemd/logind.conf
+
+      $ echo 120000 > /proc/sys/kernel/threads-max
+      $ sysctl -w kernel.threads-max=120000 >> /etc/sysctl.conf
+      $ echo 200000 > /proc/sys/kernel/pid_max
+      $ echo 600000 > /proc/sys/vm/max_map_count
+
+      $ sed -i "s/^UserTasksMax/#UserTasksMax/" /etc/systemd/system.conf
+      $ echo "UserTasksMax=60000" >> /etc/systemd/system.conf
+
+      $ grep -i "UserTasksMax" /etc/systemd/logind.conf
+      #UserTasksMax=50000
+      UserTasksMax=60000
+
+      $ ulimit -a | grep "stack size"
+      stack size              (kbytes, -s) 10240
+      $ ulimit -s 8192
 
 ### netcat(nc) 
     

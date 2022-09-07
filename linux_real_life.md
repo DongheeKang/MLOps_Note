@@ -500,6 +500,14 @@ strace is a diagnistic tool for system calls that result in error will have thei
   |  7100  |         | X-Font server port
   |  8080  |         | extended HTTP port
 
+### Get a list of all IP addresses on a LAN
+
+    $ ifconfig                             <---- one can extract ip from inet & broadcast
+
+    $ netdiscover -r 192.168.1.0/24
+    $ nmap -sP --unprivileged 192.168.1.0/24
+
+    or use angry IP scanner
 
 ### Mapping hostnames with ports in /etc/hosts
 Look into /etc/hosts first
@@ -605,28 +613,64 @@ by default the timeout is 2 minutes.
 
 * DNS configuration
 
-      $ cat /etc/hosts
+      $ cat /etc/hosts                              
       $ cat /etc/hostname
       $ cat /etc/hosts.conf
-      $ cat /etc/nsswitch.conf
+      $ cat /etc/nsswitch.conf  | grep hosts       : the priority of DNS lookup      
       $ cat /etc/resolv.conf
+
+* etc/hosts: highest priority
+
+      To point to a.localhost.com, we need to add the following lines:
+
+      $ vi /etc/hosts
+        127.0.0.1        a.localhost.com
+
+      $ vi /etc/dnsmasqd.conf
+        address=/localhost.com/127.0.0.1
+
+      $ curl localhost
+      $ curl a.localhost
+
+* /etc/resolv.conf
+      $ cat /etc/resolv.conf
+      nameserver 192.168.204.231
+      nameserver 192.168.154.6
+      nameserver 2c0f:fe38:2405:41a3::77
 
 * DNS Testing
 
-      $ host         : to get host information from name server
-      $ nslookup     : tool to ask host information from name server
-      $ dig          : after finish DNS configuration,one can test DNS
-      $ whois        : a program to find domain holder
-      $ getent       : a tool for carry out the database of administrator
-      $ rndc         : name server control utility for BIND
+      $ host                       : to get host information from name server
+      $ nslookup dongheekang.com   : tool to ask host information from name server
+      $ dig  dig dongheekang.com   : after finish DNS configuration, one can test DNS
+      $ whois                      : a program to find domain holder
+      $ getent                     : a tool for carry out the database of administrator
+      $ rndc                       : name server control utility for BIND
 
       $ vi /etc/bind/named.conf        debian
       $ vi /etc/named/named.conf       fedora
 
-* DNS operation
-    Start by systemctl, service, init.d
+* DNS operation (permanant way)
 
-    Firewall open via iptables configuration
+  To apply DNS resolve permanantly, use resolvonf (not resolv.conf) that can be started by systemctl
+
+      $ sudo apt-get install resolvconf
+      $ sudo systemctl start resolvconf.service
+      $ sudo systemctl enable resolveconf.service
+
+  after starting resolvconf then add nameserver into the configuration file. 
+
+      $ sudo vi /etc/resolvconf/resolvconf.d/head
+      nameserver 8.8.8.8
+      nameserver 8.8.4.4
+
+  systemd-resolve or avahi should be an optionl choice instead of resolv.conf!
+  https://www.baeldung.com/linux/resolve-conf-systemd-avahi
+
+
+* Security
+
+   Firewall open via iptables configuration
 
       $ vi /etc/iptables/rules           : debinas
       $ vi /etc/sysconf/iptables         : CentOS, Fedora
@@ -645,6 +689,77 @@ by default the timeout is 2 minutes.
 
 * DNS Security Extensions
   TSIG or DNSSEC
+
+
+### Basic DHCP
+    
+    1. The client sends a broadcast DHCP Discover packet. It also sends the last address it had, if any.
+    2. The server responds with a DHCP Offer. It can renew the last lease, or just send a new one.
+    3. The client broadcasts a DHCP Request to accept the offer.
+    4. The server sends a DHCP Acknowledge confirming the lease.
+
+### List assigned DHCP IP addresses
+
+  From the server side
+  
+      $ vi /var/lib/dhcpd/dhcpd.leases
+        lease 192.168.1.100
+        { 
+        starts 4 2022/07/22 20:27:28;
+        ends 1 2022/07/26 20:27:28;
+        tstp 1 2022/07/26 20:27:28;                : statement specifies the failover protocol
+        binding state free;
+        hardware ethernet 00:1b:77:93:a1:69;
+        uid "\001\000\033w\223\241i";
+        }
+
+      $ egrep "lease|hostname|hardware|\}" /var/lib/dhcpd/dhcpd.leases
+      $ dhcp-lease-list --lease /var/lib/dhcpd/dhcpd.leases
+
+  alternative way
+
+      $ cat /var/lib/dhcpcd5/dhcpcd-richard01-Richard123.lease | dhcpcd --dumplease
+      $ dhcpcd --dumplease richard01
+
+      $ grep -IR "DHCPOFFER" /var/log/*
+
+      $ journalctl | grep -m1 DHCPACK
+
+      $ arp -a
+
+
+### Multiple DHCP servers on the network
+
+procedure
+
+      1. Create subnetworks: : Each subnetwork has its own DHCP server.
+      2. Create a failover configuration: Main and standby server 
+      3. Split the address pools between multiple DHCP servers: 
+
+In DHCP server,  editing the configurations
+
+      $ vi /etc/dhcp/dhcpd.conf
+      subnet 239.252.197.0 netmask 255.255.255.0 {
+          range 239.252.197.10 239.252.197.250;
+          default-lease-time 600 max-lease-time 7200;
+          option subnet-mask 255.255.255.0;
+          option broadcast-address 239.252.197.255;
+          option routers 239.252.197.1;                         <--------- this is important!
+          option domain-name-servers 239.252.197.2, 239.252.197.3;
+          option domain-name "isc.org";
+      }
+
+      $ vi /etc/dnsmasqd.conf
+        # Define the subnet
+        dhcp-range=239.252.197.10,239.252.197.250,255.255.255.0,2h
+        # DNS configuration
+        server=239.252.197.2
+        server=239.252.197.3
+        dhcp-option=option:domain-search,isc.org
+        # Default router
+        dhcp-option = option:router, 239.252.197.1
+
+      https://www.linux.com/topic/networking/advanced-dnsmasq-tips-and-tricks/
 
 
 ### SSH Tunneling and Proxying
@@ -732,6 +847,26 @@ by default the timeout is 2 minutes.
       $ autossh -X -L 5432:<DB server IP>:5432 -R 873:<local RSYNC server>:873 [user@]remote_ssh_server
       $ autossh -f [host]
 
+### Linux TCP/IP Connections Limit
+the limits on the number of concurrent TCP connections
+
+howto
+
+      $ cat /proc/sys/fs/file-max
+      $ sysctl fs.file-max=65536
+
+
+      $ vi /etc/sysctl.conf 
+        fs.file-max=65536  # Limits the number of open files to 65536
+
+      # cat /proc/sys/fs/file-nr
+        1952    0       2147483647                    1952 is used from total 214783647 
+
+
+User-Level Descriptors Limits
+
+
+
 ### netcat(nc) 
     
 * reading and writing data across the network, through TCP or UDP 
@@ -810,6 +945,9 @@ by default the timeout is 2 minutes.
 
       $ server1> nc -l 4444
       $ server2> nc server1.com 4444
+
+
+
 
 
 ### iperf
@@ -1727,7 +1865,7 @@ How to work?
       caution) some distribution has another location for rc.local 
       /etc/rc.d/rc.local and one need to care rc0.d, rc1.d and so on.
 
-* *using init.d
+* using init.d
 
       $ vi etc/init.d
         #! /bin/sh 

@@ -1,16 +1,16 @@
-    # System Architecture
+# System Architecture
 
 
-    ### Contents
-    * [Architecture](#Architecture)
+## Contents
+* [Architecture](#Architecture)
 
 
-    <br/><a name="Architecture"></a>
+ <br/><a name="Architecture"></a>
 
-    # Architecture
+# Architecture
 
-    ===============================================================================================
-    Scenario 
+	===============================================================================================
+	Scenario 
     ===============================================================================================
     Case study for using Load Balancing and Web Server 
 

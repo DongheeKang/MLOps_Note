@@ -538,12 +538,27 @@ For Nginx, one can deal port!
 
     options (netstat & ss)
     -------------------------------------------
-    l – show only listening sockets
-    t – show TCP connections
-    n – show addresses in a numerical form
-    u – show UDP connections
-    p – show process id/program name
+    l: show only listening sockets
+    t: show TCP connections/sockets
+    n: display the numeric port number
+    u: show UDP connections
+    p: show process id/program name
     -------------------------------------------
+
+### How to find an open port? 
+
+    $ ss -tnlp 
+    $ netstat -tnlp
+    $ lsof -i -P -sTCP:LISTEN                         : using the root user
+    $ nmap google.com
+
+### Port scanning for UDP
+
+    $ nmap -sU -v 172.16.38.137
+    $ nc -vz -u 8.8.8.8 443
+
+    $ iperf3 -s
+    $ iperf3 -u -c 172.16.38.137
 
 ### How to kill running on a specific port?
 
@@ -575,6 +590,16 @@ Solution
       $ ss -Slp | grep -Po ':9999\s.*pid=\K\d+(?=,)' | xargs kill
       $ netstat -Slp | grep -Po ':9999\s.*LISTEN.*?\K\d+(?=/)' | xargs kill
 
+
+### How to open a port in linux?
+
+list the firewall rules using the iptables first and then set rules
+
+    $ sudo iptables -L
+    $ sudo iptables -A INPUT -p tcp --dport 8080 -j ACCEPT    : allows web traffic coming to server port 8080
+    $ sudo iptables -I INPUT -p tcp --dport 23 -j DROP        : block all incoming telnet
+
+see also iptables 
 
 ### Freeing up a TCP/IP port
 
@@ -691,14 +716,14 @@ by default the timeout is 2 minutes.
   TSIG or DNSSEC
 
 
-### Basic DHCP
-    
-    1. The client sends a broadcast DHCP Discover packet. It also sends the last address it had, if any.
-    2. The server responds with a DHCP Offer. It can renew the last lease, or just send a new one.
-    3. The client broadcasts a DHCP Request to accept the offer.
-    4. The server sends a DHCP Acknowledge confirming the lease.
-
 ### List assigned DHCP IP addresses
+
+  Basic
+
+      1. The client sends a broadcast DHCP Discover packet. It also sends the last address it had, if any.
+      2. The server responds with a DHCP Offer. It can renew the last lease, or just send a new one.
+      3. The client broadcasts a DHCP Request to accept the offer.
+      4. The server sends a DHCP Acknowledge confirming the lease.
 
   From the server side
   
@@ -890,7 +915,7 @@ via iptables
       $ /sbin/iptables  -A INPUT -p tcp --syn --dport 22 -m connlimit --connlimit-above 3 -j REJECT
 
 
-# Maximum number of threads per process in Linux (move to the processes)
+### Maximum number of threads per process in Linux (move to the processes)
 
       $ cat /proc/sys/kernel/threads-max
       $ sysctl -a | grep threads-max
@@ -995,11 +1020,8 @@ via iptables
       $ server2> nc server1.com 4444
 
 
-
-
-
 ### iperf
-We need to install iPerf on both the client and the server
+Performance Counters for Linux. we need to install iPerf on both the client and the server
 
 * Server
 
@@ -1021,13 +1043,6 @@ We need to install iPerf on both the client and the server
       * u upd
       * b limits the bandwidth for UDP to 1Mbits/sec by default
 
-### Port scaning for UDP
-
-      $ nmap -sU -v 172.16.38.137
-      $ nc -vz -u 8.8.8.8 443
-
-      $ iperf3 -s
-      $ iperf3 -u -c 172.16.38.137
 
 ### How to list all connected SSH sessions (possible commands)
 
@@ -1251,7 +1266,7 @@ We need to install iPerf on both the client and the server
       |ONBOOT=yes
       |NM_CONTROLLED=no
 
-### Network command set
+### Network command set with options
 
 * ifconfig
 
@@ -1281,7 +1296,7 @@ We need to install iPerf on both the client and the server
 
 * tracert
 
-  To track the exact route a given packet takes, since network traffic doesn’t go directly to the desired machine.
+  to track the exact route a given packet takes, since network traffic doesn’t go directly to the desired machine.
 
       $ traceroute dongheekang.com
       $ traceroute -m 3 dongheekang.com               : upto 3 hops
@@ -1354,6 +1369,25 @@ We need to install iPerf on both the client and the server
       $ lsof /tmp              : prozesse, die auf einen Netzwerk-Socket zugreifen
       $ tcpdump -i eth0        : show network flow into the screen using dump
 
+
+### How to sort processes by network usage on linux
+
+* nethogs
+
+  Most common network monitoring tools break the traffic down per protocol or subnet, in contrast, nethogs groups bandwidth usage by process. 
+
+      $ sudo nethogs
+      $ sudo nethogs -t wlan0
+
+      -m: to change the units displayed for the bandwidth in units like KB/sec -> KB -> B-> MB
+      -r: to sort by the magnitude of the respective traffic
+      -s: to sort by the magnitude of sent traffic
+      -q: to quit to the shell prompt
+
+* iftop 
+
+      $ sudo iftop -i eth0              : sorts the connections per usage wise
+      $ sudo iftop -p                   : to view the port number
 
 ### Network failures simulation in Linux
 * tc (traffic control command-line tool) and qdisc (queuing discipline)
@@ -2196,65 +2230,6 @@ this is really nice tool for checking disk usage!
     }
     --------------------------------------------
 
-
-<br/><a name="Docker"></a>
-
-# Docker
-
-### Doker fundamental
-
-* why chrooot? 
-      $ apt-get install coreutils
-
-      $ chroot /tmp/new_root /bin/bash
-      $ ldd /bin/bash      
-
-### Setup two dockers for network testing
-
-   ?
-
-
-### Connecting from Docker Containers to Resources in the Host
-our goal is to make the host and the containers (DB & API) share the same networking!
-
-* Let's check 
-
-      $ ifconfig                  : network interfaces list for a host with Docker installed
-
-      docker0   Link encap:Ethernet  HWaddr 02:42:A7:6A:EC:A9  
-                inet addr:172.17.0.1  Bcast:172.17.255.255  Mask:255.255.0.0
-      ...
-      eth0      Link encap:Ethernet  HWaddr 00:15:5D:40:01:0C
-      ...  
-      lo        Link encap:Local Loopback
-      ...  
-     
-* DB will be connected with docker in the same network, DB configuration will have bind-address
-
-      bind-address = 172.17.0.1
-      $ mariadb -h 172.17.0.1
-
-* docker setup
-
-      By default, Docker will create a bridge network. This default network doesn’t allow the containers to connect to the host. So, we’ll need to use '--network host'. Now, the localhost address (127.0.0.1) will be referencing the localhost interface of the host, instead of the one of the container. Therefore, we can access our MariaDB – from the container – just by connecting to localhost:
-
-      $ docker run --rm -it --network host alpine sh                          : 
-      $ mariadb -h 127.0.0.1
-
-https://www.dongheekang.com/linux/nginx-docker-container
-
-
-
-### Starting a Shell in the Alpine Docker Container
-
-docker run — will start up a new container and run a process within that new container.
-docker exec — will execute a command in a container is already running.
-
-      $ docker run -it --rm --name myubuntu ubuntu:latest
-      $ docker run -it -d --name myubuntu -e OS_ENV=container ubuntu:latest
-      $ docker run -it alpine /bin/sh
-      $ docker exec -it <container-name> /bin/sh
-      $ docker exec -it myubuntu /bin/bash
 
 
 

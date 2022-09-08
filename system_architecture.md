@@ -49,6 +49,9 @@
     Create a SSL Certificate on Apache for Ubuntu 14.04  
 
 
+
+##  Senario 1. LAMP
+
     ===============================================================================================
     Senario 1. LAMP
     ===============================================================================================
@@ -91,6 +94,7 @@
     $ sudo rm /var/www/html/info.php
 
 
+##  Senario 2. LAMP
     ===============================================================================================
     Senario 2. LEMP 
     ===============================================================================================
@@ -171,6 +175,7 @@
     http://your_server_IP_address/info.php
     $ sudo rm /var/www/html/info.php
 
+## Senario 3. Nginx (advanced)
 
     ===============================================================================================
     Senario 3. Nginx (advanced)
@@ -314,6 +319,9 @@
       |	add_header Cache-Control "no-store";
     |}
 
+
+##  Senario 4. Nginx as a Load Balancer + SSL 
+
     ===============================================================================================
     Senario 4. Nginx as a Load Balancer + SSL 
     ===============================================================================================
@@ -397,6 +405,9 @@
     |?>
     $ curl https://example.com/test.php https://example.com/test.php 
     curl 169.254.169.254/metadata/v1/interfaces/public/0/anchor_ipv4/address && echo
+
+
+## Senario 5. Internet - (keepalived, HAproxy, LB1,2) - (web1,2, nginx) - DB
 
     ===============================================================================================
     Senario 5. Internet - (keepalived, HAproxy, LB1,2) - (web1,2, nginx) - DB
@@ -586,6 +597,8 @@
     $ sudo service nginx restart
 
 
+## Senario 6. Internet - (keepalived, HAproxy, LB1,2) - (web1,2, apache) - DB
+
     ===============================================================================================
     Senario 6. Internet - (keepalived, HAproxy, LB1,2) - (web1,2, apache) - DB
     ===============================================================================================
@@ -718,6 +731,9 @@
 
     - HAProxy Statistics
     http://192.168.0.99/haproxy?stats
+
+
+## Senario 7. Internet - HAproxy LB - (wordpress1,2) - mysql
 
     ===============================================================================================
     Senario 7. Internet - HAproxy LB - (wordpress1,2) - mysql
@@ -910,6 +926,9 @@
 
     - Load Balancing Complete!
 
+
+## Senario 8. Internet - HAproxy LB - (web, (wordpress1,2)) - DB
+
     ===============================================================================================
     Senario 8. Internet - HAproxy LB - (web, (wordpress1,2)) - DB
     ===============================================================================================
@@ -1010,6 +1029,7 @@
 
     	$ sudo service haproxy reload
 
+## Senario 9. HAproxy Load Balancer + SSL 
 
     ===============================================================================================
     Senario 9. HAproxy Load Balancer + SSL 
@@ -1062,6 +1082,8 @@
     | $UDPServerAddress 127.0.0.1
     $ sudo service haproxy restart
 
+
+## Senario 10. Apache + SSL in Web server
 
     ===============================================================================================
     Senario 10. Apache + SSL in Web server

@@ -93,25 +93,18 @@ docker exec — will execute a command in a container is already running.
 
 
 
-
-
-
-
-
-
-
 <br/><a name="kubernetes"></a>
 
 # Kubernetes
 
 * Deployment
-```
-$ kubectl create -f ./load-balancer-example.yaml
-$ kubectl get deployments
-$ kubectl rollout status deployment/nginx-deployment
-$ kubectl describe deployments
-$ kubectl get pods --show-labels
-```
+  
+    $ kubectl create -f ./load-balancer-example.yaml
+    $ kubectl get deployments
+    $ kubectl rollout status deployment/nginx-deployment
+    $ kubectl describe deployments
+    $ kubectl get pods --show-labels
+
 
 
 <div><br/>

@@ -3,17 +3,15 @@
 
 ### Contents
   * [Architecture](#Architecture)
-  * [Docker](#Docker)
-
 
 
 <br/><a name="Architecture"></a>
 
 # Architecture
 
-===============================================================================================
-Scenario 
-===============================================================================================
+	===============================================================================================
+	Scenario 
+	===============================================================================================
 Case study for using Load Balancing and Web Server 
 
 - Senario 1. 
@@ -51,9 +49,9 @@ Case study for using Load Balancing and Web Server
 	Create a SSL Certificate on Apache for Ubuntu 14.04  
 
 
-===============================================================================================
-Senario 1. LAMP
-===============================================================================================
+	===============================================================================================
+	Senario 1. LAMP
+	===============================================================================================
 1. Install the Apache2 Web Server
 	sudo apt-get update
 	sudo apt-get install apache2
@@ -93,9 +91,9 @@ Senario 1. LAMP
 	$ sudo rm /var/www/html/info.php
 
 
-===============================================================================================
-Senario 2. LEMP 
-===============================================================================================
+	===============================================================================================
+	Senario 2. LEMP 
+	===============================================================================================
 1. Install the Nginx Web Server
 	$ sudo apt-get update
 	$ sudo apt-get install nginx
@@ -174,9 +172,9 @@ Senario 2. LEMP
 	$ sudo rm /var/www/html/info.php
 
 
-===============================================================================================
-Senario 3. Nginx (advanced)
-===============================================================================================
+	===============================================================================================
+	Senario 3. Nginx (advanced)
+	===============================================================================================
 - Understanding Nginx HTTP Proxying, Load Balancing, Buffering, and Caching
 - Install
 	$ sudo apt-get update
@@ -316,9 +314,9 @@ Senario 3. Nginx (advanced)
     |	add_header Cache-Control "no-store";
 	|}
 
-===============================================================================================
-Senario 4. Nginx as a Load Balancer + SSL 
-===============================================================================================
+	===============================================================================================
+	Senario 4. Nginx as a Load Balancer + SSL 
+	===============================================================================================
 - How To Set Up Nginx Load Balancing with SSL Termination
 
 - On Apache Web server 1 & 2
@@ -400,9 +398,9 @@ Senario 4. Nginx as a Load Balancer + SSL
 	$ curl https://example.com/test.php https://example.com/test.php 
 curl 169.254.169.254/metadata/v1/interfaces/public/0/anchor_ipv4/address && echo
 
-===============================================================================================
-Senario 5. Internet - (keepalived, HAproxy, LB1,2) - (web1,2, nginx) - DB
-===============================================================================================
+	===============================================================================================
+	Senario 5. Internet - (keepalived, HAproxy, LB1,2) - (web1,2, nginx) - DB
+	===============================================================================================
 - How To Set Up Highly Available HAProxy Servers with Keepalived 
 
 - Preliminary Note
@@ -588,9 +586,9 @@ Senario 5. Internet - (keepalived, HAproxy, LB1,2) - (web1,2, nginx) - DB
 	$ sudo service nginx restart
 
 
-===============================================================================================
-Senario 6. Internet - (keepalived, HAproxy, LB1,2) - (web1,2, apache) - DB
-===============================================================================================
+	===============================================================================================
+	Senario 6. Internet - (keepalived, HAproxy, LB1,2) - (web1,2, apache) - DB
+	===============================================================================================
 - Same as Senario 5 but web server are used with Apache 
 
 - Preliminary Note
@@ -721,9 +719,9 @@ Senario 6. Internet - (keepalived, HAproxy, LB1,2) - (web1,2, apache) - DB
 - HAProxy Statistics
 	http://192.168.0.99/haproxy?stats
 
-===============================================================================================
-Senario 7. Internet - HAproxy LB - (wordpress1,2) - mysql
-===============================================================================================
+	===============================================================================================
+	Senario 7. Internet - HAproxy LB - (wordpress1,2) - mysql
+	===============================================================================================
 - How To Use HAProxy As A Layer 4 Load Balancer for WordPress
     haproxy-www : HAProxy server, for load balancing
     wordpress-1 : WordPress web application server
@@ -1124,71 +1122,9 @@ Senario 10. Apache + SSL in Web server
 
 
 ===============================================================================================
-End of Architec
+End of Architecture
 ===============================================================================================
 
-
-<br/><a name="Docker"></a>
-
-# Docker
-
-### Doker fundamental
-
-* why chrooot? 
-      $ apt-get install coreutils
-
-      $ chroot /tmp/new_root /bin/bash
-      $ ldd /bin/bash      
-
-### Setup two dockers for network testing
-
-   ?
-
-
-### Connecting from Docker Containers to Resources in the Host
-our goal is to make the host and the containers (DB & API) share the same networking!
-
-* Let's check 
-
-      $ ifconfig                  : network interfaces list for a host with Docker installed
-
-      docker0   Link encap:Ethernet  HWaddr 02:42:A7:6A:EC:A9  
-                inet addr:172.17.0.1  Bcast:172.17.255.255  Mask:255.255.0.0
-      ...
-      eth0      Link encap:Ethernet  HWaddr 00:15:5D:40:01:0C
-      ...  
-      lo        Link encap:Local Loopback
-      ...  
-     
-* DB will be connected with docker in the same network, DB configuration will have bind-address
-
-      bind-address = 172.17.0.1
-      $ mariadb -h 172.17.0.1
-
-* docker setup
-
-      By default, Docker will create a bridge network. This default network doesn’t allow the containers to connect to the host. So, we’ll need to use '--network host'. Now, the localhost address (127.0.0.1) will be referencing the localhost interface of the host, instead of the one of the container. Therefore, we can access our MariaDB – from the container – just by connecting to localhost:
-
-      $ docker run --rm -it --network host alpine sh                          : 
-      $ mariadb -h 127.0.0.1
-
-https://www.dongheekang.com/linux/nginx-docker-container
-
-
-
-### Starting a Shell in the Alpine Docker Container
-
-docker run — will start up a new container and run a process within that new container.
-docker exec — will execute a command in a container is already running.
-
-      $ docker run -it --rm --name myubuntu ubuntu:latest
-      $ docker run -it -d --name myubuntu -e OS_ENV=container ubuntu:latest
-      $ docker run -it alpine /bin/sh
-      $ docker exec -it <container-name> /bin/sh
-      $ docker exec -it myubuntu /bin/bash
-
-
-### Setup two dockers for network testing
 
 
 

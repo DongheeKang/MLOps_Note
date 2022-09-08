@@ -1912,6 +1912,32 @@ How to work?
           -pubkey -noout) -signature /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.sha256 /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.md5
 
 
+### OpenVPN
+* Installation and configuration of OpenVPN
+
+      $ sudo apt-get update
+      $ sudo apt-get install openvpn easy-rsa
+
+      $ gunzip -c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz /etc/openvpn/server.conf
+      $ vim /etc/openvpn/server.conf
+      | dh2048.pem
+      | push "redirect-gateway def1 bypass-dhcp"
+
+      Options for OpenVPN
+      | Packet Forwarding ip_forward
+      | ufw...or iptables
+
+* Creating a Certificate Authority and Server-Side Certificate & Key
+
+      1. RSA or IPSec
+      2. Generate a Certificate and Key for the Server
+      3. Move the Server Certificates and Keys
+      4. Generate Certificates and Keys for Clients
+      5. Transferring Certificates and Keys to Client Devices
+      6. Creating a Unified OpenVPN Profile for Client Devices
+
+
+  
 
 
 <br/><a name="Service"></a>

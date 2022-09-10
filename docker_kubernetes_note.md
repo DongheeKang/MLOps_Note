@@ -12,25 +12,83 @@
 
 # Docker container
 
+The underlying technology
 
-### Doker fundamental
+    Docker is written in Go and makes use of several kernel features to deliver the functionality we’ve seen.
 
-* why chrooot? 
-      $ apt-get install coreutils
+Namespaces
 
-      $ chroot /tmp/new_root /bin/bash
-      $ ldd /bin/bash      
+    Docker takes advantage of a technology called namespaces to provide
+    the isolated workspace we call the container. When you run a container,
+    Docker creates a set of namespaces for that container.
+    This provides a layer of isolation: each aspect of a container runs
+    in its own namespace and does not have access outside it.
+    Some of the namespaces that Docker uses on Linux are:
 
+    The pid namespace: Used for process isolation (PID: Process ID).
+    The net namespace: Used for managing network interfaces (NET: Networking).
+    The ipc namespace: Used for managing access to IPC resources (IPC: InterProcess Communication).
+    The mnt namespace: Used for managing mount-points (MNT: Mount).
+    The uts namespace: Used for isolating kernel and version identifiers. (UTS: Unix Timesharing System).
 
+Control groups
 
-* why cgroup? 
+    Docker on Linux also makes use of another technology called cgroups or control groups.
+    A key to running applications in isolation is to have them only use the resources you want.
+    This ensures containers are good multi-tenant citizens on a host.
+    Control groups allow Docker to share available hardware resources to containers and,
+    if required, set up limits and constraints. For example, limiting the memory available
+    to a specific container.
 
+Union file systems
 
+    Union file systems, or UnionFS, are file systems that operate by creating layers,
+    making them very lightweight and fast. Docker uses union file systems to provide
+    the building blocks for containers. Docker can make use of several union file system
+    variants including: AUFS, btrfs, vfs, and DeviceMapper.
 
+Container format
 
-* why namespace? 
+    Docker combines these components into a wrapper we call a container format.
+    The default container format is called libcontainer. In the future, Docker may support
+    other container formats, for example, by integrating with BSD Jails or Solaris Zones.
 
+### Docker procedure
 
+Pulls the ubuntu image:
+
+    Docker checks for the presence of the ubuntu image and,
+    if it doesn’t exist locally on the host,
+    then Docker downloads it from Docker Hub.
+    If the image already exists,
+    then Docker uses it for the new container.
+
+Creates a new container:
+
+    Once Docker has the image, it uses it to create a container.
+
+Allocates a filesystem and mounts a read-write layer:
+
+    The container is created in the file system and
+    a read-write layer is added to the image.
+
+Allocates a network / bridge interface:
+
+    Creates a network interface that allows the Docker container
+    to talk to the local host.
+
+Sets up an IP address:
+
+    Finds and attaches an available IP address from a pool.
+
+Executes a process that you specify:
+
+    Runs your application,
+
+Captures and provides application output:
+
+    Connects and logs standard input, outputs and errors for you
+    to see how your application is running.
 
 
 ### Docker image

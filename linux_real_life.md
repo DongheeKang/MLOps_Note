@@ -220,6 +220,9 @@ strace is a diagnistic tool for system calls that result in error will have thei
     $ readlink -e /proc/23217/cwd        : or readlink
 
 
+
+
+
 <br/><a name="Users"></a>
 
 # User Management
@@ -293,6 +296,14 @@ strace is a diagnistic tool for system calls that result in error will have thei
         Running annie-script.sh as user annie
       $ sudo -u root /home/annie/annie-script.sh
         Running annie-script.sh as user root
+
+### Why chrooot is important?
+
+    $ apt-get install coreutils
+
+    $ chroot /tmp/new_root /bin/bash
+
+    $ ldd /bin/bash      
 
 
 ### How to Change the Default Home Directory of a User

@@ -133,38 +133,39 @@
     sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.backup
     sudo vi /etc/nginx/sites-available/default
     |server {
-      |	listen 80 default_server;
-      |	listen [::]:80 default_server ipv6only=on;
+    |	  listen 80 default_server;
+    |	  listen [::]:80 default_server ipv6only=on;
     |
-      |	root /usr/share/nginx/html;
-      |	index index.html index.htm;
+    |	  root /usr/share/nginx/html;
+    |	  index index.html index.htm;
     |
-      |	server_name localhost;
+    |	  server_name localhost;
     |
-      |	location / {
-      |	   try_files $uri $uri/ =404;
-      |	}
+    |	  location / {
+    |	     try_files $uri $uri/ =404;
+    |	  }
     |}
-      change you need ... 
+      
+    change you need ... 
     |server {
-      |   ...
-      |	index index.php index.html index.htm;      <--- index.php
+    |   ...
+    |	  index index.php index.html index.htm;      <--- index.php
     | 	server_name server_domain_name_or_IP;
     |   ...
-     	|   error_page 404 /404.html;
-      |   error_page 500 502 503 504 /50x.html;
-      |   location = /50x.html {
-      |       root /usr/share/nginx/html;
-      |   }
-      |   location ~ \.php$ {
-      |     try_files $uri =404;
-      |     fastcgi_split_path_info ^(.+\.php)(/.+)$;
-      |     fastcgi_pass unix:/var/run/php5-fpm.sock;
-      |     fastcgi_index index.php;
-      |     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-      |     include fastcgi_params;
-      |   }
-      |}
+    |   error_page 404 /404.html;
+    |   error_page 500 502 503 504 /50x.html;
+    |   location = /50x.html {
+    |       root /usr/share/nginx/html;
+    |   }
+    |   location ~ \.php$ {
+    |     try_files $uri =404;
+    |     fastcgi_split_path_info ^(.+\.php)(/.+)$;
+    |     fastcgi_pass unix:/var/run/php5-fpm.sock;
+    |     fastcgi_index index.php;
+    |     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    |     include fastcgi_params;
+    |   }
+    |}
     $ sudo service nginx restart
 
     5. Create a PHP File to Test Configuration
@@ -244,20 +245,20 @@
     $ sudo vi /etc/nginx/sites-available/example.com  
     |upstream backend_hosts {    
     |   least_conn;                                  : round robin(default), hash, ip_hash
-      |#  hash $remote_addr$remote_port consistent;    : for hash case need to provide key
+    |#  hash $remote_addr$remote_port consistent;    : for hash case need to provide key
     |
-      |	server host1.example.com weight=3;           : Weighting, receive 3 times traffic
-      |	server host2.example.com;
-      |	server host3.example.com;
+    |	server host1.example.com weight=3;           : Weighting, receive 3 times traffic
+    |	server host2.example.com;
+    |	server host3.example.com;
     |}
     |
     |server {
-      |	listen 80;
-      |	server_name example.com;
+    |	listen 80;
+    |	server_name example.com;
     |
-      |	location /proxy-me {
-      |    	proxy_pass http://backend_hosts;
-      |	}
+    |	location /proxy-me {
+    |    	proxy_pass http://backend_hosts;
+    |	}
     |}
 
     - Using Buffers to Free Up Backend Servers
@@ -285,11 +286,11 @@
     |  proxy_cache_valid 404 1m;
     |  
     |  location /proxy-me {
-      |    proxy_cache backcache;
-     	| 	 proxy_cache_bypass $http_cache_control;
-      |	 add_header X-Proxy-Cache $upstream_cache_status;
+    |    proxy_cache backcache;
+    | 	 proxy_cache_bypass $http_cache_control;
+    |	 add_header X-Proxy-Cache $upstream_cache_status;
     |
-      |	 proxy_pass http://backend;
+    |	 proxy_pass http://backend;
     |  }
     |}
 
@@ -307,16 +308,16 @@
     you can set some of this using expires directive, which set the max-age for Cache-Control
 
     |location / {
-      |	expires 60m;                           : cache for 1 hour 
+    |	expires 60m;                           : cache for 1 hour 
     |}
 
     |location /check-me {
-      |	expires -1;                            : means "no-cache"
+    |	expires -1;                            : means "no-cache"
     |}
 
     |location /private {
-      |	expires -1;
-      |	add_header Cache-Control "no-store";
+    |	expires -1;
+    |	add_header Cache-Control "no-store";
     |}
 
 
@@ -350,18 +351,18 @@
     $ sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/example.com
     $ sudo vi /etc/nginx/sites-available/example.com
     |upstream mywebapp1 {
-      |	server 10.130.227.11;
-      |	server 10.130.227.22;
+    |	server 10.130.227.11;
+    |	server 10.130.227.22;
     |}
     |server {
-      |	listen 80;    
+    |	listen 80;    
     |   listen 443 ssl;
-      |	server_name example.com www.example.com;
+    |	server_name example.com www.example.com;
     |
     |   ssl on;
-      |   ssl_certificate         /etc/nginx/ssl/example.com/server.crt;
-      |   ssl_certificate_key     /etc/nginx/ssl/example.com/server.key;
-      |   ssl_trusted_certificate /etc/nginx/ssl/example.com/ca-certs.pem;
+    |   ssl_certificate         /etc/nginx/ssl/example.com/server.crt;
+    |   ssl_certificate_key     /etc/nginx/ssl/example.com/server.key;
+    |   ssl_trusted_certificate /etc/nginx/ssl/example.com/ca-certs.pem;
     |
     |   # here is the additional stuff for hardening 
     |   ssl_session_cache shared:SSL:20m;
@@ -373,13 +374,13 @@
     |									RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS;
     |	add_header Strict-Transport-Security "max-age=31536000";
     |
-      |	location / {
-      |    	proxy_pass http://mywebapp1;
-      |    	proxy_set_header Host $host;
-      |    	proxy_set_header X-Real-IP $remote_addr;
-      |    	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      |    	proxy_set_header X-Forwarded-Proto $scheme;
-      |	}
+    |	location / {
+    |    	proxy_pass http://mywebapp1;
+    |    	proxy_set_header Host $host;
+    |    	proxy_set_header X-Real-IP $remote_addr;
+    |    	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    |    	proxy_set_header X-Forwarded-Proto $scheme;
+    |	}
     |}
     $ sudo service nginx configtest
     $ service nginx reload
@@ -395,16 +396,16 @@
 
     $ sudo vi /var/www/html/test.php
     |<?php
-      |	header( 'Content-Type: text/plain' );
-      |	echo 'Host: ' . $_SERVER['HTTP_HOST'] . "\n";
-      |	echo 'Remote Address: ' . $_SERVER['REMOTE_ADDR'] . "\n";
-      |	echo 'X-Forwarded-For: ' . $_SERVER['HTTP_X_FORWARDED_FOR'] . "\n";
-      |	echo 'X-Forwarded-Proto: ' . $_SERVER['HTTP_X_FORWARDED_PROTO'] . "\n";
-      |	echo 'Server Address: ' . $_SERVER['SERVER_ADDR'] . "\n";
-      |	echo 'Server Port: ' . $_SERVER['SERVER_PORT'] . "\n\n";
+    |	header( 'Content-Type: text/plain' );
+    |	echo 'Host: ' . $_SERVER['HTTP_HOST'] . "\n";
+    |	echo 'Remote Address: ' . $_SERVER['REMOTE_ADDR'] . "\n";
+    |	echo 'X-Forwarded-For: ' . $_SERVER['HTTP_X_FORWARDED_FOR'] . "\n";
+    |	echo 'X-Forwarded-Proto: ' . $_SERVER['HTTP_X_FORWARDED_PROTO'] . "\n";
+    |	echo 'Server Address: ' . $_SERVER['SERVER_ADDR'] . "\n";
+    |	echo 'Server Port: ' . $_SERVER['SERVER_PORT'] . "\n\n";
     |?>
-    $ curl https://example.com/test.php https://example.com/test.php 
-    curl 169.254.169.254/metadata/v1/interfaces/public/0/anchor_ipv4/address && echo
+    $ curl https://example.com/test.php
+    $ curl 169.254.169.254/metadata/v1/interfaces/public/0/anchor_ipv4/address && echo
 
 
 ## Senario 5. Internet - (keepalived, HAproxy, LB1,2) - (web1,2, nginx) - DB
@@ -430,12 +431,12 @@
 
     $ sudo nano /etc/nginx/sites-available/default
     |server {
-      |	listen web_server_private_IP:80;
+    |	listen web_server_private_IP:80;
     |
-      |	allow load_balancer_1_private_IP;
-      |	allow load_balancer_2_private_IP;
-      |	deny all;
-      |	. . .
+    |	allow load_balancer_1_private_IP;
+    |	allow load_balancer_2_private_IP;
+    |	deny all;
+    |	. . .
     |}
 
     $ sudo nginx -t
@@ -446,8 +447,8 @@
     $ curl web_server_public_IP             <--- fail
     $ curl web_server_private_IP            <--- output html
 
-      $ sudo apt-get update
-      $ sudo apt-get install haproxy
+    $ sudo apt-get update
+    $ sudo apt-get install haproxy
 
     $ sudo nano /etc/default/haproxy
     |# Set ENABLED to 1 if you want the init script to start haproxy.
@@ -457,36 +458,36 @@
 
     $ sudo nano /etc/haproxy/haproxy.cfg
     |defaults
-      |	log     global
-      |	mode    tcp
-      |	option  tcplog
+    |	log     global
+    |	mode    tcp
+    |	option  tcplog
     |...
     |frontend www
-      |	bind load_balancer_anchor_IP:80
-      |	default_backend nginx_pool
+    |	bind load_balancer_anchor_IP:80
+    |	default_backend nginx_pool
     |
     |backend nginx_pool
-      |	balance roundrobin
-      |	mode tcp
-      |	server web1 web_server_1_private_IP:80 check
-      |	server web2 web_server_2_private_IP:80 check
+    |	balance roundrobin
+    |	mode tcp
+    |	server web1 web_server_1_private_IP:80 check
+    |	server web2 web_server_2_private_IP:80 check
 
     $ sudo haproxy -f /etc/haproxy/haproxy.cfg -c
     $ sudo service haproxy restart
 
-      $ curl 127.0.0.1                        <---fail
-      $ curl load_balancer_public_IP			<---fail
-      $ curl load_balancer_private_IP			<---fail
+    $ curl 127.0.0.1                        <---fail
+    $ curl load_balancer_public_IP			<---fail
+    $ curl load_balancer_private_IP			<---fail
 
     - Keepalived on both Load Balancers
     $ sudo apt-get install build-essential libssl-dev
 
     $ wget http://www.keepalived.org/software/keepalived-1.2.19.tar.gz
-      $ tar xzvf keepalived*
-      $ cd keepalived*
-      $ ./configure
-      $ make
-      $ sudo make install
+    $ tar xzvf keepalived*
+    $ cd keepalived*
+    $ ./configure
+    $ make
+    $ sudo make install
 
     $ sudo nano /etc/init/keepalived.conf
     |description "load-balancing and high-availability service"
@@ -503,59 +504,59 @@
     - Primary Load Balancer (LB 1)
     $ sudo nano /etc/keepalived/keepalived.conf
     |vrrp_script chk_haproxy {
-      |	script "pidof haproxy"
-      |	interval 2
+    |	script "pidof haproxy"
+    |	interval 2
     |}
     |vrrp_instance VI_1 {
-      |	interface eth1
-      |	state MASTER
-      |	priority 200
-      |	virtual_router_id 33
-      |	unicast_src_ip primary_private_IP
-      |	unicast_peer {
-      |	    secondary_private_IP
-      |	}
-      |	authentication {
-      |	    auth_type PASS
-      |	    auth_pass password
-      |	}    
+    |	interface eth1
+    |	state MASTER
+    |	priority 200
+    |	virtual_router_id 33
+    |	unicast_src_ip primary_private_IP
+    |	unicast_peer {
+    |	    secondary_private_IP
+    |	}
+    |	authentication {
+    |	    auth_type PASS
+    |	    auth_pass password
+    |	}    
     |   track_script {
     |       chk_haproxy
-      |	}
-      |	notify_master /etc/keepalived/master.sh
+    |	}
+    |	notify_master /etc/keepalived/master.sh
     |}
 
     - Secondary Load Balancer (LB 2)
     $ sudo nano /etc/keepalived/keepalived.conf
     |vrrp_script chk_haproxy {
-      |	script "pidof haproxy"
-      |	interval 2
+    |	script "pidof haproxy"
+    |	interval 2
     |}
     |vrrp_instance VI_1 {
-      |	interface eth1
-      |	state BACKUP                            <----- 
-      |	priority 100							<-----  
-      |	virtual_router_id 33
-      |	unicast_src_ip secondary_private_IP     <----- 
-      |	unicast_peer {
-      |	    primary_private_IP                  <-----
-      |	}
-      |	authentication {
-      |	    auth_type PASS
-      |	    auth_pass password
-      |	}    
+    |	interface eth1
+    |	state BACKUP                            <----- 
+    |	priority 100							<-----  
+    |	virtual_router_id 33
+    |	unicast_src_ip secondary_private_IP     <----- 
+    |	unicast_peer {
+    |	    primary_private_IP                  <-----
+    |	}
+    |	authentication {
+    |	    auth_type PASS
+    |	    auth_pass password
+    |	}    
     |   track_script {
     |       chk_haproxy
-      |	}
-      |	notify_master /etc/keepalived/master.sh
+    |	}
+    |	notify_master /etc/keepalived/master.sh
     |}
 
     - Configure a Floating IP for your Infrastructure
     Only DigitalOcean specific, 
     create a DigitalOcean API Token and the Floating IP Transition Scripts
 
-      $ cd /usr/local/bin
-      $ sudo curl -LO http://do.co/assign-ip
+    $ cd /usr/local/bin
+    $ sudo curl -LO http://do.co/assign-ip
     $ python /usr/local/bin/assign-ip floating_ip droplet_ID
 
     $ sudo nano /etc/keepalived/master.sh
@@ -565,13 +566,13 @@
     |HAS_FLOATING_IP=$(curl -s http://169.254.169.254/metadata/v1/floating_ip/ipv4/active)
     |
     |if [ $HAS_FLOATING_IP = "false" ]; then
-      |	n=0
-      |	while [ $n -lt 10 ]
-      |	do
-      |    	python /usr/local/bin/assign-ip $IP $ID && break
-      |    	n=$((n+1))
-      |    	sleep 3
-      |	done
+    |	n=0
+    |	while [ $n -lt 10 ]
+    |	do
+    |    	python /usr/local/bin/assign-ip $IP $ID && break
+    |    	n=$((n+1))
+    |    	sleep 3
+    |	done
     |fi
     $ sudo chmod +x /etc/keepalived/master.sh
 
@@ -637,36 +638,36 @@
     $ cat /dev/null > /etc/haproxy/haproxy.cfg
     $ vi /etc/haproxy/haproxy.cfg
     |global
-      |    log 127.0.0.1   local0
-      |    log 127.0.0.1   local1 notice
-      |    #log loghost    local0 info
-      |    maxconn 4096
-      |    #debug
-      |    #quiet
-      |    user haproxy
-      |    group haproxy
+    |    log 127.0.0.1   local0
+    |    log 127.0.0.1   local1 notice
+    |    #log loghost    local0 info
+    |    maxconn 4096
+    |    #debug
+    |    #quiet
+    |    user haproxy
+    |    group haproxy
     |defaults
-      |    log     global
-      |    mode    http
-      |    option  httplog
-      |    option  dontlognull
-      |    retries 3
-      |    redispatch
-      |    maxconn 2000
-      |    contimeout      5000
-      |    clitimeout      50000
-      |    srvtimeout      50000
+    |    log     global
+    |    mode    http
+    |    option  httplog
+    |    option  dontlognull
+    |    retries 3
+    |    redispatch
+    |    maxconn 2000
+    |    contimeout      5000
+    |    clitimeout      50000
+    |    srvtimeout      50000
     |listen webfarm 192.168.0.99:80
-      |   mode http
-      |   stats enable
-      |   stats auth someuser:somepassword
-      |   balance roundrobin
-      |   cookie JSESSIONID prefix
-      |   option httpclose
-      |   option forwardfor
-      |   option httpchk HEAD /check.txt HTTP/1.0
-      |   server webA 192.168.0.102:80 cookie A check
-      |   server webB 192.168.0.103:80 cookie B check
+    |   mode http
+    |   stats enable
+    |   stats auth someuser:somepassword
+    |   balance roundrobin
+    |   cookie JSESSIONID prefix
+    |   option httpclose
+    |   option forwardfor
+    |   option httpchk HEAD /check.txt HTTP/1.0
+    |   server webA 192.168.0.102:80 cookie A check
+    |   server webB 192.168.0.103:80 cookie B check
 
     $ vi /etc/default/haproxy
     |# Set ENABLED to 1 if you want the init script to start haproxy.
@@ -683,22 +684,22 @@
     On LB 1
     $ vi /etc/keepalived/keepalived.conf
     |vrrp_script chk_haproxy {           # Requires keepalived-1.1.13
-      |    script "killall -0 haproxy"     # cheaper than pidof
-      |    interval 2                      # check every 2 seconds
-      |    weight 2                        # add 2 points of prio if OK
+    |    script "killall -0 haproxy"     # cheaper than pidof
+    |    interval 2                      # check every 2 seconds
+    |    weight 2                        # add 2 points of prio if OK
     |}
     |
     |vrrp_instance VI_1 {
-      |    interface eth0
-      |    state MASTER
-      |    virtual_router_id 51
-      |    priority 101                    # 101 on master, 100 on backup
-      |    virtual_ipaddress {
-      |        192.168.0.99
-      |    }
-      |    track_script {
-      |        chk_haproxy
-      |    }
+    |    interface eth0
+    |    state MASTER
+    |    virtual_router_id 51
+    |    priority 101                    # 101 on master, 100 on backup
+    |    virtual_ipaddress {
+    |        192.168.0.99
+    |    }
+    |    track_script {
+    |        chk_haproxy
+    |    }
     |}
     $ /etc/init.d/keepalived start
     $ ip addr sh eth0
@@ -706,22 +707,22 @@
     On LB 2
     $ vi /etc/keepalived/keepalived.conf
     |vrrp_script chk_haproxy {           # Requires keepalived-1.1.13
-      |    script "killall -0 haproxy"     # cheaper than pidof
-      |    interval 2                      # check every 2 seconds
-      |    weight 2                        # add 2 points of prio if OK
+    |    script "killall -0 haproxy"     # cheaper than pidof
+    |    interval 2                      # check every 2 seconds
+    |    weight 2                        # add 2 points of prio if OK
     |}
     |
     |vrrp_instance VI_1 {
-      |    interface eth0
-      |    state MASTER
-      |    virtual_router_id 51
-      |    priority 100                    # 101 on master, 100 on backup
-      |    virtual_ipaddress {
-      |        192.168.0.99
-      |    }
-      |    track_script {
-      |        chk_haproxy
-      |    }
+    |    interface eth0
+    |    state MASTER
+    |    virtual_router_id 51
+    |    priority 100                    # 101 on master, 100 on backup
+    |    virtual_ipaddress {
+    |        192.168.0.99
+    |    }
+    |    track_script {
+    |        chk_haproxy
+    |    }
     |}
     $ /etc/init.d/keepalived start
     $ ip addr sh eth0
@@ -785,30 +786,30 @@
     $ sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/example.com
     $ sudo nano /etc/nginx/sites-available/example.com
     |server {
-      |	listen 80;
-      |	root /var/www/example.com;
-      |	index index.php index.hmtl index.htm;
-      |	server_name example.com;
-      |	location / {
-      |    	try_files $uri $uri/ /index.php?q=$uri&$args;
-      |	}
-      |	error_page 404 /404.html;
-      |	error_page 500 502 503 504 /50x.html;
-      |	location = /50x.html {
-      |    	root /usr/share/nginx/www;
-     	| 	}
-      |	location ~ \.php$ {
-      |    	try_files $uri =404;
-      |    	fastcgi_pass unix:/var/run/php5-fpm.sock;
-      |    	fastcgi_index index.php;
-      |    	include fastcgi_params;
-      |	}
+    |	listen 80;
+    |	root /var/www/example.com;
+    |	index index.php index.hmtl index.htm;
+    |	server_name example.com;
+    |	location / {
+    |    	try_files $uri $uri/ /index.php?q=$uri&$args;
+    |	}
+    |	error_page 404 /404.html;
+    |	error_page 500 502 503 504 /50x.html;
+    |	location = /50x.html {
+    |    	root /usr/share/nginx/www;
+    | 	}
+    |	location ~ \.php$ {
+    |    	try_files $uri =404;
+    |    	fastcgi_pass unix:/var/run/php5-fpm.sock;
+    |    	fastcgi_index index.php;
+    |    	include fastcgi_params;
+    |	}
     |}
     $ sudo rm /etc/nginx/sites-enabled/default
     $ sudo ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/
     $ sudo service nginx restart
 
-      $ sudo vi /etc/hosts
+    $ sudo vi /etc/hosts
     | 10.0.0.2  wordpress-1
     | 10.0.0.3  wordpress-2
 
@@ -891,14 +892,14 @@
     | option  tcplog                : httplog ---> tcplog
     |
     | frontend www
-     	|	bind haproxy_www_public_IP:80
-     	|	default_backend wordpress-backend
+    |	bind haproxy_www_public_IP:80
+    |	default_backend wordpress-backend
     |
     | backend wordpress-backend
-     	|   balance roundrobin
-     	|	mode tcp
-     	|	server wordpress-1 wordpress_1_private_IP:80 check
-     	|	server wordpress-2 wordpress_2_private_IP:80 check
+    |   balance roundrobin
+    |	mode tcp
+    |	server wordpress-1 wordpress_1_private_IP:80 check
+    |	server wordpress-2 wordpress_2_private_IP:80 check
 
     - Enabling HAProxy Logging
     $ sudo vi /etc/rsyslog.conf
@@ -964,31 +965,31 @@
     | option  httplog
     |
     | frontend www
-     	|	bind haproxy_www_public_IP:80
+    |	bind haproxy_www_public_IP:80
     |	option http-server-close
-      |	acl url_wordpress path_beg /wordpress
-      |	use_backend wordpress-backend if url_wordpress
-     	|	default_backend web-backend
+    |	acl url_wordpress path_beg /wordpress
+    |	use_backend wordpress-backend if url_wordpress
+    |	default_backend web-backend
     |
     | backend web-backend
-     	|	server web-1 web_1_private_IP:80 check
+    |	server web-1 web_1_private_IP:80 check
     |
     | backend wordpress-backend   
     |	reqrep ^([^\ :]*)\ /wordpress/(.*) \1\ /\2
-     	|	server wordpress-1 wordpress_1_private_IP:80 check
+    |	server wordpress-1 wordpress_1_private_IP:80 check
     | 
     | listen stats :1936
-     	|	stats enable   
-     	|	stats scope www
-     	|	stats scope web-backend
-     	|	stats scope wordpress-backend
-     	|	stats uri /
-     	|	stats realm Haproxy\ Statistics
-     	|	stats auth haproxy:Pa$$W0rd  
+    |	stats enable   
+    |	stats scope www
+    |	stats scope web-backend
+    |	stats scope wordpress-backend
+    |	stats uri /
+    |	stats realm Haproxy\ Statistics
+    |	stats auth haproxy:Pa$$W0rd  
 
-    	$ sudo service haproxy reload
+    $ sudo service haproxy reload
 
-      http://haproxy\_www\_public\_ip:1936/ 
+    http://haproxy\_www\_public\_ip:1936/ 
 
     - Enabling HAProxy Logging 	
     $ sudo vi /etc/rsyslog.conf
@@ -1012,10 +1013,10 @@
     - Load Balancing web-1
     $ sudo vi /etc/haproxy/haproxy.cfg
     | backend web-backend
-     	|	server web-1 web_1_private_IP:80 check
-     	|	server web-2 web_2_private_IP:80 check
+    |	server web-1 web_1_private_IP:80 check
+    |	server web-2 web_2_private_IP:80 check
 
-    	$ sudo service haproxy reload
+    $ sudo service haproxy reload
 
     - Load Balancing wordpress-1
       Create Your Second Web Application Server : wordpress-2
@@ -1024,10 +1025,10 @@
 
     $ sudo vi /etc/haproxy/haproxy.cfg
     | backend wordpress-backend
-     	|	server wordpress-1 wordpress_1_private_IP:80 check
-     	|	server wordpress-2 wordpress_2_private_IP:80 check
+    |	server wordpress-1 wordpress_1_private_IP:80 check
+    |	server wordpress-2 wordpress_2_private_IP:80 check
 
-    	$ sudo service haproxy reload
+    $ sudo service haproxy reload
 
 ## Senario 9. HAproxy Load Balancer + SSL 
 
@@ -1051,30 +1052,30 @@
     | maxconn 2048  
     | tune.ssl.default-dh-param 2048
     | option forwardfor
-     	| option http-server-close
+    | option http-server-close
     |
     | frontend www-http
-     	|  bind haproxy_www_public_IP:80
-     	|  reqadd X-Forwarded-Proto:\ http
-     	|  default_backend www-backend
+    |  bind haproxy_www_public_IP:80
+    |  reqadd X-Forwarded-Proto:\ http
+    |  default_backend www-backend
     |
     | frontend www-https
-     	|	bind haproxy_www_public_IP:443 ssl crt /etc/ssl/private/example.com.pem    <---!!!
+    |	bind haproxy_www_public_IP:443 ssl crt /etc/ssl/private/example.com.pem    <---!!!
     |	reqadd X-Forwarded-Proto:\ https
-     	|	default_backend www-backend
+    |	default_backend www-backend
     |
     | backend www-backend   
     |	redirect scheme https if !{ ssl_fc }
-     	|	server www-1 www_1_private_IP:80 check
+    |	server www-1 www_1_private_IP:80 check
     |	server www-2 www_2_private_IP:80 check
     | 
     | listen stats :1936
-     	|	stats enable   
-     	|	stats scope www
-     	|	stats scope www-backend
-     	|	stats uri /stats
-     	|	stats realm Haproxy\ Statistics
-     	|	stats auth haproxy:Pa$$W0rd  
+    |	stats enable   
+    |	stats scope www
+    |	stats scope www-backend
+    |	stats uri /stats
+    |	stats realm Haproxy\ Statistics
+    |	stats auth haproxy:Pa$$W0rd  
 
     $ sudo vi /etc/rsyslog.conf
     | $ModLoad imudp
@@ -1112,27 +1113,27 @@
     - Configure Apache to Use SSL
     $ sudo nano /etc/apache2/sites-available/default-ssl.conf
     |<IfModule mod_ssl.c>
-      |	<VirtualHost _default_:443>
-      |    	ServerAdmin admin@example.com                 					<-----
-      |    	ServerName your_domain.com										<-----
-      |    	ServerAlias www.your_domain.com									<-----
-      |    	DocumentRoot /var/www/html										<-----
-      |    	ErrorLog ${APACHE_LOG_DIR}/error.log
-      |    	CustomLog ${APACHE_LOG_DIR}/access.log combined
-      |    	SSLEngine on
-      |    	SSLCertificateFile /etc/apache2/ssl/apache.crt					<-----
-      |    	SSLCertificateKeyFile /etc/apache2/ssl/apache.key				<-----
-      |    	<FilesMatch "\.(cgi|shtml|phtml|php)$">
-      |                    SSLOptions +StdEnvVars
-      |    	</FilesMatch>
-      |    	<Directory /usr/lib/cgi-bin>
-      |                   SSLOptions +StdEnvVars
-      |    	</Directory>
-      |    	BrowserMatch "MSIE [2-6]" \
-      |                    nokeepalive ssl-unclean-shutdown \
-      |                    downgrade-1.0 force-response-1.0
-      |    	BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
-      |	</VirtualHost>
+    |	<VirtualHost _default_:443>
+    |    	ServerAdmin admin@example.com                 <-----
+    |    	ServerName your_domain.com										<-----
+    |    	ServerAlias www.your_domain.com								<-----
+    |    	DocumentRoot /var/www/html										<-----
+    |    	ErrorLog ${APACHE_LOG_DIR}/error.log
+    |    	CustomLog ${APACHE_LOG_DIR}/access.log combined
+    |    	SSLEngine on
+    |    	SSLCertificateFile /etc/apache2/ssl/apache.crt					<-----
+    |    	SSLCertificateKeyFile /etc/apache2/ssl/apache.key				<-----
+    |    	<FilesMatch "\.(cgi|shtml|phtml|php)$">
+    |                    SSLOptions +StdEnvVars
+    |    	</FilesMatch>
+    |    	<Directory /usr/lib/cgi-bin>
+    |                   SSLOptions +StdEnvVars
+    |    	</Directory>
+    |    	BrowserMatch "MSIE [2-6]" \
+    |                    nokeepalive ssl-unclean-shutdown \
+    |                    downgrade-1.0 force-response-1.0
+    |    	BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+    |	</VirtualHost>
     |</IfModule>
 
     - Activate the SSL Virtual Host

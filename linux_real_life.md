@@ -515,14 +515,14 @@ strace is a diagnistic tool for system calls that result in error will have thei
 
 ### How do I know my public IP in local machine?
 
-	  $ curl ipinfo.io/ip
-	  $ curl -s ipinfo.io/ip
-	  $ wget -qO- http://ipecho.net/plain ; echo
-	  $ dig +short myip.opendns.com @resolver1.opendns.com
+    $ curl ipinfo.io/ip
+    $ curl -s ipinfo.io/ip
+    $ wget -qO- http://ipecho.net/plain ; echo
+    $ dig +short myip.opendns.com @resolver1.opendns.com
 
 ### Get a list of all IP addresses on a LAN
 
-    $ ifconfig                             <---- one can extract ip from inet & broadcast
+    $ ifconfig                             <---- one can extract ip from inet & broadcast column
 
     $ netdiscover -r 192.168.1.0/24
     $ nmap -sP --unprivileged 192.168.1.0/24

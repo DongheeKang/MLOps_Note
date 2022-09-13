@@ -755,12 +755,12 @@
     | bind-address        = your_database_IP        : private IP
     $ sudo service mysql restart
 
-      $ mysql -u root -p
+    $ mysql -u root -p
       > CREATE DATABASE wordpress;
-    > CREATE USER 'wordpressuser'@'web_server_IP' IDENTIFIED BY 'password';
+      > CREATE USER 'wordpressuser'@'web_server_IP' IDENTIFIED BY 'password';
       > GRANT SELECT,DELETE,INSERT,UPDATE ON wordpress.* TO 'wordpressuser'@'web_server_ip';
-    > FLUSH PRIVILEGES;
-    > exit
+      > FLUSH PRIVILEGES;
+      > exit
     $ mysql -u wordpressuser -p
 
     - Installation of MySQL-client, Nginx, PHP on WordPress 1 and 2 
@@ -782,7 +782,7 @@
     | listen = /var/run/php5-fpm.sock              : use socket
     $ sudo service php5-fpm restart
 
-      Configure Nginx  
+    Configure Nginx  
     $ sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/example.com
     $ sudo nano /etc/nginx/sites-available/example.com
     |server {
@@ -939,7 +939,7 @@
       wordpress-2 : second WordPress web application server
       web-1       : Nginx server
       web-2       : second Nginx web server 
-    mysql-1     : MySQL server connect with wordpress-backend
+      mysql-1     : MySQL server connect with wordpress-backend
 
     	web       : http://example.com/ 
       wordpress : http://example.com/wordpress 

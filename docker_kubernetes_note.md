@@ -55,7 +55,7 @@ Container format
 
 ### Docker procedure
 
-Pulls the ubuntu image:
+1. Pulls the ubuntu image:
 
     Docker checks for the presence of the ubuntu image and,
     if it doesn’t exist locally on the host,
@@ -63,29 +63,29 @@ Pulls the ubuntu image:
     If the image already exists,
     then Docker uses it for the new container.
 
-Creates a new container:
+2. Creates a new container:
 
     Once Docker has the image, it uses it to create a container.
 
-Allocates a filesystem and mounts a read-write layer:
+3. Allocates a filesystem and mounts a read-write layer:
 
     The container is created in the file system and
     a read-write layer is added to the image.
 
-Allocates a network / bridge interface:
+4. Allocates a network / bridge interface:
 
     Creates a network interface that allows the Docker container
     to talk to the local host.
 
-Sets up an IP address:
+5. Sets up an IP address:
 
     Finds and attaches an available IP address from a pool.
 
-Executes a process that you specify:
+6. Executes a process that you specify:
 
     Runs your application,
 
-Captures and provides application output:
+7. Captures and provides application output:
 
     Connects and logs standard input, outputs and errors for you
     to see how your application is running.
@@ -348,6 +348,10 @@ https://www.dongheekang.com/linux/nginx-docker-container
       $ docker ps
       CONTAINER ID   IMAGE     COMMAND                  CREATED              STATUS              PORTS                               NAMES
       816532f135c8   server    "/docker-entrypoint.…"   About a minute ago   Up About a minute   0.0.0.0:80->80/tcp, :::80->80/tcp   nginx
+
+
+* Advanced
+      $ docker image pull nginx:alpine
 
 
 ### Docker setup for MongoDB

@@ -1,6 +1,5 @@
 # Linux Administration: Advanced
 
-
 ## Contents
 
   Virtualization and High Availability

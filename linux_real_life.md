@@ -511,6 +511,15 @@ strace is a diagnistic tool for system calls that result in error will have thei
   |  7100  |         | X-Font server port
   |  8080  |         | extended HTTP port
 
+
+
+### How do I know my public IP in local machine?
+
+	  $ curl ipinfo.io/ip
+	  $ curl -s ipinfo.io/ip
+	  $ wget -qO- http://ipecho.net/plain ; echo
+	  $ dig +short myip.opendns.com @resolver1.opendns.com
+
 ### Get a list of all IP addresses on a LAN
 
     $ ifconfig                             <---- one can extract ip from inet & broadcast
@@ -882,6 +891,13 @@ In DHCP server,  editing the configurations
       $ autossh [-V] [-M port[:echo_port]] [-f] [SSH_OPTIONS]
       $ autossh -X -L 5432:<DB server IP>:5432 -R 873:<local RSYNC server>:873 [user@]remote_ssh_server
       $ autossh -f [host]
+
+
+### Classical tunneling for SSH
+
+* Example!
+
+
 
 ### Linux TCP/IP Connections Limit
 the limits on the number of concurrent TCP connections
@@ -1718,6 +1734,7 @@ Uncomplicated Firewall(UFW)
     $ sudo systemctl start firewalld	      :start the service for the mean time
     $ sudo systemctl enable firewalld	      :enable the service to auto-start at boot time
 
+
 ### iptables
 iptables is a utility that allows a system administrator to configure the IP packet filter rules of the Linux kernel firewall filters connections based on user-defined rules
 
@@ -1784,7 +1801,6 @@ How to work?
         $ vi /etc/sysconf/iptables           : CentOS, Fedora   
 
 
-
 ### Obtaining an SSL certificate from the server
 * Use a browser Firefox or Chrome, find the PEM 
       
@@ -1810,6 +1826,7 @@ How to work?
 
       $ openssl s_client -showcerts -connect 172.64.104.34:443                               : this will not work
       $ openssl s_client -servername dongheekang.com -showcerts -connect 172.64.104.34:443   : need option --servername
+
 
 ### SSL/TLS authentication
     ==============================================================================================

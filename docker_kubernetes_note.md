@@ -287,6 +287,30 @@ our goal is to make the host and the containers (DB & API) share the same networ
 https://www.dongheekang.com/linux/nginx-docker-container
 
 
+### Anaylze Disk Usage of a Docker Container
+
+* Test setup first: two nginx docker containers
+
+      $ docker image pull nginx:alpine
+      $ docker container run --rm -it --name web-server-01 -d nginx:alpine
+      $ docker container run --rm -it --name web-server-02 -d nginx:alpine
+
+      - create and attch a volut to the container
+      $ docker volume create web-server-vol 
+      $ docker container run --rm -it --name web-server-03 -v web-server-vol:/shared-volume -d nginx:alpine
+
+      $ docker image list                  : 1      
+      $ docker container ls -a             : 3
+      $ docker volume list                 : 1
+
+      $ docker container ls --size
+
+      $ docker exec -it web-server-03 sh
+      docker03> cd shared-volume/
+      docker03> fallocate -l 2G sample-file.img        : create 2GB volume
+      docker03> exit
+
+      $ docker system df --verbose
 
 ### Docker error bind: address already in use
 * Scenario 1 : "address already in use" 

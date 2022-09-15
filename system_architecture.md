@@ -476,8 +476,8 @@
     $ sudo service haproxy restart
 
     $ curl 127.0.0.1                        <---fail
-    $ curl load_balancer_public_IP			<---fail
-    $ curl load_balancer_private_IP			<---fail
+    $ curl load_balancer_public_IP			    <---fail
+    $ curl load_balancer_private_IP			    <---fail
 
     - Keepalived on both Load Balancers
     $ sudo apt-get install build-essential libssl-dev
@@ -535,7 +535,7 @@
     |vrrp_instance VI_1 {
     |	interface eth1
     |	state BACKUP                            <----- 
-    |	priority 100							<-----  
+    |	priority 100							              <-----  
     |	virtual_router_id 33
     |	unicast_src_ip secondary_private_IP     <----- 
     |	unicast_peer {

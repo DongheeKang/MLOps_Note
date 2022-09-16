@@ -600,6 +600,7 @@ For Nginx, one can deal port!
     $ nc -vz $IP $PORT_STEALTH                          : need to ctrl+c in order to stop
     $ telnet $IP $PORT_OPEN
     $ curl $IP:$PORT_OPEN
+    
 ### How to kill running on a specific port?
 
 creat three processes using port 9999 and the protocols SCTP, TCP, and UDP respectively.

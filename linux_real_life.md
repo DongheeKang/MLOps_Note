@@ -709,8 +709,17 @@ by default the timeout is 2 minutes.
       nameserver 8.8.8.8
       nameserver 8.8.4.4
 
+* systemd-resolve / avahi
+
   systemd-resolve or avahi should be an optionl choice instead of resolv.conf!
   https://www.baeldung.com/linux/resolve-conf-systemd-avahi
+
+      $ vi /etc/systemd/resolved.conf.d/dns_servers.conf
+      $ vi /etc/systemd/resolved.conf.d/configured.conf
+      $ vi /etc/systemd/resolved.conf
+
+      $ sudo systemctl start systemd-resolved.service
+      $ sudo systemctl enable systemd-resolved.service
 
 
 * Security
@@ -772,6 +781,16 @@ by default the timeout is 2 minutes.
 
       $ arp -a
 
+
+### How do I find if there is a rogue DHCP server on my network
+
+      $ sudo dhclient -v
+      $ ifconfig | grep "inet"
+
+      $ nmap -sV --allports -T4 192.x.x.x
+      $ sudo nmap --script broadcast-dhcp-discover -e eth0 
+
+      $ sudo nmap -sV --allports -T4 192.168.x.x
 
 ### Multiple DHCP servers on the network
 
@@ -1453,12 +1472,36 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
       $ sudo tc qdisc add dev eth0 root netem rate 10Mbit
       $ iperf3 -c 172.18.0.3 -p 8080
 
+### Network bonding: multiple network interfaces
+
+      check if the bonding kernel module is available
+      $ lsmod | grep bond
+        bonding               196608  0
+
+      if bonding is not existed, do this
+      $ sudo modprobe bonding
+
+      check network interfaces
+      $ sudo lshw -short -c network
+        H/W path   Device   Class     Description
+        =======================================================
+        /0/100/3   enp0s3   network   82540EM Gigabit Ethernet Controller
+        /0/100/8   enp0s8   network   82540EM Gigabit Ethernet Controller
+
+
+      Bonding With systemd-networkd
+      $ systemctl status NetworkManager
+
+   
+
+
 ### Monitoring Network Usage in Linux (extended)
 
       $ nload
       $ speedometer
       $ iftop
       $ nethogs
+      $ wireshark
 
 ### Wireless information
 * standard command
@@ -1751,7 +1794,7 @@ Keywords
 * targets 
 
       ACCEPT, DROP, REJECT
-    
+      Comparison: https://www.baeldung.com/linux/iptables-reject-vs-drop
 
 How to work? 
 * To look up first:
@@ -1766,22 +1809,33 @@ How to work?
 * To drop all packets from a particular IP:
 
       $ iptables -A INPUT -s 10.1.2.3 -j DROP
+      -A INPUT: we’re interested in the incoming traffic.
+      -s option : a source IP address that we’re interested in
 
 * To block all connections from the IP address 10.10.10.10.
 
-      $ iptables -A INPUT -s 10.10.10.10 -j DROP
+      $ iptables -A INPUT -s 10.10.10.10 -j DROP          
 
 * To block a specific port:
 
       $ iptables -A INPUT -p tcp --dport ssh -s 10.10.10.10 -j DROP
+      -p: icmp part was for examining ICMP packets
+
+* For multiple sources 
+      $ iptables –A INPUT –s 192.16.22.41,192.16.22.43 –p icmp –j REJECT
+      $ iptables –A INPUT –s 192.16.22.40/30 –p icmp –j REJECT   
+      : specified the IP addresses 192.16.22.40 to 192.16.22.43 by 192.16.22.40/30
 
 * To drop all packets to a specific port:
 
       $ iptables -A INPUT -p tcp --dport 8080 -s 10.1.2.3 -j DROP
-
+       
 * To drop all packets on a particular protocol:
 
       $ iptables -A INPUT -p tcp --dport 22 -j DROP
+
+* To remove rule we had applied before on server
+      $ iptables –D INPUT –s 192.39.59.17 –j REJECT            : -D  option! 
 
 * To change policy:
 
@@ -1789,13 +1843,28 @@ How to work?
       $ iptables --policy OUTPUT ACCEPT   (accept, drop, reject)
       $ iptables --policy FORWARD ACCEPT  (accept, drop, reject)
 
-* Saving IP Tables Rules
+* -m option with ipset
 
-      $ /sbin/iptables-save                : debian case
-      $ /sbin/service iptables save        : CentOS, Fedora
-      $ /etc/init.d/iptables save 
+      extends iptables for using several packet matching modules
 
-* Firewall rules 
+      $ ipset create my_ip_set iphash              : create ipset
+      $ ipset add my_ip_set 192.16.22.41           : add IP addresses to the se
+      $ ipset add my_ip_set 192.16.22.43
+      $ iptables –D INPUT –s 192.16.22.41,192.16.22.43 –p icmp –j REJECT
+      $ iptables –A INPUT –p icmp –m set –-match-set my_ip_set src –j REJECT
+      $ iptables –A INPUT –p icmp –m iprange –-src-range 192.16.22.41-192.16.22.43 –j REJECT
+
+
+
+
+Saving IP Tables Rules, 
+
+    $ /sbin/iptables-save                : debian case, this is command
+    $ /sbin/service iptables save        : CentOS, Fedora 
+    $ /etc/init.d/iptables save 
+
+
+Firewall rules with iptables
 
         $ vi /etc/iptables/rules             : debian, ubuntu
         $ vi /etc/sysconf/iptables           : CentOS, Fedora   

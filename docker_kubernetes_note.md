@@ -193,7 +193,25 @@ Container format
   use VSCode with container mode, not in MacOS!
 
 
-### Docker Monitoring 
+
+### Running Docker without sudo
+* situtation
+
+      $ docker run hello-world  
+        ....
+        connect: permission denied. See 'docker run --help'
+
+      $ id donghee                         
+        uid=1000(donghee) gid=1001(example_group) groups=1001(example_group),27(sudo)     
+      $ group donghee
+
+      $ sudo groupadd docker
+      $ sudo usermod -aG docker donghee
+      $ su - donghee
+
+      $ docker run hello-world
+
+### Docker monitoring 
 
       $ docker ps -a
       $ docker inspect -f '{{.State.Status}}' mycontainer
@@ -342,6 +360,10 @@ https://www.dongheekang.com/linux/nginx-docker-container
       $ docker run -itd -e POSTGRES_USER=donghee -e POSTGRES_PASSWORD=password \ 
                         -p 8080:5432 -v /data:/var/lib/postgresql/data \
                         --name postgresql-donghee postgres
+
+
+### Assigning a port mapping to a running docker container
+
 
 
 ### Docker Setup nginx server (2 ways)

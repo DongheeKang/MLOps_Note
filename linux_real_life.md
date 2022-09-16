@@ -512,7 +512,6 @@ strace is a diagnistic tool for system calls that result in error will have thei
   |  8080  |         | extended HTTP port
 
 
-
 ### How do I know my public IP in local machine?
 
     $ curl ipinfo.io/ip
@@ -559,8 +558,8 @@ For Nginx, one can deal port!
     options (netstat & ss)
     -------------------------------------------
     l: show only listening sockets
-    t: show TCP connections/sockets
-    n: display the numeric port number
+    t: filter TCP connections/sockets
+    n: displays the port numbers
     u: show UDP connections
     p: show process id/program name
     -------------------------------------------
@@ -574,12 +573,33 @@ For Nginx, one can deal port!
 
 ### Port scanning for UDP
 
-    $ nmap -sU -v 172.16.38.137
-    $ nc -vz -u 8.8.8.8 443
+    $ nmap -sU -v 172.16.38.137                      : - sU option specifies a UDP scan
+    $ nc -vz -u 8.8.8.8 443                          : -u specify UDP -z send empty packet
 
-    $ iperf3 -s
-    $ iperf3 -u -c 172.16.38.137
+    $ iperf3 -s                                      : -s server on the server side
+    $ iperf3 -u -c 172.16.38.137                     : -u specify UDP on the client side
 
+### How to ping a specific port? 
+
+    $ ssh -Y -C root@x.x.x.x
+    
+    root@TestGRC:~# export XAUTHORITY=$HOME/.Xauthority
+    root@TestGRC:~# firefox -no-remote https://www.grc.com/
+
+    then open a https://www.grc.com/port_111.htm                 : profiling 
+
+    $ IP=78.141.212.157                     : testing machine's IP
+    $ PORT_OPEN=22
+    $ PORT_CLOSED=111
+    $ PORT_STEALTH=137
+
+    $ nmap -p $PORT_OPEN,$PORT_CLOSED,$PORT_STEALTH $IP
+    $ nping -p $PORT_OPEN,$PORT_CLOSED,$PORT_STEALTH $IP
+    $ nc -vz $IP $PORT_OPEN
+    $ nc -vz $IP $PORT_CLOSED
+    $ nc -vz $IP $PORT_STEALTH                          : need to ctrl+c in order to stop
+    $ telnet $IP $PORT_OPEN
+    $ curl $IP:$PORT_OPEN
 ### How to kill running on a specific port?
 
 creat three processes using port 9999 and the protocols SCTP, TCP, and UDP respectively.
@@ -639,6 +659,26 @@ by default the timeout is 2 minutes.
 
     TIME-WAIT: the process closed the connection, and the port is waiting for a timeout without any process using it.
 
+### Make Apache Web Server listen on two different ports
+
+      $ vi /etc/apache2/ports.conf
+        ...
+        Listen 80
+        Listen 8888 
+        ...
+        <IfModule ssl_module>
+        ...
+
+      for virtual host
+      $ vi /etc/apache2/sites-enabled/000-default.conf
+        <VirtualHost *:80 *:8888> 
+        ... 
+        </VirtualHost> 
+        ...
+
+      $ sudo service apache2 restart
+      $ sudo netstat -nltp | grep apache
+
 ### Domain Name System (DNS)
 * working principle: resolves domain names to IP addresses
 
@@ -661,7 +701,7 @@ by default the timeout is 2 minutes.
       $ cat /etc/hosts                              
       $ cat /etc/hostname
       $ cat /etc/hosts.conf
-      $ cat /etc/nsswitch.conf  | grep hosts       : the priority of DNS lookup      
+      $ cat /etc/nsswitch.conf  | grep hosts       : to setup the priority of DNS lookup      
       $ cat /etc/resolv.conf
 
 * etc/hosts: highest priority
@@ -674,20 +714,21 @@ by default the timeout is 2 minutes.
       $ vi /etc/dnsmasqd.conf
         address=/localhost.com/127.0.0.1
 
-      $ curl localhost
+      $ curl localhost                    : Using localhost as the domain
       $ curl a.localhost
 
 * /etc/resolv.conf
       $ cat /etc/resolv.conf
-      nameserver 192.168.204.231
-      nameserver 192.168.154.6
-      nameserver 2c0f:fe38:2405:41a3::77
+        nameserver 192.168.204.231
+        nameserver 192.168.154.6
+        nameserver 2c0f:fe38:2405:41a3::77
+
 
 * DNS Testing
 
       $ host                       : to get host information from name server
       $ nslookup dongheekang.com   : tool to ask host information from name server
-      $ dig  dig dongheekang.com   : after finish DNS configuration, one can test DNS
+      $ dig dongheekang.com        : after finish DNS configuration, one can test DNS
       $ whois                      : a program to find domain holder
       $ getent                     : a tool for carry out the database of administrator
       $ rndc                       : name server control utility for BIND
@@ -705,7 +746,7 @@ by default the timeout is 2 minutes.
 
   after starting resolvconf then add nameserver into the configuration file. 
 
-      $ sudo vi /etc/resolvconf/resolvconf.d/head
+      $ sudo vi /etc/resolv.conf/resolvconf.d/head
       nameserver 8.8.8.8
       nameserver 8.8.4.4
 
@@ -826,7 +867,7 @@ In DHCP server,  editing the configurations
       https://www.linux.com/topic/networking/advanced-dnsmasq-tips-and-tricks/
 
 
-### SSH Tunneling and Proxying
+### SSH Proxying
 
 * Server side configuration: sshd
 
@@ -917,8 +958,7 @@ In DHCP server,  editing the configurations
 * Example!
 
 
-
-### Linux TCP/IP Connections Limit
+### Linux TCP/IP connections Limit
 the limits on the number of concurrent TCP connections
 
 via Kernel-Level
@@ -1071,8 +1111,8 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
 
 * Server
 
-      $ iperf -s 
-      $ iperf -s -u -p 5003                 : let'S make the server use UDP and listen on port 5003
+      $ iperf -s                            : -s (server) option
+      $ iperf -s -u -p 5003                 : -u specify the server use UDP and listen on port 5003
 
 * Client: 
       
@@ -1223,12 +1263,16 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
       $ ping 100.1.1.100
       $ tcpdump -i enp8s0 host 100.1.1.100 -n 
 
-* MAC address access via ip
+###  Resolving MAC address from IP address in linux
+
+      $ ip a 
+      $ arp -a            :  address resolution protocol(arp) one can access MAC address in local network
 
       $ ip neighbour show
-      $ arp -a                     :  address resolution protocol(arp) using IP one can access MAC address
-
-
+        172.16.187.2 dev ens160 lladdr 00:50:56:f3:ce:92 STALE                     : gateway node
+        172.16.187.129 dev ens160 lladdr 00:0c:29:02:d4:5a REACHABLE               : host in our LAN
+      $ ip route                       : only retrieve MAC addresses in local network
+        
 ### Configure network settings using network manager in Linux
 * nmcli
 
@@ -1396,14 +1440,22 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
         [...]
 
 * telnet
+      
+      For debian
+      $ sudo systemctl status inetd
+      $ sudo systemctl enable inetd
+      $ sudo ufw allow 23/tcp
+      $ sudo ufw reload
+      $ sudo useradd telnet
+      $ sudo passwd telnet
 
-      $ telnet impa.lpic.de 143          <--- telnet also possible for checking port connection! this is a great tip!
       $ telnet -l donghee 5.182.18.49
 
-
+      tip!
+      $ telnet impa.lpic.de 143    <--- telnet also possible for checking port connection! this is a great 
 ### Connectivity test (standard)
 
-      $ ping -c 1 141.1.1.1
+      $ ping -c 1 141.1.1.1                        : -c to specify the count (number of packet requests)
       $ ping6 ::1
 
       $ traceroute   www.xxxx.com
@@ -1414,7 +1466,6 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
       $ nmap                   : port scanning and defending networks
       $ lsof /tmp              : prozesse, die auf einen Netzwerk-Socket zugreifen
       $ tcpdump -i eth0        : show network flow into the screen using dump
-
 
 ### How to sort processes by network usage on linux
 
@@ -1474,6 +1525,8 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
 
 ### Network bonding: multiple network interfaces
 
+* check interface and inactive NetworkManager
+
       check if the bonding kernel module is available
       $ lsmod | grep bond
         bonding               196608  0
@@ -1488,14 +1541,70 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
         /0/100/3   enp0s3   network   82540EM Gigabit Ethernet Controller
         /0/100/8   enp0s8   network   82540EM Gigabit Ethernet Controller
 
-
-      Bonding With systemd-networkd
+      Instead of NetworkManager, we can use the systemd-networkd
       $ systemctl status NetworkManager
+      $ systemctl disable NetworkManager
+      $ systemctl status NetworkManager-wait-online
+      $ systemctl disable NetworkManager-wait-online
 
-   
+* Using systemd-networkd 
+      Bonding With systemd-networkd 
+      $ systemctl enable systemd-networkd-wait-online
+      $ systemctl enable systemd-networkd 
+      $ ls -1 /etc/systemd/network
+      10-nd-bond.network
+      20-enp0s3.network
+      20-nd-bond.netdev
+      30-enp0s8.network
+      99-dhcp.network
 
+      Need modify 
+      $ cat 20-nd-bond.netdev
+        [NetDev]
+        Name=nd-bond
+        Kind=bond
+        [Bond]
+        Mode=active-backup
+        PrimaryReselectPolicy=always
+        IIMonitorSec=1s
+      $ cat 10-nd-bond.network
+        [Match]
+        Name=nd-bond
+        [Network]
+        DHCP=yes
+      $ cat 30-enp0s8.network
+        [Match]
+        Name=enp0s3
+        [Network]
+        Bond=nd-bond
+        PrimarySlave=true
+      $ cat 30-enp0s8.network
+        [Match]
+        Name=enp0s8
+        [Network]
+        Bond=nd-bond
+      $ cat 99-dhcp.network
+        [Match]
+        Name=enp0*
+        [Network]
+        DHCP=yes
 
-### Monitoring Network Usage in Linux (extended)
+      $ networkctl          <---------- check network service
+      $ sudo ip link set enp0s8 down
+      $ networkctl          
+
+        IDX LINK    TYPE     OPERATIONAL      SETUP     
+        1 lo        loopback carrier          unmanaged
+        2 enp0s3    ether    enslaved         configured
+        3 enp0s8    ether    off              configured
+        4 nd-bond   bond     degraded-carrier configured
+
+* optinal 
+      
+      Using nmtui or netplan
+      https://www.baeldung.com/linux/network-bonding
+
+### Monitoring network usage in linux (extended)
 
       $ nload
       $ speedometer
@@ -2213,6 +2322,8 @@ you have a service as like java/python application, do registering and then runn
 
       $ crontab -e
         30 10 * * 1-5 /usr/bin/systemctl restart my-service.service
+
+
 
 
 

@@ -600,7 +600,7 @@ For Nginx, one can deal port!
     $ nc -vz $IP $PORT_STEALTH                          : need to ctrl+c in order to stop
     $ telnet $IP $PORT_OPEN
     $ curl $IP:$PORT_OPEN
-    
+
 ### How to kill running on a specific port?
 
 creat three processes using port 9999 and the protocols SCTP, TCP, and UDP respectively.
@@ -956,7 +956,29 @@ In DHCP server,  editing the configurations
 
 ### Classical tunneling for SSH
 
-* Example!
+- Standard
+  hohup
+  ssh -g -L 27017:147.204.68.148:27017 -f -N User@jumphost
+
+  telnet localhost 27017
+  telnet> quit
+
+- For opennebula
+  ssh -f -N opennebula_user@capacity-monitoring.public.infra.hybris.com -L 12633:opennebula.sin.hybris.com:2633
+
+- For HCM Mongo Testen
+  Mongo 147.204.68.148:27017
+  EMEA6      mo-cf345a9e2     10.97.178.61
+  DevAdapter mo-d41926cf9     10.173.74.131
+  ssh -L 27017:147.204.68.148:27017 -f -N c5258293@mo-cf345a9e2.mo.sap.corp
+
+- For VMware Testen
+  EMEA5      mo-2f62a050c     10.97.150.83
+  DevAdapter mo-d41926cf9     10.173.74.131
+  ssh -g -L 50050:10.248.41.226:443 -f -N c5258293@mo-2f62a050c.mo.sap.corp
+
+- For HANA IDP
+  ssh -g -L 30015:itoaidpcl.zone1.mo.sap.corp:30015 -f -N c5257229@mo-cf345a9e2 (someone already use)
 
 
 ### Linux TCP/IP connections Limit

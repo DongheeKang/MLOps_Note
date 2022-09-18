@@ -1366,14 +1366,16 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
       $ nmcli connection down my_ethernet
       $ nmcli connection up my_ethernet
 
-### Netwrok interface configuration
+### Configuring netwrok interface
 
-* command set
+* check 
 
-      $ ifconfig
-      $ ifup
-      $ ifdown
-      $ brctl show
+      $ ls /sys/class/net
+        eth0 lo wlan0 
+      $ ip link 
+      $ ip addr
+      $ ifconfig -a                    : see more ifconf session 
+      $ brctl show    
 
 * configurations
 
@@ -1390,18 +1392,26 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
 
       $ vi /etc/network/interfaces
       |auto eth0
-      |iface eth0 inet dhcp
+      |iface eth0 inet dhcp             
       |sudo ifup eth0
-
       |auto eth0:0
       |iface eth0:0 inet static
-      |address ABC.DEF.GHI.JKL
-      |netmask 255.255.255.255
-      |network ABC.DEF.GHI.0
-      |broadcast ABC.DEF.GHI.JKL
-      |gateway 10.255.255.1
+      |  address ABC.DEF.GHI.JKL
+      |  netmask 255.255.255.255
+      |  network ABC.DEF.GHI.0
+      |  broadcast ABC.DEF.GHI.JKL
+      |  gateway 10.255.255.1
+      
+      $ vi /etc/network/interfaces
+      |auto eth0
+      |iface eth0 inet static
+      |  address 192.168.1.100
+      |  netmask 255.255.255.0
+      |  gateway 192.168.1.1
+      |dns-nameservers 8.8.8.8 8.8.4.4
+      |pre-up /usr/local/sbin/start-iptables.sh
+      |post-up /usr/local/sbin/backup-log.sh
 
-      $ /etc/init.d/networking restart
 
 * Netzwerkkonfiguration CentOS
 
@@ -1421,6 +1431,17 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
       |ONBOOT=yes
       |NM_CONTROLLED=no
 
+
+* enable or unable
+
+      $ sudo ifdup eth0
+      $ sudo ifdown eth0
+
+
+* if /etc/network/interface file is empty, then no service with network manager
+
+      $ sudo systemctl stop NetworkManager.service
+      $ sudo systemctl disable NetworkManager.service
 ### Network command set with options
 
 * ifconfig

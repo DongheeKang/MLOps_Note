@@ -222,7 +222,6 @@ strace is a diagnistic tool for system calls that result in error will have thei
 
 
 
-
 <br/><a name="Users"></a>
 
 # User Management
@@ -305,11 +304,14 @@ strace is a diagnistic tool for system calls that result in error will have thei
 
     $ ldd /bin/bash      
 
+### How to change the default home directory of a user
 
-### How to Change the Default Home Directory of a User
+    As a default one can create user in /home/ 
+    $ sudo useradd -d /home/kang -m kang         : -m for user -d for directory
 
-    $ sudo useradd -m dongheekang   
-    $ sudo useradd -m -d /home/dongheekang dongheekang
+    $ sudo useradd -m donghee                           
+    $ sudo useradd -m -d /home/dongheekang donghee      
+    $ sudo passwd kang
 
     move the existing content to the new location, has to use -m option 
     $ sudo usermod -m -d /usr/dongheekang dongheekang
@@ -332,7 +334,6 @@ strace is a diagnistic tool for system calls that result in error will have thei
       only user print out! 
       $ cut -d: -f1 /etc/group
 
-
 * getent
 
       $ getent group
@@ -353,6 +354,43 @@ strace is a diagnistic tool for system calls that result in error will have thei
       $ id -Gn
       $ id -Gn root
 
+### How to change password for other user account?
+
+      only with super user
+      $ su -
+
+      check password of user first 
+      $ getent passwd | grep donghee
+      $ passwd donghee    
+      $ passwd -V donghee                 : to view password status
+
+      *** this is important!           
+      $ sudo passwd           : if passwd with no specified user, then will change password for root
+### Forcing user to change password at their next login
+
+      Let us immediately expire an account’s password
+
+      $ sudo passwd -e donghee
+      $ sudo passwd --expire donghee
+### Extend expire date of user
+
+      $ usermod -e 2025-09-01 user
+### Lock and unlock of user    
+
+      $ usermod -L user
+      $ usermod -U user 
+
+### Change account’s username
+
+      $ usermod -l old new
+
+### create a user group and add one user into
+
+    $ sudo addgroup administrator
+    $ sudo adduser donghee administrator
+### Add user to sudo group
+
+    $ sudo usermod -aG sudo donghee
 
 ### Fixing the “Command Not Found” Error When Using Sudo 
   
@@ -364,20 +402,6 @@ strace is a diagnistic tool for system calls that result in error will have thei
 
       $ sudo -E myscript
 
-### Modify user 
-
-* Update Account’s Username
-
-      $ usermod -l old new
-
-* to lock and unlock    
-
-      $ usermod -L user
-      $ usermod -U user 
-      
-* to extend expire date
-
-      $ usermod -e 2025-09-01 user
 
 
 <br/><a name="Networking"></a>
@@ -836,13 +860,13 @@ by default the timeout is 2 minutes.
 
 ### Multiple DHCP servers on the network
 
-procedure
+* procedure
 
       1. Create subnetworks: : Each subnetwork has its own DHCP server.
       2. Create a failover configuration: Main and standby server 
       3. Split the address pools between multiple DHCP servers: 
 
-In DHCP server,  editing the configurations
+* editing the configurations in DHCP server
 
       $ vi /etc/dhcp/dhcpd.conf
       subnet 239.252.197.0 netmask 255.255.255.0 {
@@ -956,30 +980,48 @@ In DHCP server,  editing the configurations
 
 ### Classical tunneling for SSH
 
-- Standard
-  hohup
-  ssh -g -L 27017:147.204.68.148:27017 -f -N User@jumphost
+* SSH
 
-  telnet localhost 27017
-  telnet> quit
+      - background
+      $ nohup
 
-- For opennebula
-  ssh -f -N opennebula_user@capacity-monitoring.public.infra.hybris.com -L 12633:opennebula.sin.hybris.com:2633
+      - from local:27107 to 147....148:27017 
+      $ ssh -g -L 27017:147.204.68.148:27017 -f -N User@jumphost
+      $ ssh -f -N opennebula_user@hybris.com -L 12633:opennebula.sin.hybris.com:2633
 
-- For HCM Mongo Testen
-  Mongo 147.204.68.148:27017
-  EMEA6      mo-cf345a9e2     10.97.178.61
-  DevAdapter mo-d41926cf9     10.173.74.131
-  ssh -L 27017:147.204.68.148:27017 -f -N c5258293@mo-cf345a9e2.mo.sap.corp
+      - access with tunneling port
+      $ telnet localhost 27017
+      telnet> quit
 
-- For VMware Testen
-  EMEA5      mo-2f62a050c     10.97.150.83
-  DevAdapter mo-d41926cf9     10.173.74.131
-  ssh -g -L 50050:10.248.41.226:443 -f -N c5258293@mo-2f62a050c.mo.sap.corp
+      - For HCM Mongo Testen
+      Mongo      147.204.68.148:27017
+      EMEA6      mo-cf345a9e2     10.97.178.61
+      $ ssh -L 27017:147.204.68.148:27017 -f -N c5258293@mo-cf345a9e2.mo.sap.corp
 
-- For HANA IDP
-  ssh -g -L 30015:itoaidpcl.zone1.mo.sap.corp:30015 -f -N c5257229@mo-cf345a9e2 (someone already use)
+      - For VMware Testen
+      Vmware     10.248.41.226:443
+      EMEA5      mo-2f62a050c     10.97.150.83
+      $ ssh -g -L 50050:10.248.41.226:443 -f -N c5258293@mo-2f62a050c.mo.sap.corp
 
+      - N : port forwarding
+      - f : set the ssh in the background before executing any command
+      - g : listening port remains available for other network connections and is not restricted to connections originating in the localhost
+
+* ncat
+
+      $ ncat -l -p 8001 -c "ncat 127.0.0.1 8000"
+      $ ncat -l -p 8001 -c "ncat localhost 8000"
+      $ ncat -k -l -p 8001 -c "ncat localhost 8000"
+
+      - l : to listen for incoming connections
+      - p : to specify the source port to be used
+      - k : to keep it running
+
+* socat
+
+      $ socat tcp-listen:8001 tcp:localhost:8000
+      $ socat tcp-listen:8001,reuseaddr,fork tcp:localhost:8000
+      $ socat tcp-listen:8001,reuseaddr,fork tcp:localhost:8000 &
 
 ### Linux TCP/IP connections Limit
 the limits on the number of concurrent TCP connections
@@ -1454,13 +1496,15 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
 
   Network Mapper (shortened to nmap) is a network exploration tool
 
-      $ nmap -p $PORT_OPEN,$PORT_CLOSED,$PORT_STEALTH $IP
+      $ nmap -p $PORT $IP
         [...]
         PORT    STATE    SERVICE
         22/tcp  open     ssh
         111/tcp closed   rpcbind
         137/tcp filtered netbios-ns
         [...]
+      
+      https://www.tecmint.com/nmap-command-examples/
 
 * telnet
       
@@ -1490,6 +1534,35 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
       $ lsof /tmp              : prozesse, die auf einen Netzwerk-Socket zugreifen
       $ tcpdump -i eth0        : show network flow into the screen using dump
 
+### mtr
+
+    mtr is used to analyze the network traffic hop-to-hop using ICMP packets 
+    traceroute and ping
+    
+    $ sudo apt-get install -y mtr
+
+    $ mtr -t donghee.com
+      myhome (192.168.0.7)                          2022-06-08T01:41:48+0700
+      Keys:   Help   Display mode   Restart statistics   Order of fields   quit
+                                     Packets           Pings
+      Host                                Loss% Snt Last Avg  Best Wrst StDev
+      1. _gateway                         0.0%  21  4.8  4.7  3.3  12.0 1.9
+      2. 11.68.93.1                       0.0%  21  12.9 14.5 11.9 22.2 2.7
+      3. bex-0005-pele.fast.net.id        0.0%  21  19.4 17.6 14.3 27.3 3.5
+      4. bex-0005-pele.fast.net.id        0.0%  21  21.9 18.2 13.6 33.7 5.0
+      5. fm-dyn-www-73-22-333.fast.net.id 0.0%  21  16.9 19.1 15.6 35.4 4.9
+      6. fm-dyn-www-136-22-333.fast.net.i 0.0%  20  24.1 20.5 16.0 41.9 5.8
+      7. 172.66.40.248                    0.0%  20  16.2 17.4 14.6 22.8 2.3
+
+    $ mtr -o 'SA' -t donghee.com              : this will show Snt & Avg columns
+    $ mtr -m 3 -t donghee.com                 : maximum hops 3
+    $ mtr -i 10 -t donghee.com                : slow down the packets by 10 times
+    $ mtr -f 3 -t donghee.com                 : filter out the first two hops
+    $ mtr -T -t donghee.com                   : TCP
+    $ mtr -u -t donghee.com                   : UDP
+    $ mtr -r -c 15 donghee.com                : report mode with sending packets 15
+
+
 ### How to sort processes by network usage on linux
 
 * nethogs
@@ -1509,6 +1582,76 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
       $ sudo iftop -i eth0              : sorts the connections per usage wise
       $ sudo iftop -p                   : to view the port number
 
+### Monitor internet bandwidth usage on Linux
+
+* vnstat
+
+      $ systemctl enable --now vnstat
+      $ systemctl status vnstat
+      $ vnstat                      : statistics from the last two months and for each interface
+      $ vnstat -d                   : -h, -d, -m, and -y  for certain time periods, daily                 
+      $ vnstat -d -i eth0           : daily basis of eth0 interface      
+
+      $ vnstati -m -i eth0 -o monthly.png     : can be generated an image!
+      $ vnstati -vs -i eth0 -o summary.png
+
+      Let’s write a bash script to alert when the transmitted bandwidth usage exceeds a 1 TiB limit
+      #!/bin/bash
+      if ! vnstat -i eth0 --alert 0 3 monthly tx 1 TiB; then
+          # The eth0 interface exceeded the 1 TiB transmitted limit
+          # We can send an email to alert us
+      fi
+
+* Using the /proc/net/dev File
+      
+      $ cat /proc/net/dev
+      $ awk '/^\s*eth0:/ {
+            RX=$2/1024/1024
+            TX=$10/1024/1024
+            TOTAL=RX+TX
+            print "RX:", RX, "MiB\nTX:", TX, "MiB\nTotal:", TOTAL, "MiB"
+        }' /proc/net/dev
+        RX: 2453.29 MiB
+        TX: 129.875 MiB
+        Total: 2583.16 MiB
+      
+      #!/bin/bash
+      LOG=/var/log/bandwidth_usage_$(date +%Y%m).csv
+      echo -n "$(date --rfc-3339=date)," >> $LOG
+      awk '/^\s*eth0:/ {
+          RX=$2/1024/1024
+          TX=$10/1024/1024
+          TOTAL=RX+TX
+          print RX "," TX "," TOTAL
+      }' /proc/net/dev >> $LOG 
+      $ cat /var/log/bandwidth_usage_202207.csv 
+
+### Monitoring HTTP requests on a network interface in real time
+
+* tcpflow
+
+      $ sudo apt install tcpflow
+      $ ifconfig -a
+
+      $ sudo tcpflow -p -c -i wlp0s20f3 port 80 | grep -oE '(GET|POST) .* HTTP/1.[01]|Host: .*'
+
+      -p: disables promiscuous mode
+      -c: means only print the output to the console and don’t create files
+      -i: specifies the network interface
+
+* httpry
+
+      $ git clone https://github.com/jbittel/httpry.git
+      $ cd httpry
+      $ make
+      $ sudo make install
+      
+      $ sudo httpry -i wlp0s20f3
+      $ sudo httpry -i wlp0s20f3 -m post             : post 
+      $ sudo httpry -i wlp0s20f3 -o human.txt        : output 
+
+      $ sudo httpry -i wlp0s20f3 -b binary.o         : read as a binary
+      $ httpry -r binary.o                           : then can read by httpry
 ### Network failures simulation in Linux
 * tc (traffic control command-line tool) and qdisc (queuing discipline)
 
@@ -2167,8 +2310,6 @@ Firewall rules with iptables
 
 
   
-
-
 <br/><a name="Service"></a>
 
 # Service
@@ -2354,12 +2495,89 @@ you have a service as like java/python application, do registering and then runn
 
 # Utility
 
+### touch to change create date
+
+     $ touch -d tomorrow test             : 
+     $ touch -d '1 day ago' test          : 
+     $ touch -d '5 years ago' test        : 
+     $ touch test{1..10}                  : 
+
+     $ touch -t YYMMDDHHMM fileName       :  set the timestamp 
+     $ touch -r file2 file1               :  file2 is updated with the time stamp of file1
+
+### truncate
+
+     $ cp original.output backup.output
+     $ truncate -s 0 original.output
+     $ cat backup.output > original.output
+
+### sftp, scp, rsync
+
+    $ sftp username@your_server_ip_or_remote_hostname 
+    $ sftp -oPort=custom_port username@your_server_ip_or_remote_hostname
+
+    $ scp -P 22 [user@]SRC_HOST:]file1 [user@]DEST_HOST:]file2
+    $ scp file.txt donghee@ip_address_of_remote:/remote/directory
+    $ scp -i ~/.ssh/donghee.pem ubuntu@ec2-52-57-133-64.eu-central-1.compute.amazonaws.com:~/data/
+
+     -r: Recursively copy entire directories
+
+    1.scp transfer
+      If I want to file transfer From CERN location to Freiburg:
+      1.With CERN machine
+      scp * donghee@axfr01.physik.uni-freiburg.de:/users/donghee/tmp/
+      scp * donghee@pcfr38.physik.uni-freiburg.de:~/tmp/
+      scp mc/Aroma/a.f donghee@pcfr38.physik.uni-freiburg.de:~/tmp/
+      scp ~/mc/Aroma/* donghee@pcfr38.physik.uni-freiburg.de:~/tmp/
+      2.With Freiburg machine
+      scp donghee@lxplus.cern.ch:/afs/cern.ch/user/d/donghee/mc/aroma/*.* .
+      scp donghee@lxplus.cern.ch:~/mc/aroma/*.* .
+
+    2.scp transfer
+      scp -P24 User14.cc donghee@compass.fzk.de:/grid/fzk.de/cvs/User14.cc
+      From local to Gridka
+      scp -r -P24 AAAAAA donghee@compass.fzk.de:~/work/
+      From Gridka to local
+      scp -r -P22 AAAAAA donghee@lxplus.cern.ch:~/work/
+
+### rsync
+
+      rsync copy to minidisk per month!
+      $ sudo rsync --delete -avv /home/dkang/ /media/Linux/dkang/
+      $ sudo rsync --delete -avv /media/Data/Data/ /media/Window/Data/
+
+      copy to Memorystick only important and selected files! per weeks!
+      $ sudo rsync --delete --exclude data -avv /home/dkang/GSI/macro_dvcs/ /media/MEMORY/rsync/macro_dvcs/
+      $ sudo rsync --delete -avv /home/donghee/Desktop/ /media/MEMORY/rsync/Desktop/
+      $ sudo rsync --delete -avv /media/Data/Data/arbeits/analysis-GPDsDVCS/ /media/MEMORY/rsync/analysis-GPDsDVCS/
+      $ sudo rsync --delete -avv /media/Data/Data/document/HIM-GSI/ /media/MEMORY/rsync/HIM-GSI/
+      $ sudo rsync --delete -avv /media/Data/Data/vortrag/ /media/MEMORY/rsync/vortrag/
+
+      $ sudo rsync --delete --exclude GSI -avv /home/dkang/ /media/Linux/dkang/
+      $ sudo rsync --delete -avv /home/dkang/GSI/ /media/Linux/dkang/
+      (care about .VirtualBox/HardDisks, that are too heavy)
+
+      $ rsync -a /sc/sc32b/* .
+      $ rsync -a /sc/sc32b/* .
+### rssh
+
+      $ /usr/local/etc/rssh.conf
+      $ /etc/group
+      $ /etc/passwd
+
+### lpr
+
+      $ lpr -P color $1       - Color
+      $ lpr restart dl1       - Restart
+      $ cancel -Pdl1 669      - kill  ???
+      $ lpq -Pdl1             - job que
+      $ lprm -Pdl1 699        - kill
 
 
 
 <br/><a name="Filesystens"></a>
 
-# File systens
+# File systems
 
 ### Where disk space hss gone on linux
       
@@ -2401,6 +2619,28 @@ this is really nice tool for checking disk usage!
 <br/><a name="Files"></a>
 
 # Files & Directory 
+
+### permission and owner for directory
+
+      $ sudo chmod 755 directory
+
+      $ sudo chown -R user:group  directory
+      $ sudo chown -R kang:admin  backup_donghwa
+
+      chmod 755  :  chmod u=rwx,g=rx,o=rx
+
+      Symbolic:  rwx r-x r-x 
+      Decimal:    7   5   5 
+
+      chmod 666  :  chmod a=rw, read and write by everyone
+
+      chmod +x   :  chmod ugo+x
+      chmod a+x  :  chmod ugo+x  a=all
+
+      chmod u+x  :  Add excute permission to a file/directory for user
+      chmod u+X  :  Change execute permission only on the directories
+
+      chmod o-w  :  to remove the write permission for others
 
 ### “No such file or directory” error when executing a binary
 

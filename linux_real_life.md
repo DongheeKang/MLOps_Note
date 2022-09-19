@@ -1438,7 +1438,9 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
       $ sudo ifdown eth0
 
 
-* if /etc/network/interface file is empty, then no service with network manager
+* some tip
+      
+      if /etc/network/interface file is empty, then no service with network manager
 
       $ sudo systemctl stop NetworkManager.service
       $ sudo systemctl disable NetworkManager.service
@@ -2510,7 +2512,27 @@ you have a service as like java/python application, do registering and then runn
 
 
 
+### put the list for unbuntu library
+* legacy
 
+      $ vi /etc/apt/sources.list
+
+      deb http://security.ubuntu.com/ubuntu intrepid-security main
+      deb http://download.virtualbox.org/virtualbox/debian lucid non-free
+      deb http://archive.canonical.com/ lucid partner
+
+      $ sudo apt-get update
+
+* modern way
+
+      add
+      $ sudo add-apt-repository ppa:thomas-schiex/blender
+
+      remove
+      $ sudo add-apt-repository --remove ppa:thomas-schiex/blender
+      
+      fix for "command not found" by installing software-properties-common package
+      $ sudo apt install software-properties-common -y
 
 <br/><a name="Utility"></a>
 
@@ -2593,7 +2615,6 @@ you have a service as like java/python application, do registering and then runn
       $ cancel -Pdl1 669      - kill  ???
       $ lpq -Pdl1             - job que
       $ lprm -Pdl1 699        - kill
-
 
 
 <br/><a name="Filesystens"></a>

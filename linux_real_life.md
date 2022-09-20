@@ -568,7 +568,7 @@ strace is a diagnistic tool for system calls that result in error will have thei
       $ nmcli 
       $ curl ifconfig.me
 
-# Get external IP address in a shell script
+### Get external IP address in a shell script
 * Network interface first
 
       $ ip address show
@@ -1183,14 +1183,14 @@ via iptables
 
   set server node
 
-      # Listening on 0.0.0.0 1234
-      # Connection received on server.dongheekang 36170
+      - Listening on 0.0.0.0 1234
+      - Connection received on server.dongheekang 36170
 
       $ nc -lv 1234
       $ mkfifo /tmp/rs
       $ cat /tmp/rs | /bin/bash 2>&1 | nc -v client 1234 > /tmp/rs
 
-      # checking
+      -  checking
 
       $ hostname
       $ server
@@ -1298,7 +1298,8 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
 
 * add routes
 
-      ![Network interface, subnet and routing](fig/linuxrouter2.webp)
+    ![Network interface, subnet and routing](fig/linuxrouter2.webp)
+
       want to access 100.1.1.0/24
       we have now under subnet 192.168.221.0/24 with a second network interface
       how to add routing ? 

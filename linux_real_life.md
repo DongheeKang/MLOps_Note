@@ -552,6 +552,52 @@ strace is a diagnistic tool for system calls that result in error will have thei
 
     or use angry IP scanner
 
+### Find primary IP address of a linux
+* Primary active interface first
+
+      $ ip address show
+      $ route
+
+* Primary IP address
+
+      $ ip address show dev ens33 
+      $ ip address show dev ens33 | grep -w inet | awk '{print $2}'   
+      $ ip route get 1.1.1.1
+        1.1.1.1 via 192.168.207.2 dev ens33 src 192.168.207.128 uid 1000           : primary = 192.168.207.128
+      $ ifconfig ens33 | grep -w inet | awk '{print $2}'
+      $ nmcli 
+      $ curl ifconfig.me
+
+# Get external IP address in a shell script
+* Network interface first
+
+      $ ip address show
+      $ ip address show eif0 | grep 'inet'
+        169.254.6.66
+      $ ip address show eif0 | grep 'inet'
+        2001:db8:666:666::10
+
+* External IP Checks
+
+      $ ssh user@server-router 'ip address show eif0'
+
+      $ curl --user USERNAME:PASSWORD http://router/
+      $ ssh sshmyip.com
+      $ telnet telnetmyip.com
+      $ wget -qO- telnetmyip.com
+
+* DNS IP query
+
+      $ dig +short myip.opendns.com @resolver1.opendns.com
+      $ host myip.opendns.com resolver1.opendns.com
+      $ dig +short txt ch whoami.cloudflare @1.1.1.1
+      $ dig +short txt o-o.myaddr.test.l.google.com @ns1.google.com
+
++ unnpc 
+
+      $ UPNP_DATA = $(upnpc -s | grep ^ExternalIPAddress | cut -c21-)
+      $ echo "${UPNP_DATA}"
+
 ### Mapping hostnames with ports in /etc/hosts
 Look into /etc/hosts first
 
@@ -977,7 +1023,6 @@ by default the timeout is 2 minutes.
       $ autossh -X -L 5432:<DB server IP>:5432 -R 873:<local RSYNC server>:873 [user@]remote_ssh_server
       $ autossh -f [host]
 
-
 ### Classical tunneling for SSH
 
 * SSH
@@ -1215,51 +1260,6 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
       $ sudo ss -tp | grep "ESTAB.*sshd"
       $ sudo lsof -i TCP -s tcp:established -n | grep ssh
 
-### Find primary IP address of a linux
-* Primary active interface first
-
-      $ ip address show
-      $ route
-
-* Primary IP address
-
-      $ ip address show dev ens33 
-      $ ip address show dev ens33 | grep -w inet | awk '{print $2}'   
-      $ ip route get 1.1.1.1
-        1.1.1.1 via 192.168.207.2 dev ens33 src 192.168.207.128 uid 1000           : primary = 192.168.207.128
-      $ ifconfig ens33 | grep -w inet | awk '{print $2}'
-      $ nmcli 
-      $ curl ifconfig.me
-
-# Get external IP address in a shell script
-* Network interface first
-
-      $ ip address show
-      $ ip address show eif0 | grep 'inet'
-        169.254.6.66
-      $ ip address show eif0 | grep 'inet'
-        2001:db8:666:666::10
-
-* External IP Checks
-
-      $ ssh user@server-router 'ip address show eif0'
-
-      $ curl --user USERNAME:PASSWORD http://router/
-      $ ssh sshmyip.com
-      $ telnet telnetmyip.com
-      $ wget -qO- telnetmyip.com
-
-* DNS IP query
-
-      $ dig +short myip.opendns.com @resolver1.opendns.com
-      $ host myip.opendns.com resolver1.opendns.com
-      $ dig +short txt ch whoami.cloudflare @1.1.1.1
-      $ dig +short txt o-o.myaddr.test.l.google.com @ns1.google.com
-
-+ unnpc 
-
-      $ UPNP_DATA = $(upnpc -s | grep ^ExternalIPAddress | cut -c21-)
-      $ echo "${UPNP_DATA}"
 
 
 ### Translate DNS to IP
@@ -1278,19 +1278,31 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
 
       $ ip monitor                                      : live monitoring for connection of MAC and IP
       $ ip rule list                                    : To look up the route table and rule
+      $ ip route 
+        default via 194.168.23.1
+        194.168.23.132:24´ via 194.168.23.1 dev enp1s0 scope link src 194.168.23.120 metric 100
+        <address>:<mask> via <gateway> <interface> scope link <source address> 
 
+      
       $ ip route get 194.168.23.132                   
 
         194.168.23.132 via 194.168.23.1 dev enp1s0 src 194.168.23.120 uid 1000 
         cache  
 
+      so we can identify 
         gateway      : 194.168.23.1 
         destination  : 194.168.23.132
 
-      test 
+      to test connection do this
       $ traceroute 172.23.1.100  
 
-      add 
+* add routes
+
+      ![Network interface, subnet and routing](fig/Ilinuxrouter2.webp)
+      want to access 100.1.1.0/24
+      we have now under subnet 192.168.221.0/24 with a second network interface
+      how to add routing ? 
+
       $ ip route add 100.1.1.0/24 via 192.168.221.142 dev enp7s0     : add static router
       $ ip route add 10.10.20.0/24 via 192.168.50.100 dev eth0       : add static router
       $ ip route add default gw 20.14.5.65               : result of routing table of network
@@ -1311,7 +1323,7 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
 
   Source-based
       
-      IP Masquerading
+      IP masquerading
       $ firewall-cmd --change-interface=enp7s0 --zone=external --permanent
       $ firewall-cmd --change-interface=enp8s0 --zone=external --permanent
       $ firewall-cmd --change-interface=enp1s0 --zone=internal --permanent
@@ -1585,7 +1597,26 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
     $ mtr -u -t donghee.com                   : UDP
     $ mtr -r -c 15 donghee.com                : report mode with sending packets 15
 
+### arping
+    
+    $ arping 192.39.59.17
+    $ arping –c 2 192.39.59.17                  : -c number of requests
+    $ arping –f 192.39.59.17                    : -f when signal receive then stop 
+    $ date; arping –w 5 192.39.59.17; date      : -w to stop sending ARP requests after a specific time duration
+    $ arping –f –I ens192 192.39.59.17          : -I specific network interface 
+    $ arping -b –c 2 192.39.59.17               : -b for broadcast
+    $ arping –U -c 1 192.39.59.17               : -U to update the ARP table of the destination host
+    $ arping –A -c 1 192.39.59.17               : -A sends an ARP reply, in this case, don’t get any responses
+    $ arping –c 1 –s 192.39.59.20 192.39.59.17  : -s specifying source IP
+    $ arping –D –c 1 192.39.59.17               : -D Duplicate Address Detection (DAD) mode
 
+    creation of new entries in the ARP table
+    $ sysctl net.ipv4.conf.all.arp_accept          : Unsolicited ARP isn’t allowed
+    $ sysctl -w net.ipv4.conf.all.arp_accept=1     : Now, unsolicited ARP is allowed
+     
+    for source IP case, we need ip_nonlocal_bind=1 in order to able to set source IP
+    $ sysctl net.ipv4.ip_nonlocal_bind             : isn’t allowed 
+    $ sysctl –w net.ipv4.ip_nonlocal_bind=1        : is allowed 
 ### How to sort processes by network usage on linux
 
 * nethogs
@@ -2530,7 +2561,7 @@ you have a service as like java/python application, do registering and then runn
 
       remove
       $ sudo add-apt-repository --remove ppa:thomas-schiex/blender
-      
+
       fix for "command not found" by installing software-properties-common package
       $ sudo apt install software-properties-common -y
 

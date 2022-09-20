@@ -1298,7 +1298,7 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
 
 * add routes
 
-      ![Network interface, subnet and routing](fig/Ilinuxrouter2.webp)
+      ![Network interface, subnet and routing](fig/linuxrouter2.webp)
       want to access 100.1.1.0/24
       we have now under subnet 192.168.221.0/24 with a second network interface
       how to add routing ? 

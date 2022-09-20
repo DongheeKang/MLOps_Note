@@ -139,13 +139,21 @@
   |  8080  |         | extended HTTP port
 
 
+### Get the hostname from an IP Address in Linux
+
+    $ host 8.8.8.8
+    $ dig -x 8.8.8.8   
+    $ dig -x 8.8.8.8 +noall +answer        : noall removes all lines in the output   
+    $ nmblookup -A 192.168.1.142  
+
+    $ nbtscan 192.168.1.142                
+    $ avahi-resolve -a 192.168.1.142
 ### How do I know my public IP in local machine?
 
     $ curl ipinfo.io/ip
     $ curl -s ipinfo.io/ip
     $ wget -qO- http://ipecho.net/plain ; echo
     $ dig +short myip.opendns.com @resolver1.opendns.com
-
 ### Get a list of all IP addresses on a LAN
 
     $ ifconfig                             <---- one can extract ip from inet & broadcast column
@@ -541,7 +549,7 @@ by default the timeout is 2 minutes.
       https://www.linux.com/topic/networking/advanced-dnsmasq-tips-and-tricks/
 
 
-### SSH Proxying
+### SSH Proxying and tunneling
 
 * Server side configuration: sshd
 
@@ -670,6 +678,29 @@ by default the timeout is 2 minutes.
       $ socat tcp-listen:8001 tcp:localhost:8000
       $ socat tcp-listen:8001,reuseaddr,fork tcp:localhost:8000
       $ socat tcp-listen:8001,reuseaddr,fork tcp:localhost:8000 &
+
+
+### How to set jump host?
+
+    • How do I use jump host (local -> server1 -> server2)
+
+      $ ssh -tt server1 ssh server2
+
+      $ ssh -fqN -L2222:server2:22 server1
+      $ ssh localhost -p 2222
+
+      $ ssh -o ProxyCommand="ssh server1 nc server2 22" server2
+      $ ssh -o ProxyCommand="ssh -W server2:22 server1" server2
+
+      or one can configure server2 via server1, i.e. go to server1 and configure this
+      $ vi ~/.ssh/config
+      |Host s2
+      |HostName server2
+      |User user2
+      |IdentityFile ~/.ssh/server2_id_rsa
+      |ProxyCommand ssh -W server2:22 server1
+      $ ssh s2
+      $ ssh user2@s2
 
 ### Linux TCP/IP connections Limit
 the limits on the number of concurrent TCP connections
@@ -818,7 +849,6 @@ via iptables
       $ server1> nc -l 4444
       $ server2> nc server1.com 4444
 
-
 ### iperf
 Performance Counters for Linux. we need to install iPerf on both the client and the server
 
@@ -842,7 +872,6 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
       * u upd
       * b limits the bandwidth for UDP to 1Mbits/sec by default
 
-
 ### How to list all connected SSH sessions (possible commands)
 
       $ who
@@ -862,8 +891,6 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
       $ sudo netstat -tpn | grep "ESTABLISHED.*sshd"
       $ sudo ss -tp | grep "ESTAB.*sshd"
       $ sudo lsof -i TCP -s tcp:established -n | grep ssh
-
-
 
 ### Translate DNS to IP
 
@@ -903,14 +930,16 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
 
     ![Network interface, subnet and routing](fig/linuxrouter2.webp)
 
-
       want to access 100.1.1.0/24
       we have now under subnet 192.168.221.0/24 with a second network interface
       how to add routing ? 
 
       $ ip route add 100.1.1.0/24 via 192.168.221.142 dev enp7s0     : add static router
-      $ ip route add 10.10.20.0/24 via 192.168.50.100 dev eth0       : add static router
-      $ ip route add default gw 20.14.5.65               : result of routing table of network
+
+      this is example of "ip route" or "route"
+
+      $ ip route add default via 192.168.1.254       : add routing table of network for default gw
+      $ route add default gw 20.14.5.65              : add routing table of network for default gw
 
 * To make the routes persistent (nmcli)
 
@@ -918,7 +947,6 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
 
       $ systemctl status NetworkManager
       $ nmcli connection modify enp7s0 +ipv4.routes "100.1.1.0/24, 8.8.8.8 192.168.221.142"
-
       $ cat /etc/sysconfig/network-scripts/route-enp7s0 
         ADDRESS0=100.1.1.0
         NETMASK0=255.255.255.0

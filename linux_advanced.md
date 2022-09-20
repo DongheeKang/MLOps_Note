@@ -1,3 +1,81 @@
+# Linux advanced topics
+### Contents
+  * [High Availability](#HA)
+  * [Netowrk](#Netowrk)
+  * [Service](#Service)
+
+
+
+<br/><a name="HA"></a>
+
+# High Availability
+
+### LVS (Linux Virtual Server)
+    LVS is a highly scalable and available server built on a cluster of real servers, with the load balancer running on the Linux operating system.
+
+  LVS components
+  * lvs daemon
+  * ipvsadm
+  * iptables
+  * acls
+
+  LVS Forwarding
+  * Network Address Translation (NAT)
+  * Direct Routing
+  * Tunneling
+  * Local Node
+
+
+### IPVS (IP Virtual Server)
+IPVS is incorporated into the LVS, where it runs on a host and acts as a load balancer in front of a cluster of real servers.
+usually called Layer-4 switching. IPVS running on a host acts as a load balancer
+
+### Virtual Router Redundancy Protocol (VRRP)
+VRRP is a computer networking protocol that provides for automatic assignment of available IP routers to participating hosts.
+
+### keepalived
+is a routing software written in C. The main goal is to provide robust facilities for
+loadbalancing and high-availability to Linux based infrastructures.
+Internally keepalived uses VRRP.
+
+### ldirectord
+is a daemon to monitor and administer real servers in a LVS cluster of load balanced
+virtual servers. ldirectord typically used as a resource for HAProxy.
+
+### HAProxy
+provides a HA load balancer and proxy server
+
+### Nginx as a load balancing
+
+### Failover clusters
+When the VM is temporarily stopped, snapshotted, moved, and then resumed on the new
+
+### Pacemaker
+A scalable High Availability cluster resource manager.
+
+### Fencing
+isolation of a failed node so that it does not cause disruption to a computer cluster.
+
+### STONITH
+Shoot The Other Node In The Head (STONITH) is a technique for fencing.
+
+### HeartBeat
+enables the highly available operation of services
+
+### Corosync and Pacemaker
+allows to create a high availability (HA) server infrastructure with a Reserved IP
+
+###  OpenAIS (Open Implementation of the Application Interface Specification)
+
+###  CMAN (Oracle connection manager)
+
+
+
+
+<br/><a name="Network"></a>
+
+# Netowrk
+
 ### Next-Gen Firewalls (NGFW)
     ===============================================================================================
     Next-Gen Firewalls (NGFW)
@@ -55,7 +133,6 @@
       HAProxy
       NAT
 
-
 ### VPN Description
     ===============================================================================================
     VPN (Virtual Private Network)
@@ -72,7 +149,6 @@
     allows user or group-specific access control policies using firewall rules applied to the
     VPN virtual interface. OpenVPN is not a web application proxy and does not operate through
     a web browser.
-
 
 ### Stateless vs Stateful Firewall
     ===============================================================================================
@@ -110,9 +186,14 @@
 
     - Malware today is an conclusion of all above and more.
 
-
 ### Intrusion Detection Prevention (IDP)
-
+Intrusion detection is the process of monitoring your network traffic and analyzing it for signs of possible
+intrusions, such as exploit attempts and incidents that may be imminent threats to your network. For its part
+intrusion prevention is the process of performing intrusion detection and then stopping the detected
+incidents, typically done by dropping packets or terminating sessions. These security measures are available
+as intrusion detection systems (IDS) and intrusion prevention systems (IPS), which are part of network
+security measures taken to detect and stop potential incidents and are included functionality within
+next-generation firewalls (NGFW).
 
 ### Intrusion Detection System (IDS)
 is based on a specific pattern to detect the attacker's intrusion

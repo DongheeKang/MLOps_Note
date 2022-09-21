@@ -1,7 +1,8 @@
 # Linux system administration
 ### Contents
   * [Linux System](#Linux)
-  * [Package](#package)
+  * [Installation](#Installation)
+  * [Package](#Package)
   * [Processes and Monitoring](#Processes)
   * [User Management](#Users)
   * [Service](#Service)
@@ -150,9 +151,8 @@ Technical Recommendations:
 
 
 ### init
-
     ===============================================================================================
-    init
+    init (SysVinit)
     ===============================================================================================
     - Setup to start automatically after a crash or reboot
       Runlevel 0  : System shutdown
@@ -204,7 +204,6 @@ Technical Recommendations:
       $ sudo kill -9 1031
       Wait 5 minutes, then check mysql is still in working!
       $ sudo service mysql status
-
 
 ### Systemd
     ===============================================================================================
@@ -285,28 +284,99 @@ Technical Recommendations:
       Still survice mysql as wish
       $ sudo systemctl status mysqld.service
 
+<br/><a name="Linux installation"></a>
+
+# Installation
+
+### Initial setup after installation (based on ubuntu)
+
+    1. root login
+      $ ssh root@123.456.789.100
+      |
+      | warning..... bla blaa
+      |
+      $ ssh-keygen -R 123.456.789.100    : remove old key for root of 123.456.789.100
+      $ eval `ssh-agent -s`              : check ssh-agent of local machine
+      $ ssh-add ~/.ssh/id_rsa            : add private key to local machine
+      $ ssh root@123.456.789.100         : try again, now OK with root!
+
+    2. create user admin, who has root privileges
+      $ adduser admin
+
+    3. root privileges
+      $ gpasswd -a admin sudo
+
+    4. Add Public Key Authentication to admin user  : this is realy interesting!
+      Generate a Key Pair
+      $ ssh-keygen
+      Enter file in which to save the key (/Users/localuser/.ssh/id_rsa): <enter>
+      | ~/.ssh/id_rsa        (private key)
+      | ~/.ssh/id_ras.pub    (public key)
+
+      Copy the Public Key,
+      $ ssh-copy-id demo@SERVER_IP_ADDRESS
+      or
+      $ cat ~/.ssh/id_rsa.pub
+      | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...rggpFmu3HbXBnWSUdf localuser@machine.local
+      | ctrl + c
+      $ su - admin
+      $ mkdir .ssh
+      $ chmod 700 .ssh
+      $ nano .ssh/authorized_keys
+      | ctrl + v
+      $ chmod 600 .ssh/authorized_keys
+
+    5. Configure SSH Daemon
+      $ nano /etc/ssh/sshd_config
+      | PermitRootLogin no                : disabling remote root login is highly recommended
+
+    6. Reload SSH
+      $ service ssh restart
+      $ ssh demo@SERVER_IP_ADDRESS        : it work! login with demo accout from local to server
+
+    Optional) additional Recommended Steps
+    7. Firewall policies
+      $ sudo aptitude install ufw
+      $ sudo ufw status
+
+      $ sudo ufw allow ssh                     : to configure your firewall policies
+      $ sudo ufw allow 4444/tcp                : extra SSH 2222
+      $ sudo ufw allow 80/tcp                  : HTTP
+      $ sudo ufw allow 443/tcp                 : SSL/TLS
+      $ sudo ufw allow 25/tcp                  : SMTP
+      $ sudo ufw allow 21/tcp                  : ftp
+      $ sudo ufw show added                    : finalized
+      $ sudo ufw enable                        : confirm then type "y"
+      $ sudo ufw allow from 192.168.255.255
+      $ sudo ufw default deny incoming
+      $ sudo ufw default deny outgoing
+      $ sudo ufw delete allow 80/tcp
+      $ sudo ufw delete allow 1000:2000/tcp
+
+    8. Configure Timezones and Network Time Protocol Synchronization
+      $ sudo dpkg-reconfigure tzdata
+      $ sudo apt-get update
+      $ sudo apt-get install ntp
+
+    9. Create a Swap File
+      $ sudo fallocate -l 4G /swapfile
+      $ sudo chmod 600 /swapfile
+      $ sudo mkswap /swapfile
+      $ sudo swapon /swapfile
+      $ sudo sh -c 'echo "/swapfile none swap sw 0 0" >> /etc/fstab'
+
+
 
 
 <br/><a name="Linux package"></a>
 
 # Linux package
 
-### Binary packages
-    ===============================================================================================
-    Binary packages
-    ===============================================================================================
-    - dpkg:
-      Originally used by Debian and now by Ubuntu. Uses the .deb format and was the first to have
-      a widely known dependency resolution tool, APT. The ncurses-based front-end for APT,
-      aptitude, is also a popular package manager for Debian-based systems.
+### dpkg
 
-    - RPM Package Manager:
-      Created by Red Hat. RPM is the Linux Standard Base packaging format and the base of a
-      number of additional tools, including apt4rpm, Red Hat's up2date, Mandriva's urpmi,
-      openSUSE's ZYpp, PLD Linux's poldek, and YUM, which is used by Fedora, Red Hat Enterprise
-      Linux, and Yellow Dog Linux.
+    Originally used by Debian and now by Ubuntu. Uses the .deb format and was the first to have a widely known dependency resolution tool, APT. The ncurses-based front-end for APT, aptitude, is also a popular package manager for Debian-based systems.
 
-    - dpkg
+      $ dpkg -i <package_name>
       $ dpkg -Gi package(s).deb          install/upgrade package file(s)
       $ dpkg -r package                  remove package
       $ dpkg -l '*spell*'                show all packages whose names contain the spell
@@ -333,7 +403,11 @@ Technical Recommendations:
       | .
       | Creating backups is now more fun than ever!
 
-    - rpm
+
+### RPM 
+
+    Created by Red Hat. RPM is the Linux Standard Base packaging format and the base of a number of additional tools, including apt4rpm, Red Hat's up2date, Mandriva's urpmi, openSUSE's ZYpp, PLD Linux's poldek, and YUM, which is used by Fedora, Red Hat Enterprise Linux, and Yellow Dog Linux.
+
       $ rpm -Uvh packages(s).rpm          install/upgrade package file(s)
       $ rpm -e package                    remove package
       $ rpm -qa '*spell*'                 show all packages whose names contain the spell
@@ -390,6 +464,13 @@ Technical Recommendations:
 
       $ sudo apt-cache search “metasearch engine”                : keyword
       $ sudo apt-cache show apache2                              : package name 
+
+### How to upgrade packages
+
+      $ sudo apt-get update && apt-get dist-upgrade 
+
+### What is the apt equivalent to these dselect commands?
+    https://unix.stackexchange.com/questions/361219/what-is-the-apt-equivalent-to-these-dselect-commands
 
 
 <br/><a name="Processes"></a>
@@ -666,7 +747,10 @@ strace is a diagnistic tool for system calls that result in error will have thei
         Running annie-script.sh as user root
 
       Skipping Password Prompt
-      dave ALL=(ALL) NOPASSWD: /home/annie/annie-script.sh
+      $ cat /etc/sudoers
+        dave ALL=(ALL) NOPASSWD: /home/annie/annie-script.sh
+        admin ALL = (root) NOPASSWD: ALL
+        user ALL = (root) /usr/bin/apt-get update, /usr/bin/apt-get dist-upgrade
 
       $ sudo -u annie /home/annie/annie-script.sh
         Running annie-script.sh as user annie
@@ -1557,8 +1641,44 @@ this is really nice tool for checking disk usage!
 
 <br/><a name="Shell"></a>
 
-# Shell 
+# Bash Shell 
 
+    ===============================================================================================
+    Bash 
+    ===============================================================================================
+    - Wenn ich Hilfe brauche unbekannte Programm Name!
+      $ whatis <command>         : sucht Erklaerung der Befehl                            
+      $ apropos <command>        : search the whatis database for complete words with apropos
+      $ whereis <command>        : zeigt Pfade zu Binaer und /oder Konfigurationsdateien
+      $ which <command>          : zeigt Pfade zu ausfuehrbaren Dateien.                     
+      $ man -k <command>         : Pfade der Manpages und Pfade zu Programmquellen
+      $ <command> --help         : typical help
+
+    - useful tips 
+      $ ls -l 'which locate'     : list of location indicated by 'which locate'
+      $ ls -l $(which passwd)
+
+      $ ls -li  : Inode show
+  	  $ ls -lS  : sort by Size
+  	  $ ls -lc  : sort by last modification of file status information
+
+
+    - Useful command for administration
+      $ expand    : Converts tabs to spaces
+      $ unexpand  : Converts spaces to tab
+      $ fmt       : a formatter for simplifying and optimizing text files
+      $ nl        : numbers of lines of files
+      $ wc        : counts of bytes, characers, words and lines of a file
+      $ sort      : sort lines of text files alphabetically
+      $ uniq      : removes consecutive duplicate lines
+      $ split     : splits a file into different groups/files
+      $ cut       : cut the field
+      $ paste     : horizontalles cat, paste together lines on a file into vertical columns
+      $ join      : horizontalles cat, prints a pair of input lines
+      $ pr        : Convertsa text file for printing few page printing
+      $ stat      : Status of this files who access, modify, etc
+      $ file      : show info about file
+      $ type (ls, echo, firefox)         : type zeigt fuer ausfuehrbare Dateien
 
 
 <br/><a name="Files"></a>

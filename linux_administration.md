@@ -287,7 +287,6 @@ Technical Recommendations:
 <br/><a name="Linux installation"></a>
 
 # Installation
-
 ### Initial setup after installation (based on ubuntu)
 
     1. root login
@@ -402,6 +401,7 @@ Technical Recommendations:
       | This script provides an easy way of creating backups
       | .
       | Creating backups is now more fun than ever!
+      
 
 
 ### RPM 
@@ -436,8 +436,34 @@ Technical Recommendations:
       | - Initial version of the package
 
 ### apt-get
-      
-      will be added!
+
+* *How to find out the packages
+
+      $ sudo apt-cache search “metasearch engine”                : keyword
+      $ sudo apt-cache show apache2                              : package name
+
+      $ dpkg -l *<search_term>*               : whether a package is installed or not installed
+
+* How to upgrade packages
+
+      $ sudo apt-get update && apt-get dist-upgrade 
+
+      apt-get dist-upgrade vs apt-get upgrade
+     
+      $ apt-get upgrade
+      upgrades all installed packages. This is the equivalent of "Mark all upgrades" in Synaptic
+
+* How to clean up
+
+      $ apt-get autoclean
+      $ apt-get clean
+      The same as above, except it removes all packages from the package cache.
+
+* Removal commands
+
+      $ apt-get remove <package_name>
+      $ apt-get purge <package_name>
+
 ### put the list for unbuntu library
 * legacy
 
@@ -460,14 +486,7 @@ Technical Recommendations:
       fix for "command not found" by installing software-properties-common package
       $ sudo apt install software-properties-common -y
 
-### How to find out the packages
 
-      $ sudo apt-cache search “metasearch engine”                : keyword
-      $ sudo apt-cache show apache2                              : package name 
-
-### How to upgrade packages
-
-      $ sudo apt-get update && apt-get dist-upgrade 
 
 ### What is the apt equivalent to these dselect commands?
     https://unix.stackexchange.com/questions/361219/what-is-the-apt-equivalent-to-these-dselect-commands

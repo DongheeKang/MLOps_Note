@@ -776,6 +776,8 @@ strace is a diagnistic tool for system calls that result in error will have thei
       $ sudo -u root /home/annie/annie-script.sh
         Running annie-script.sh as user root
 
+
+
 ### Why chrooot is important?
 
     $ apt-get install coreutils
@@ -795,6 +797,20 @@ strace is a diagnistic tool for system calls that result in error will have thei
 
     move the existing content to the new location, has to use -m option 
     $ sudo usermod -m -d /usr/dongheekang dongheekang
+
+### add user but disable login 
+
+     sudo adduser --disabled-login --gecos 'GitLab' git    
+
+     --disabled-login                           : login is deactivated, user will be unable to login
+     --gecos 'Donald Trump,3,,,President'       : full name, Room number, Work phone, Home phone, other
+
+     $ getent shadow git
+       git:*:15998::::::
+
+       *  = The account is deactivated & locked
+       !  = The login is deactivated, user will be unable to login
+       !!  = The password has expired
 
 ### List all groups in linux
 
@@ -846,6 +862,7 @@ strace is a diagnistic tool for system calls that result in error will have thei
 
       *** this is important!           
       $ sudo passwd           : if passwd with no specified user, then will change password for root
+
 ### Forcing user to change password at their next login
 
       Let us immediately expire an account’s password
@@ -1145,6 +1162,65 @@ you have a service as like java/python application, do registering and then runn
       $ cancel -Pdl1 669      - kill  ???
       $ lpq -Pdl1             - job que
       $ lprm -Pdl1 699        - kill
+
+
+
+
+### postgres
+    
+    sudo apt install -y postgresql postgresql-client libpq-dev postgresql-contrib
+    $ sudo adduser donghee
+    $ sudo -i -u donghee
+
+    $ psql
+    $ psql -d postgres
+
+    pg> \conninfo
+
+    pg> CREATE TABLE playground (
+    pg>   equip_id serial PRIMARY KEY,
+    pg>   type varchar (50) NOT NULL,
+    pg>   color varchar (25) NOT NULL,
+    pg>   location varchar(25) check (location in ('north', 'south', 'west', 'east', 'northeast', 'southeast', 
+    pg>   'southwest', 'northwest')),
+    pg>   install_date date
+    pg> );
+
+    pg> \d                      : see table
+    pg> \dt                     : see table
+    pg> \q                      : quit
+    
+    pg> SELECT * FROM playground;
+
+### Elasticsearch
+Elasticsearch is a distributed, RESTful search and analytics engine capable of storing data and searching it in near real time.
+
+      index       : database
+      type        : table
+      document    : row
+      field       : column
+      mapping     : schema
+
+### Redis
+
+Redis is a data structure store that acts as a NoSQL Database. It is a popular in-memory data platform
+
+      $ sudo apt-get install redis-server
+
+### Ngix
+
+      $ sudo apt-get install -y nginx
+
+      configureation
+ 
+      $ sudo systemctl restart nginx.service
+
+
+
+
+
+
+
 
 
 
@@ -1467,7 +1543,7 @@ this is really nice tool for checking disk usage!
 ### Upgrade of HANA DB
 
     ===============================================================================================
-    Upgrade of HANA volume size
+    Upgrade of HANA volume size by LVM
     ===============================================================================================
     1. Command sets
       $ sudo su -
@@ -1653,9 +1729,6 @@ this is really nice tool for checking disk usage!
       adoption across both enterprise and small to medium-sized business environments.
       A SAN does not provide file abstraction, only block-level operations. However, file systems
       built on top of SANs do provide file-level access, and are known as shared-disk file systems.
-
-
-
 
 
 <br/><a name="Shell"></a>

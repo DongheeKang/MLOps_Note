@@ -150,7 +150,7 @@ Container format
       or with one liner
       $ docker exec -it centos bash -c "vi /baeldung.txt"
 
-### After starting docker, do configure 
+### After starting docker, do configure it
 
 * first check container:
 
@@ -367,7 +367,7 @@ https://www.dongheekang.com/linux/nginx-docker-container
 
 
 ### Docker Setup nginx server (2 ways)
-* write Dockerfile
+* first method) 
 
       $ vi Dockerfile 
         # Pull the minimal Ubuntu image
@@ -387,7 +387,7 @@ https://www.dongheekang.com/linux/nginx-docker-container
       $ docker run -d -p 80:80 haidar/server
 
 
-* or using offcial image
+* second method) using offcial image
 
       $ docker pull nginx
       $ docker run -d --name server -p 80:80 nginx
@@ -395,10 +395,9 @@ https://www.dongheekang.com/linux/nginx-docker-container
       CONTAINER ID   IMAGE     COMMAND                  CREATED              STATUS              PORTS                               NAMES
       816532f135c8   server    "/docker-entrypoint.…"   About a minute ago   Up About a minute   0.0.0.0:80->80/tcp, :::80->80/tcp   nginx
 
-
 * Advanced
-      $ docker image pull nginx:alpine
 
+      $ docker image pull nginx:alpine
 
 ### Docker setup for MongoDB
 * using offcial image

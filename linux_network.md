@@ -362,6 +362,7 @@ by default the timeout is 2 minutes.
       $ sudo netstat -nltp | grep apache
 
 ### Domain Name System (DNS)
+
 * working principle: resolves domain names to IP addresses
 
       1. domain name typed in
@@ -378,6 +379,18 @@ by default the timeout is 2 minutes.
       Authoritative Only DNS Server
       Recursive name server = cache name server = resolving name server
 
+* Detailed Steps
+
+      1. type in the Domain Name in web browser
+      2. if the computer can't find its IP address in its cache memory, it will send the query to the Resolver server(basically your ISP)
+      3. Resolver will check its own cache memory, if not, it will send the query to Root server, the top or the root of the DNS hierarchy, 13 sets of root servers around the world, operated by 12 organizations. each set has its own IP address
+      4. he root server will direct the resolver the Top Level Domain server (TLD), for the .com, .net, .org(top level domains) domain.
+      5. TLD will direct the resolver to the Authoritative Name Server(ANS), and the resolver will ask the ANS for the IP address
+      6. ANS is responsible for knowing everything including the IP address of the domain
+      7. ANS will respond with IP address
+      8. the resolver will tell the computer the IP address
+      9. the resolver will store the IP Address in its cache memory
+
 * DNS configuration
 
       $ cat /etc/hosts                              
@@ -392,6 +405,7 @@ by default the timeout is 2 minutes.
 
       $ vi /etc/hosts
         127.0.0.1        a.localhost.com
+        192.168.56.103   dongheekang.com
 
       $ vi /etc/dnsmasqd.conf
         address=/localhost.com/127.0.0.1
@@ -405,18 +419,20 @@ by default the timeout is 2 minutes.
         nameserver 192.168.154.6
         nameserver 2c0f:fe38:2405:41a3::77
 
+* DNS Testing and looup
 
-* DNS Testing
-
-      $ host                       : to get host information from name server
-      $ nslookup dongheekang.com   : tool to ask host information from name server
-      $ dig dongheekang.com        : after finish DNS configuration, one can test DNS
-      $ whois                      : a program to find domain holder
-      $ getent                     : a tool for carry out the database of administrator
-      $ rndc                       : name server control utility for BIND
+      $ host dongheekang.com                : to get host information from name server
+      $ ping -c 1 dongheekang.com
+      $ nslookup dongheekang.com            : tool to ask host information from name server
+      $ dig A +short dongheekang.com        : after finish DNS configuration, one can test DNS, A = ipv4
+      $ whois                               : a program to find domain holder
+      $ getent                              : a tool for carry out the database of administrator
+      $ rndc                                : name server control utility for BIND
+      $ sudo tcpdump -i enp0s8
 
       $ vi /etc/bind/named.conf        debian
       $ vi /etc/named/named.conf       fedora
+   
 
 * DNS operation (permanant way)
 
@@ -432,9 +448,9 @@ by default the timeout is 2 minutes.
       nameserver 8.8.8.8
       nameserver 8.8.4.4
 
-* systemd-resolve / avahi
+* systemd-resolved / avahi
 
-  systemd-resolve or avahi should be an optionl choice instead of resolv.conf!
+  systemd-resolved or avahi should be an optionl choice instead of resolv.conf!
   https://www.baeldung.com/linux/resolve-conf-systemd-avahi
 
       $ vi /etc/systemd/resolved.conf.d/dns_servers.conf
@@ -444,7 +460,57 @@ by default the timeout is 2 minutes.
       $ sudo systemctl start systemd-resolved.service
       $ sudo systemctl enable systemd-resolved.service
 
+### DNS caching
+    DNS Caching intercepts hostname requests of recently visited websites before they’re sent out to the internet and refers them to its local database. This significantly reduces the time taken to load already visited websites as their respective IP address have already been cached.
 
+
+* configure systemd-resolved first
+
+      $ sudo resolvectl status
+      $ sudo systemctl start systemd-resolved.service
+      $ sudo systemctl enable systemd-resolved.service
+
+      $ sudo nano /etc/systemd/resolved.conf
+      DNS=8.8.8.8 8.8.4.4
+
+      $ sudo mv /etc/resolv.conf /etc/resolv.conf.original
+
+      $ sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+
+      $ sudo systemctl restart systemd-resolved.service
+
+* using BIND 9
+
+      $ sudo apt update
+      $ sudo apt install bind9 bind9utils -y
+
+      $ sudo systemctl start --now named
+      $ sudo systemctl enable --now named
+      $ sudo systemctl stop --now named
+      $ sudo systemctl restart --now named
+
+      test 
+      $ dig +noall +stats donghee.com
+        ;; Query time: 23 msec                 <-------- 23 msec at first attempt
+        ;; SERVER: 127.0.0.1#53(127.0.0.1)
+        ;; WHEN: Sat Jan 01 11:19:05 EST 2022
+        ;; MSG SIZE  rcvd: 56
+      $ dig +noall +stats donghee.com
+        ;; Query time: 0 msec                  <-------- now 0 msec because of caching
+        ....
+
+* using dnsmasq
+
+      $ sudo apt-get install dnsmasq
+      $ sudo systemctl start dnsmasq
+      $ sudo systemctl enable dnsmasq    
+
+      $ dig +noall +stats donghee.com
+
+      We can also clear the dnsmasq cache by restarting it:
+      $ sudo systemctl restart dnsmasq
+
+### Waht about the security issue about DNS? 
 * Security
 
    Firewall open via iptables configuration
@@ -452,21 +518,8 @@ by default the timeout is 2 minutes.
       $ vi /etc/iptables/rules           : debinas
       $ vi /etc/sysconf/iptables         : CentOS, Fedora
 
-* Detailed Steps
-
-      1. type in the Domain Name in web browser
-      2. if the computer can't find its IP address in its cache memory, it will send the query to the Resolver server(basically your ISP)
-      3. Resolver will check its own cache memory, if not, it will send the query to Root server, the top or the root of the DNS hierarchy, 13 sets of root servers around the world, operated by 12 organizations. each set has its own IP address
-      4. he root server will direct the resolver the Top Level Domain server (TLD), for the .com, .net, .org(top level domains) domain.
-      5. TLD will direct the resolver to the Authoritative Name Server(ANS), and the resolver will ask the ANS for the IP address
-      6. ANS is responsible for knowing everything including the IP address of the domain
-      7. ANS will respond with IP address
-      8. the resolver will tell the computer the IP address
-      9. the resolver will store the IP Address in its cache memory
-
 * DNS Security Extensions
   TSIG or DNSSEC
-
 
 ### List assigned DHCP IP addresses
 

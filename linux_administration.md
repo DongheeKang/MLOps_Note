@@ -6,7 +6,6 @@
   * [Processes and Monitoring](#Processes)
   * [User Management](#Users)
   * [Service](#Service)
-  * [Utility](#Utility)
   * [File system](#Filesystem)
   * [Shell](#Shell)
   * [Files and Directories](#Files)
@@ -150,6 +149,7 @@ Technical Recommendations:
       /tmp    : no
 
 
+
 ### init
     ===============================================================================================
     init (SysVinit)
@@ -284,6 +284,7 @@ Technical Recommendations:
       Still survice mysql as wish
       $ sudo systemctl status mysqld.service
 
+
 <br/><a name="Linux installation"></a>
 
 # Installation
@@ -401,8 +402,6 @@ Technical Recommendations:
       | This script provides an easy way of creating backups
       | .
       | Creating backups is now more fun than ever!
-      
-
 
 ### RPM 
 
@@ -486,8 +485,6 @@ Technical Recommendations:
       fix for "command not found" by installing software-properties-common package
       $ sudo apt install software-properties-common -y
 
-
-
 ### What is the apt equivalent to these dselect commands?
     https://unix.stackexchange.com/questions/361219/what-is-the-apt-equivalent-to-these-dselect-commands
 
@@ -533,6 +530,13 @@ Technical Recommendations:
 * /proc
 
       $ cat /proc/{pid}/status | grep State
+
+
+* /var  
+
+      /var/run/utmp   : maintains a full accounting of the current status of the system
+      /var/log/wtmp   : acts as a historical utmp
+      /var/log/btmp   : records only failed login attempts. 
 
 * sysstat
 
@@ -698,38 +702,36 @@ strace is a diagnistic tool for system calls that result in error will have thei
     $ readlink -e /proc/23217/cwd        : or readlink
 
 
+### Advanced monitoring solutions
+    Monitoring solutions (network and system)
+      Nagios, MRTG(Multi Router Traffic Grapher), Cacti, Wireshark, Icinga2
+      collectd(system statistics collection daemon for IT infrastructure)
+      cloudwatch, rackspace, prometheus    
 
 <br/><a name="Users"></a>
 
 # User Management
 
-### Running script or command as another user in Linux
+### su or sudo
+    su (substitue user)
+    sudo (Super User DO)
+
+### visudo 
     
-* visudo 
-    
-  will show /etc/sudoers
+    will show /etc/sudoers
     
       $ visudo 
         root  ALL=(ALL:ALL) ALL
         user hostname=(runas-user:runas-group) command
 
-  add 'hope' user account to the super user / admin group
+    add 'donghee' user account to the super user / admin group
 
-      usermod -aG sudo hope
-      usermod -aG admin hope
+      usermod -aG sudo donghee
+      usermod -aG admin donghee
 
-* su (substitue user)
+### Running a script or command as another user in Linux
 
-  compare below two without '-' and with '-'
-
-      $ su - 
-        root@server:~# pwd 
-        /root 
-      $ su  
-        root@server:/home/test# pwd 
-        /home/test      
-
-  command
+* method 1 (su way)
 
       $ cat > /home/annie/annie-script.sh <<EOF
         echo "Running annie-script.sh as user $(whoami)"
@@ -748,7 +750,7 @@ strace is a diagnistic tool for system calls that result in error will have thei
       $ su -c /home/annie/annie-script.sh annie
         Running annie-script.sh as user annie
 
-* sudo (Super User DO)
+* method 2 (sudo way)
 
       Edit the /etc/sudoers file
       $ echo 'dave ALL=(annie) /home/annie/annie-script.sh' | EDITOR='tee -a' visudo
@@ -776,15 +778,44 @@ strace is a diagnistic tool for system calls that result in error will have thei
       $ sudo -u root /home/annie/annie-script.sh
         Running annie-script.sh as user root
 
+### su or su -
 
+    compare below two without '-' and with '-'
 
-### Why chrooot is important?
+      $ su - 
+        root@server:~# pwd 
+        /root 
+      $ su  
+        root@server:/home/test# pwd 
+        /home/test      
 
-    $ apt-get install coreutils
+      $ sudo su                    : simple su is not working at ubuntu  
+      $ su                         : simple su is not working at ubuntu ? 
 
-    $ chroot /tmp/new_root /bin/bash
+### User and group
 
-    $ ldd /bin/bash      
+      /etc/passwd
+      /etc/shadow
+      /etc/group
+
+      $ useradd              : without -m means NO home directoy
+      $ adduser              : some distribution also possible
+      $ userdel              : delete recursively home and also mail spool
+      $ usermod              : modification of user account
+
+      $ groupadd
+      $ groupdel
+      $ groupmod
+      $ gpasswd
+
+### How to allow to login to system with a permission? 
+
+      /etc/nologin
+      /etc/hosts.allow
+      /etc/hosts.deny
+      $ vi /etc/security/limits.conf
+      $ vi /etc/security/access.conf
+      $ chsh -s /bin/false kang                 : user kang can not access anything!
 
 ### How to change the default home directory of a user
 
@@ -797,6 +828,9 @@ strace is a diagnistic tool for system calls that result in error will have thei
 
     move the existing content to the new location, has to use -m option 
     $ sudo usermod -m -d /usr/dongheekang dongheekang
+
+
+    /etc/skel       : automatically copied files under this directory over to a new user's home directory
 
 ### add user but disable login 
 
@@ -830,63 +864,89 @@ strace is a diagnistic tool for system calls that result in error will have thei
       only user print out! 
       $ cut -d: -f1 /etc/group
 
-* getent
+* getent 
 
       $ getent group
 
       only user print out! 
       $ getent group | cut -d: -f1
 
+      $ getent passwd kang         : Check a user whether exist or not
+
 * group
 
-      $ groups
+      $ groups                         : list of all group
       lp wheel dbus network video audio optical storage input users vboxusers docker donghee
     
-      $ groups root
+      $ groups root                    : list of all group for this user
       root bin daemon sys adm disk wheel log
 
 * id
 
+      $ id kang            : display UID and GID
       $ id -Gn
       $ id -Gn root
 
-### How to change password for other user account?
+### How to generates a compact listing of all the users on the system
 
-      only with super user
-      $ su -
+    $ cut -d: -f < /etc/passwd | sort | xargs echo
 
-      check password of user first 
-      $ getent passwd | grep donghee
-      $ passwd donghee    
-      $ passwd -V donghee                 : to view password status
+### Modification I
 
-      *** this is important!           
-      $ sudo passwd           : if passwd with no specified user, then will change password for root
+* How to change password for other user account?
 
-### Forcing user to change password at their next login
+    only with super user
+    $ su -
 
-      Let us immediately expire an account’s password
+    check password of user first 
+    $ getent passwd | grep donghee
+    $ passwd donghee    
+    $ passwd -V donghee                 : to view password status
 
-      $ sudo passwd -e donghee
-      $ sudo passwd --expire donghee
-### Extend expire date of user
+    *** this is important!           
+    $ sudo passwd           : if passwd with no specified user, then will change password for root
 
-      $ usermod -e 2025-09-01 user
-### Lock and unlock of user    
+* Forcing user to change password at their next login
 
-      $ usermod -L user
-      $ usermod -U user 
+    Let us immediately expire an account’s password
 
-### Change account’s username
+    $ sudo passwd -e donghee
+    $ sudo passwd --expire donghee
 
-      $ usermod -l old new
+* Extend expire date of user
 
-### create a user group and add one user into
+    $ usermod -e 2025-09-01 user
 
+* Lock and unlock of user    
+
+    $ usermod -L user
+    $ usermod -U user 
+
+* Change account’s username
+
+    $ usermod -l old new
+
+### Modification II 
+
+    $ chage -l kang        : administrative tool for passwd and expiring date
+    $ chfn & finger        : change personal data as like name, telefone, office number
+    $ newgrp newgroup      : change primary group by newgroup from normal user
+          
+    Befehle zur Verwaltung des Shadow-Systems
+    $ pwconv               : transferieren der Passwort-Hashes aus passwd -> nach shadow
+    $ pwunconv             : shadow -> passwd
+    $ pwck                 : Konsistenz von passwd u. shadow ueberpruefen
+
+    $ grpconv
+    $ grpunconv
+    $ grpck
+
+### To create a user group and add one user into there
+    
     $ sudo addgroup administrator
     $ sudo adduser donghee administrator
-### Add user to sudo group
 
+    Add existing user to sudo group
     $ sudo usermod -aG sudo donghee
 
 ### Fixing the “Command Not Found” Error When Using Sudo 
@@ -898,6 +958,12 @@ strace is a diagnistic tool for system calls that result in error will have thei
 * Fixing the error for a single command. We can pass the -E flag to sudo to make it preserve the current environment variables:
 
       $ sudo -E myscript
+
+### Why chrooot is important?
+
+    $ apt-get install coreutils
+    $ chroot /tmp/new_root /bin/bash
+    $ ldd /bin/bash     
 
 
 
@@ -1022,6 +1088,18 @@ you have a service as like java/python application, do registering and then runn
       @reboot (cd /home/dongheekang/monitoring-scripts; bash monitor-memory.sh)
       ----------------------------------------------------------------------------
 
+
+### crontab / anacrontab / at
+
+      $ cat /etc/crontab    : crontable
+      $ crontab
+      $ cat /var/spool/cron/crontab/kang
+      # /etc/cron.{d,daily,hourly,monthly,weekly}
+      # /etc/cron.allow            : listed user can access
+      # /etc/cron.deny             : listed user cannot access, not cron.allow file
+      $ cat /etc/anacrontab
+
+
 ### Configure a systemd service to restart periodically
 
 * where is systemd?
@@ -1078,33 +1156,63 @@ you have a service as like java/python application, do registering and then runn
       $ crontab -e
         30 10 * * 1-5 /usr/bin/systemctl restart my-service.service
 
+### inetd
+
+    Superdaemon, Einen Rechner absichern
+      FTP-Server, LPRd, CUPS, TCP/UDP-Dienste wie Daytime, Echo
+
+      Konfigurationsdatei fuer Super Daemon
+      /etc/inetd.d/
+      /etc/inetd.conf
+      /etc/xinetd.d/
+      /etc/xinetd.conf
+
+      TCP-Wrapper konfiguration
+      /etc/hosts.allow
+      /etc/hosts.deny
+
+      tcpchk: eine inetd.conf auf Syntaxfehler pruefen
+
+### Mail service
+
+    * Mail Port
+      SMTP 25  : default SMTP
+      SMTP 465 : to send messages using SMTP securely
+      IMAP 143 : non-encrypted port
+      IMAP 993 : using IMAP securely
+      POP3 110 : default POP3 non-encrypted port
+      POP3 995 : using POP3 securely
+
+    * mail directroy
+      /var/spool/mail   : delievered by MDA
+      /var/spool/mqueue : auszuliefernde Mail-Queue
+
+      Mail alias by root
+      $ vi /etc/aliases
+
+    * SMTP mail server
+      Postfix, sendmail, exim, qmail
+
+    * MDA, POP and IMAP server
+      dovecot, courier
+
+    * MDA(mail delivery agent)
+      Procmail
+
+    General way to test
+      $ netcat localhost 25
+      $ telnet localhost 25
 
 
 
-<br/><a name="Utility"></a>
+### sftp
 
-# Utility
-
-### touch to change create date
-
-     $ touch -d tomorrow test             : 
-     $ touch -d '1 day ago' test          : 
-     $ touch -d '5 years ago' test        : 
-     $ touch test{1..10}                  : 
-
-     $ touch -t YYMMDDHHMM fileName       :  set the timestamp 
-     $ touch -r file2 file1               :  file2 is updated with the time stamp of file1
-
-### truncate
-
-     $ cp original.output backup.output
-     $ truncate -s 0 original.output
-     $ cat backup.output > original.output
-
-### sftp, scp, rsync
+    FTP client Port 21 ---> FTP Server Port 20
+    vsftp  Pure-FTPd  ProFTPD  sftp
 
     $ sftp username@your_server_ip_or_remote_hostname 
     $ sftp -oPort=custom_port username@your_server_ip_or_remote_hostname
+### scp(22)
 
     $ scp -P 22 [user@]SRC_HOST:]file1 [user@]DEST_HOST:]file2
     $ scp file.txt donghee@ip_address_of_remote:/remote/directory
@@ -1151,20 +1259,33 @@ you have a service as like java/python application, do registering and then runn
       $ rsync -a /sc/sc32b/* .
 ### rssh
 
+    A restricted shell and allow only specific protocols such as SCP or SFTP
       $ /usr/local/etc/rssh.conf
       $ /etc/group
       $ /etc/passwd
 
+      $ sudo vim /etc/rssh.conf
+        # set the log facility.  "LOG_USER" and "user" are equivalent.
+        logfacility = LOG_USER
+        allowscp
+        #allowsftp
+        #allowrsync
+        # set the default umask
+        umask = 022
+
 ### lpr
 
+    printer
+      BSD   -> Apple
+      SysmV -> Oracle
+      CUPS  -> Common Unix Printing System by Apple
+  
+    lpr
       $ lpr -P color $1       - Color
       $ lpr restart dl1       - Restart
       $ cancel -Pdl1 669      - kill  ???
       $ lpq -Pdl1             - job que
       $ lprm -Pdl1 699        - kill
-
-
-
 
 ### postgres
     
@@ -1207,6 +1328,32 @@ Redis is a data structure store that acts as a NoSQL Database. It is a popular i
 
       $ sudo apt-get install redis-server
 
+
+### Web service
+
+- Leading Web Server
+      Apache, Microsoft-IIS, nginx, Tomcat, Node.js
+      Proxy Server: HAProxy, Nginx, Squid, Varnish are mostly used
+
+      htpasswd can create a password. list to allow access
+      $ ./htpasswd kim
+      $ vi .htaccess
+      $ vi .htgroup
+
+      Certificates are usually stored in /etc/ssl/ or /etc/pki/.
+      /etc/ssl/    : the standard location for OpenSSL configuration
+      /etc/pki/    : the standard location for PKI (Puclbic Key Infrastructure)
+
+### Apache
+
+      Apache
+      /etc/apache2/apache2.conf  @ Debian
+      /etc/httpd/conf/httpd.conf @ CentOS
+
+      Apache Module
+      /usr/src/mod_php,mod_perl,mod_auth
+      OpenSSL(Secure Sockets Layer) + Apache =  Apache-SSL -> mod_ssl
+
 ### Ngix
 
       $ sudo apt-get install -y nginx
@@ -1215,12 +1362,46 @@ Redis is a data structure store that acts as a NoSQL Database. It is a popular i
  
       $ sudo systemctl restart nginx.service
 
+      test
+      $ sudo nginx -t
+
+      Nginx with firewall @ CentOS (optional)
+      $ sudo firewall-cmd
+
+### Samba
+
+    Samba is the standard Windows interoperability suite of programs for Linux and Unix
+    smbd, nmbd, smbstatus, smbpasswd, cifs
+
+### LDAP 
+
+    LDAP permission by SSSD (System Security Services Daemon) to authentication resource
+    LDIF (LDAP Data Interchange Format) and (dn: uid=kang, ou=users, dc=linux, dc=net)
+    slapadd, slapcat, slapindex
+    ldapadd, ldapsearch, ldappasswd, ldapdelete
 
 
+### Go
+ 
+    - Remove former Go installation folder
+    sudo rm -rf /usr/local/go
 
+    - install
+    curl --remote-name --location --progress-bar "https://go.dev/dl/go1.17.10.linux-amd64.tar.gz"
+    echo '87fc728c9c731e2f74e4a999ef53cf07302d7ed3504b0839027bd9c10edaa3fd  go1.17.10.linux-amd64.tar.gz' | shasum -a256 -c - && \
+      sudo tar -C /usr/local -xzf go1.17.10.linux-amd64.tar.gz
+    sudo ln -sf /usr/local/go/bin/{go,gofmt} /usr/local/bin/
+    rm go1.17.10.linux-amd64.tar.gz
 
+### X server
 
-
+    Desktops - standard xserver location
+    $ crtl+alt+f7
+    $ startx                  : ein Frontend fuer das eigentliche Startskript xinit
+    $ x :1 -query 10.2.11.21  : show a xserver from Centos in tty8 (differ @ VBox)
+    $ xhost +10.2.11.23       : Serverseitige Massnahmen (Debian IP)
+    $ xdpyinfo                : X-display variables
+    $ xwininfo                : window information utility for X-server
 
 
 
@@ -1254,7 +1435,6 @@ this is really nice tool for checking disk usage!
 
     ncdu  
 
-    
 ### Disk and Storage in Linux
 
     ===============================================================================================
@@ -1318,42 +1498,6 @@ this is really nice tool for checking disk usage!
       $ edquota -u root      : for root
       $ repquota -v /home    :  Generates quota reports
 
-    - Attribute of directory
-      $ lsattr     	: list of attribute
-      $ chattr 	: change of attribute
-
-    - smart
-      Self monitoring analysis and reporting technology to monitor hard drive
-      $ smartctl -i /dev/sda    : info. about model, serial number, firmware ver.
-
-    - Automounter
-      normally "hald" and "dbus" daemon has been used for mount-automatization of drives
-      but network resouce "autofs" is better, consists of a kernel component and a daemon
-
-      $ vi /etc/auto.master
-      $ vi /etc/auto.misc
-      $ /etc/init.d/autofs restart              : apply permanently
-      /xxx/xxx will be created by auto.master and auto.netz
-
-    - Encrypted file systems
-      Encryption algorithms : Twofish, AES, DES
-      A virtual block is created in /dev/mapper (device mapper). All data to and from it goes
-      to an encryption or decryption filter before being mapped to another blockdevice
-
-      all relevant modules should be loaded at boot time
-      # echo aes >> /etc/modules
-      # echo dm_mod >> etc/moduls
-      # echo dm_crypt >> /etc/moduls
-      # modprobe -a aes dm_mod dm_crypt
-
-      Set up an encrypted filesystem
-      $ cryptsetup luksFormat /dev/sdb1         : use /dev/sdb1 partition
-      > *****************                       : type the password
-      $ cryptsetup luksOpen /dev/sdb1 safe      : create device mapper @ /dev/mapper/safe
-      $ mkfs.ext2 /dev/mapper/safe		  : format filesystem
-      $ mkdir /safe                             : need a mount point
-      $ mount /dev/mapper/safe /safe		  : mount it
-
     - List out information all block devices
       block devices are the hard drive partitions and other storage devices
       $ lsblk
@@ -1375,6 +1519,23 @@ this is really nice tool for checking disk usage!
     - Adjusting storage device access
       $ hdparm              : IDE/SATA device harddisk standard information
       $ sdparm --enumerate  : summary of SCSI device
+
+    - Attribute of directory
+      $ lsattr     	: list of attribute
+      $ chattr 	: change of attribute
+
+    - smart
+      Self monitoring analysis and reporting technology to monitor hard drive
+      $ smartctl -i /dev/sda    : info. about model, serial number, firmware ver.
+
+    - Automounter
+      normally "hald" and "dbus" daemon has been used for mount-automatization of drives
+      but network resouce "autofs" is better, consists of a kernel component and a daemon
+
+      $ vi /etc/auto.master
+      $ vi /etc/auto.misc
+      $ /etc/init.d/autofs restart              : apply permanently
+      /xxx/xxx will be created by auto.master and auto.netz
 
     - ISCSI
       Network transmission of scsi protocol via TCP connection
@@ -1407,14 +1568,81 @@ this is really nice tool for checking disk usage!
       $ multipath -l
       $ cd /dev/mpath/backupdisk
 
-    - LVM (Logical Volume Manager)
-      /sbin/pv*   : physical volume - a real partitions with administrative data
-      /sbin/lv*   : logical volume - extend block introduced inside volume group
-      /sbin/vg*   : volume group - mehreren physikalischen Volumen
+### Encrypted file systems
 
-      Device mapper at LVM /proc/mapper
-      The device mapper is a kernel driver that provides a framework for volume management.
-      LVM logical volumes are activated using the device mapper.
+      Encryption algorithms : Twofish, AES, DES
+      A virtual block is created in /dev/mapper (device mapper). All data to and from it goes
+      to an encryption or decryption filter before being mapped to another blockdevice
+
+      all relevant modules should be loaded at boot time
+      # echo aes >> /etc/modules
+      # echo dm_mod >> etc/moduls
+      # echo dm_crypt >> /etc/moduls
+      # modprobe -a aes dm_mod dm_crypt
+
+      Set up an encrypted filesystem
+      $ cryptsetup luksFormat /dev/sdb1         : use /dev/sdb1 partition
+      > *****************                       : type the password
+      $ cryptsetup luksOpen /dev/sdb1 safe      : create device mapper @ /dev/mapper/safe
+      $ mkfs.ext2 /dev/mapper/safe		  : format filesystem
+      $ mkdir /safe                             : need a mount point
+      $ mount /dev/mapper/safe /safe		  : mount it
+
+### DRBD (Distributed Replicated Block Device)
+
+    - DRBD
+      is a software-based, shared-nothing, replicated storage solution mirroring the content
+      of block devices (hard disks, partitions, logical volumes etc.) between servers.
+
+      DRBD's core functionality is implemented by way of a Linux kernel module.
+      DRBD constitutes a driver for a virtual block device
+
+      LVM setup for DRBD
+      lvm, vgchange, drbdadm, vgscan(vgs)
+
+      DRBD with pacemaker
+      pacemaker + crm + CIB(Cluster Information Base)
+
+      DRBD with HeartBeat
+      Heartbeat + CRM + CIB(xml)
+
+    - DLM (Distributed Lock Manager)
+      A distributed lock manager (DLM) provides distributed software applications with a
+      means to synchronize their accesses to shared resources. A lock manager is a traffic
+      cop who controls access to resources in the cluster, such as access to a GFS
+
+### Other file systems
+
+    - GFS2
+      Global File System 2 (GFS2) is a shared disk file system for Linux clusters.
+      GFS2 + cLVM(LVM2) + DLM + pacemaker
+
+    - OCFS2
+      Oracle Cluster File System (OCFS2) is a shared disk file system
+
+      O2CB manages the shared file access within a cluster of servers
+      O2CB cluster stack: Node Manager, Heartbeat, TCP, DLM & DLMFS, CONFIGFS
+
+      OSFS2 + pacemaker + DLM + O2CB + STOHICH
+
+    - Other clustered file systems
+      Coda, CephFS, GlusterFS, AFS(Andrew File System), lustre, HDFS, DFS(win), EVMS
+
+### LVM (Logical Volume Manager)
+
+    • LVM
+      Logical Volume Manager is an abstraction of physical disk devices and volumes  to volume groups (a virtual disk, multiple disks and storage pool)
+
+        /sbin/pv*   : physical volume - a real partitions with administrative data
+        /sbin/lv*   : logical volume - extend block introduced inside volume group
+        /sbin/vg*   : volume group - mehreren physikalischen Volumen
+
+      Device mapper at LVM /proc/mapper:
+        The device mapper is a kernel driver that provides a framework for volume management.
+        It provides a generic way of creating mapped devices, which may be used as LV
+        LVM logical volumes are activated using the device mapper.
+        Each logical volume is translated into a mapped device.
+        Each segment translates into a line in the mapping table that describes the device.
 
       Partition of device(disk)
       $ fdisk,sfdisk,vgscan
@@ -1452,42 +1680,90 @@ this is really nice tool for checking disk usage!
       Rename of VG and LV
       $ vgrename, lvrename
 
-    - DRBD (Distributed Replicated Block Device)
-      is a software-based, shared-nothing, replicated storage solution mirroring the content
-      of block devices (hard disks, partitions, logical volumes etc.) between servers.
+### Increase LVM Volume
+    ===============================================================================================
+    Increase LVM volume (from LPIC note)
+    ===============================================================================================
+    Creation of LVM
 
-      DRBD's core functionality is implemented by way of a Linux kernel module.
-      DRBD constitutes a driver for a virtual block device
+      1.LVM installation
+        $ yum install lvm2
+        $ apt-get install lvm2
 
-      LVM setup for DRBD
-      lvm, vgchange, drbdadm, vgscan(vgs)
+      2.Partition of device(disk)
+        $ fdisk /dev/sdb
+        > n,p,1,t
+        > 8e
+        > w
+        $ sfdisk -d /dev/sdb | sfdisk /dev/sdc
+        $ sfdisk -d /dev/sdb | sfdisk /dev/sdd
+        $ sfdisk -d /dev/sdb | sfdisk /dev/sde
+        $ vgscan -v       : sucht angeschlossene Festplatten nach vg und auch pv!
 
-      DRBD with pacemaker
-      pacemaker + crm + CIB(Cluster Information Base)
+      3.create a physical volume
+        $ pvcreate -v /dev/sdb1
+        $ pvcreate -v /dev/sdc1
+        $ pvcreate -v /dev/sdd1
+        $ pvcreate -v /dev/sde1
+        $ pvdisplay
 
-      DRBD with HeartBeat
-      Heartbeat + CRM + CIB(xml)
+      4.configuration of volume group
+        $ vgcreate vg_dig /dev/sdb1 /dev/sdc1 /dev/sdd1 /dev/sde1
+        $ vgdisplay
 
-    - DLM (Distributed Lock Manager)
-      A distributed lock manager (DLM) provides distributed software applications with a
-      means to synchronize their accesses to shared resources. A lock manager is a traffic
-      cop who controls access to resources in the cluster, such as access to a GFS
+      5.configuraion of logical volume
+        $ lvcreate -n lv_big_1 -L 20G vg_big
+        $ lvdisplay
 
-    - GFS2
-      Global File System 2 (GFS2) is a shared disk file system for Linux clusters.
-      GFS2 + cLVM(LVM2) + DLM + pacemaker
+      6.Format of LV
+        $ mkfs.ext4 /dev/vg_big/lv_big_1
+        $ mkdir /mnt
+        $ mount /dev/vg_big/lv_big_1 /mnt     : mapper start to come into play
+        > /dev/mapper/vg_big-lv_big_1 on /mnt type ext4 (rw)
+        $ cp /boot/*  /mnt/
 
-    - OCFS2
-      Oracle Cluster File System (OCFS2) is a shared disk file system
+    • Modifying of LV
+      Q) If you add some more disk space within Logiral Volume? "lvextend"
+        $ lvextend -L 25G /dev/vg_big/lv_big_1
+        $ lvextend -L +5G /dev/vg_big/lv_big_1
+        $ resize2fs /dev/vg_big/lv_big_1         : automatic
+        $ xfs_growfs /dev/vg_big/lv_big_1        : if xfs filesystem is used
 
-      O2CB manages the shared file access within a cluster of servers
-      O2CB cluster stack: Node Manager, Heartbeat, TCP, DLM & DLMFS, CONFIGFS
+      Q) if you want to resize/reduce LV? "lvreduce"
+        $ umount /lvtest                         : absolutely neccessary umount
+        $ e2fsck -f /dev/vg_big/lv_big_1         : test healthy
+        $ resize2fs /dev/vg_big/lv_big_1 1024000 : here is a blcok x 4k = 4GB
+        $ lvreduce -L 4G /dev/vg_big/lvbig_1     : also do verkleinern for LV
 
-      OSFS2 + pacemaker + DLM + O2CB + STOHICH
+      Q) if you want to delete physics volume from volume group? "vgreduce, vgextend"
+        $ vgreduce -a vg_big              : 4 partition to 1
+        $ vgextend vg_big /dev/sdc1       : redefine only first partition into volume group
 
-    - Other clustered file systems
-      Coda, CephFS, GlusterFS, AFS(Andrew File System), lustre, HDFS, DFS(win), EVMS
+      Q) LVM snapshots
+        the snapshot logical volume only saves data blocks from the original logical volume
+        that are changed in the original
+        $ lvcreate -L 1G -s -n backup /dev/vg_big/lv_big_1
+        $ mount /dev/vg_big/backup /backup
+        $ tar -pzcf backup.tar.gz  /backup
+        $ umount /backup
+        $ lvremove /dev/vg_big/backup
+        > y
 
+      Q) If file systems are upgraded and have to move data to new one.
+        $ pvmove   /dev/hdb2  /dev/sdc1       : move hdb2 data into sdc1
+
+      Q) Activate If you meet machine crash, emergency boot, and activate LVM device
+        $ vgchange -ay            : activate all known volume group's device
+
+      Q) Rename of VG and LV
+        $ vgrename vg_orignal vg_new
+        $ lvrename MyLVM debian fedora
+
+      Q) What command is used to make an exact copy of a logical volume for backup purposes?
+        $ lvcreate (no lvsnapshot)
+
+    • Remark
+      sdc (full device) can also be used a volume group, not only sdc1 or sdc2!
 
 #### HANA DB and Storage
 
@@ -1615,106 +1891,16 @@ this is really nice tool for checking disk usage!
       - oder ein Alternative wäre
       $ xfs_growfs /hana/data/HDB
 
+### NFS
 
-### Increase LVM Volume
-    ===============================================================================================
-    Increase LVM volume (from LPIC note)
-    ===============================================================================================
-    • LVM
-      Logical Volume Manager is an abstraction of physical disk devices and volumes  to volume groups (a virtual disk, multiple disks and storage pool)
+    NFS(Network File System)
+      exportfs, nfsstat, showmout, rpcinfo    at server
+      fstab, mount                            at client
 
-        /sbin/pv*   : physical volume - a real partitions with administrative data
-        /sbin/lv*   : logical volume - extend block introduced inside volume group
-        /sbin/vg*   : volume group - mehreren physikalischen Volumen
-
-      Device mapper at LVM /proc/mapper:
-        The device mapper is a kernel driver that provides a framework for volume management.
-        It provides a generic way of creating mapped devices, which may be used as LV
-        LVM logical volumes are activated using the device mapper.
-        Each logical volume is translated into a mapped device.
-        Each segment translates into a line in the mapping table that describes the device.
-
-    • Creation of LVM
-      1.LVM installation
-        $ yum install lvm2
-        $ apt-get install lvm2
-
-      2.Partition of device(disk)
-        $ fdisk /dev/sdb
-        > n,p,1,t
-        > 8e
-        > w
-        $ sfdisk -d /dev/sdb | sfdisk /dev/sdc
-        $ sfdisk -d /dev/sdb | sfdisk /dev/sdd
-        $ sfdisk -d /dev/sdb | sfdisk /dev/sde
-        $ vgscan -v       : sucht angeschlossene Festplatten nach vg und auch pv!
-
-      3.create a physical volume
-        $ pvcreate -v /dev/sdb1
-        $ pvcreate -v /dev/sdc1
-        $ pvcreate -v /dev/sdd1
-        $ pvcreate -v /dev/sde1
-        $ pvdisplay
-
-      4.configuration of volume group
-        $ vgcreate vg_dig /dev/sdb1 /dev/sdc1 /dev/sdd1 /dev/sde1
-        $ vgdisplay
-
-      5.configuraion of logical volume
-        $ lvcreate -n lv_big_1 -L 20G vg_big
-        $ lvdisplay
-
-      6.Format of LV
-        $ mkfs.ext4 /dev/vg_big/lv_big_1
-        $ mkdir /mnt
-        $ mount /dev/vg_big/lv_big_1 /mnt     : mapper start to come into play
-        > /dev/mapper/vg_big-lv_big_1 on /mnt type ext4 (rw)
-        $ cp /boot/*  /mnt/
-
-    • Modifying of LV
-      Q) If you add some more disk space within Logiral Volume? "lvextend"
-        $ lvextend -L 25G /dev/vg_big/lv_big_1
-        $ lvextend -L +5G /dev/vg_big/lv_big_1
-        $ resize2fs /dev/vg_big/lv_big_1         : automatic
-        $ xfs_growfs /dev/vg_big/lv_big_1        : if xfs filesystem is used
-
-      Q) if you want to resize/reduce LV? "lvreduce"
-        $ umount /lvtest                         : absolutely neccessary umount
-        $ e2fsck -f /dev/vg_big/lv_big_1         : test healthy
-        $ resize2fs /dev/vg_big/lv_big_1 1024000 : here is a blcok x 4k = 4GB
-        $ lvreduce -L 4G /dev/vg_big/lvbig_1     : also do verkleinern for LV
-
-      Q) if you want to delete physics volume from volume group? "vgreduce, vgextend"
-        $ vgreduce -a vg_big              : 4 partition to 1
-        $ vgextend vg_big /dev/sdc1       : redefine only first partition into volume group
-
-      Q) LVM snapshots
-        the snapshot logical volume only saves data blocks from the original logical volume
-        that are changed in the original
-        $ lvcreate -L 1G -s -n backup /dev/vg_big/lv_big_1
-        $ mount /dev/vg_big/backup /backup
-        $ tar -pzcf backup.tar.gz  /backup
-        $ umount /backup
-        $ lvremove /dev/vg_big/backup
-        > y
-
-      Q) If file systems are upgraded and have to move data to new one.
-        $ pvmove   /dev/hdb2  /dev/sdc1       : move hdb2 data into sdc1
-
-      Q) Activate If you meet machine crash, emergency boot, and activate LVM device
-        $ vgchange -ay            : activate all known volume group's device
-
-      Q) Rename of VG and LV
-        $ vgrename vg_orignal vg_new
-        $ lvrename MyLVM debian fedora
-
-      Q) What command is used to make an exact copy of a logical volume for backup purposes?
-        $ lvcreate (no lvsnapshot)
-
-    • Remark
-      sdc (full device) can also be used a volume group, not only sdc1 or sdc2!
-
-
+    - Securing NFS
+      The tcp wrapper / Firewall software can be used to limit access to an NFS server.
+      disadvantage of iptables
+      TCP Wrapper restrict access by matching usernames, but iptables does not support.
 ### Storage area network (SAN)
     ===============================================================================================
     SAN
@@ -1746,7 +1932,7 @@ this is really nice tool for checking disk usage!
       $ man -k <command>         : Pfade der Manpages und Pfade zu Programmquellen
       $ <command> --help         : typical help
 
-    - useful tips 
+    - useful tips for ls
       $ ls -l 'which locate'     : list of location indicated by 'which locate'
       $ ls -l $(which passwd)
 
@@ -1755,7 +1941,7 @@ this is really nice tool for checking disk usage!
   	  $ ls -lc  : sort by last modification of file status information
 
 
-    - Useful command for administration
+    - Useful command for administration I 
       $ expand    : Converts tabs to spaces
       $ unexpand  : Converts spaces to tab
       $ fmt       : a formatter for simplifying and optimizing text files
@@ -1771,6 +1957,82 @@ this is really nice tool for checking disk usage!
       $ stat      : Status of this files who access, modify, etc
       $ file      : show info about file
       $ type (ls, echo, firefox)         : type zeigt fuer ausfuehrbare Dateien
+
+      
+    - Useful command for administration II
+      $ who -u        : users information
+      $ dmesg         : write kernal message
+      $ lspci         : display information PCI buses in the system
+      $ lsusb -v      : display information USB buses in the system
+      $ lsdev         : display information I/O address, IRQ/DMA channels
+      $ iostat        : monitoring system input/output device load
+      $ vmstat        : reports virtual memory statistics about processes, memory, paging,
+                        block I/O, traps, disks and cpu activity.
+      $ mpstat -P 1   : output each available processor, 0 being the first one
+      $ free -h       : total amount of physical and virtual memory
+      $ w             : Wer ist momentan an System angemeldet? info.  from /var/run/utmp
+      $ last          : Wer war momentan an diesem System eingemeldet?
+      $ uptime        : how long in service, how many user in machine
+      $ lsof /tmp     : open files and corresponding processes.
+      $ sar -d        : output disk statistics
+      $ fuser         : a block device mounted on that directory
+      $ nice          : Prozessprioritaet
+      $ renice        : Prozessprioritaet
+      $ pgrep         : Wie viele Prozess fuer Kang im Lauf?
+      $ pkill         : kill all process of kang?
+
+      $ strace -p program     : Debug program to connect a running process
+      $ ltrace cat /dev/null  : Debug program to check a library call tracer
+      $ strings /bin/bash     : print characters, useful for reading non-text files.
+
+### find
+
+      Necessariness tools and tips for security
+      $ find / -perm -u+s           : SUID bit
+      $ find / -perm +4000 -type f  : list of files with SUID bit
+      $ find / -perm -g+s           : GUID bit
+      $ find /usr -uid 0            : owned by root
+
+
+### Time syncronization
+
+    $ cat /etc/timezone
+    $ tzselect                   : set time zone Europe/Berlin
+    $ timedatectl set-ntp true   : NTP network time synch is enable
+
+    $ date
+    $ hwclock
+    $ ntpdate pool.ntp.org       : access to standard ntp server
+    $ ntpq -p                    : information about current ntpd server connection
+    $ ntpdc                      : ntp diagnose with interactive mode
+
+### Local information
+
+    $ locale
+    $ iconv                   : iconv can use for converting between win(euc-kr) and ubuntu(utf-8)
+
+### Background prozess
+
+    $ bg 1
+    $ fg 1
+    $ nohup updatedb &
+    $ screen (remote shell)
+
+### touch to change create date
+
+    $ touch -d tomorrow test             : 
+    $ touch -d '1 day ago' test          : 
+    $ touch -d '5 years ago' test        : 
+    $ touch test{1..10}                  : 
+
+    $ touch -t YYMMDDHHMM fileName       :  set the timestamp 
+    $ touch -r file2 file1               :  file2 is updated with the time stamp of file1
+
+### truncate
+
+    $ cp original.output backup.output
+    $ truncate -s 0 original.output
+    $ cat backup.output > original.output
 
 
 <br/><a name="Files"></a>
@@ -1799,6 +2061,11 @@ this is really nice tool for checking disk usage!
 
       chmod o-w  :  to remove the write permission for others
 
+### chgrp 
+
+      $ chown kang:admin myfile     : owner:group
+      $ chgrp kim myfile            : nur gruppe aendern
+
 ### “No such file or directory” error when executing a binary
 
 * Two cases: 
@@ -1823,7 +2090,42 @@ this is really nice tool for checking disk usage!
 
 # Logging
 
+### Log system protocol & analysis
+
+      Where is major log files?
+      # /var/log/dmesg      : booting message in RAMdisk with Ring buffer
+      # /var/log/messages   : system log
+      # /var/log/secure     : login log, authentication and authorization privileges
+      # /var/spool/cron     : cron logs
+      # /var/log/mail.debug : for mail debugging
+      $ cat /var/log/*
+
+      Einsatz von Logdateien zur Fehlersuche
+      $ less /var/log/messages
+      $ tail -f /var/log/messages   : zeigt "Live" neue Zeilen an.
+      $ grep sshd /var/log/messages | grep invalide | less
+
+      $ cat /etc/syslog.conf   : log system configuration, syslog-ng gibt auch
+      $ cat /etc/rsyslog.conf  : Heute benutzen diese Konfiguration Datei
+
+      $ /sbin/klogd            : kernel message daemon in init-process
+      $ /proc/kmsg             : einstellungs Datei von klogd
+
+      Ruuning process with PID
+      $ cat /proc/2352/environ
+      $ cat /proc/2352/environ | tr "\000" "\n"
+
+      $ logger -t my_log_message  here is my message!
+
+
+
+      $ cat /etc/systemd/journald.conf
+      $ cat /var/log/journal/    : somtimes not here, but in /var/log/syslog
+
 ### journal
+
+    wenn Sie systemd statt upstart oder SysVinit, dann journald ist antwortlich.
+    $ journalctl --since "2015-01-10" --until "2015-01-11 03:00"
 
     $ journalctl --list­-boots                   : To get a list of boots
     $ journalctl -b                             : to get the all the logs for the current boot,
@@ -1842,10 +2144,12 @@ this is really nice tool for checking disk usage!
 
 
 ### logrotate
-    /var/lib/logrotate.status       : Default state file.
+
+    logrotate in order to save log files by rotation
     /etc/logrotate.conf             : Configuration options.
-    /etc/logrotate.d                : stores application-specific log settings
-   
+    /etc/logrotate.d                : contents, references, stores application-specific log settings
+    /var/lib/logrotate.status       : Default state file.
+
     $ logrotate log-rotation.conf                    : configure
     $ logrotate -f log-rotation.conf                 : run it
     $ logrotate -d /etc/logrotate.d/apache2.conf

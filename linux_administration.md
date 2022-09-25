@@ -846,6 +846,30 @@ strace is a diagnistic tool for system calls that result in error will have thei
        !  = The login is deactivated, user will be unable to login
        !!  = The password has expired
 
+### PAM (Pluggable Authentication Modules)
+    
+    /lib/security/pam_ldap.so   : configures authentication via LDAP.
+    /lib/security/pam_securetty : user allow to log in as root, when /etc/securetty exists
+
+    Those data location is related with PAM modules
+    /etc/security/opasswd       : old password is saved into
+    /etc/security/limits.d      : default limits are taken from
+    /etc/security/limits.conf   : configuration of limitatio
+
+    If you want to deny some users from ssh connection,
+    $ vi /etc/nosshuser
+    $ vi /etc/pam.d/sshd
+      auth required pam_listfile.so item=user sense=deny file=/etc/nosshuser
+
+    If you want to allow users, then do this
+    $ vi /etc/sshuser
+    $ vi /etc/pam.d/sshd
+      auth required pam_listfile.so item=user sense=allow file=/etc/sshuser
+
+    Simple way to deny any user login
+      $ vi /etc/nologin
+      $ vi /etc/pam.d/login
+
 ### List all groups in linux
 
 * standard method

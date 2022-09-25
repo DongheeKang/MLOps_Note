@@ -2036,29 +2036,6 @@ Firewall rules with iptables
         $ openssl dgst -sha256 -verify <(openssl x509 -in "/home/c5258293/git/dbcat/certs/SAPGlobalSSLCA.crt"  \
           -pubkey -noout) -signature /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.sha256 /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.md5
 
-### PAM (Pluggable Authentication Modules)
-    
-    /lib/security/pam_ldap.so   : configures authentication via LDAP.
-    /lib/security/pam_securetty : user allow to log in as root, when /etc/securetty exists
-
-    Those data location is related with PAM modules
-    /etc/security/opasswd       : old password is saved into
-    /etc/security/limits.d      : default limits are taken from
-    /etc/security/limits.conf   : configuration of limitatio
-
-    If you want to deny some users from ssh connection,
-    $ vi /etc/nosshuser
-    $ vi /etc/pam.d/sshd
-      auth required pam_listfile.so item=user sense=deny file=/etc/nosshuser
-
-    If you want to allow users, then do this
-    $ vi /etc/sshuser
-    $ vi /etc/pam.d/sshd
-      auth required pam_listfile.so item=user sense=allow file=/etc/sshuser
-
-    Simple way to deny any user login
-      $ vi /etc/nologin
-      $ vi /etc/pam.d/login
 
 ### OpenVPN
 * Installation and configuration of OpenVPN

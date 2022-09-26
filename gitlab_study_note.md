@@ -21,8 +21,6 @@
 2 application servers 
 1 LB persistence server
 
-
-
 1. nginx
 
     $ sfh 34.123.24.24
@@ -361,3 +359,23 @@
     #!/usr/bin/env bash
     ,,,
     sudo bash firewalls.sh  
+
+
+
+
+<br/><a name="Installation"></a>
+
+# Installation
+
+### GitLab Workhorse 
+Go 
+GitLab Workhorse is a smart reverse proxy for GitLab. It handles “large” HTTP requests such as file downloads, file uploads, Git push/pull and Git archive downloads.
+
+### Gitlab Pages
+One can publish static websites directly from a repository in GitLab
+### Sidekiq
+Sidekiq is an open source job scheduler written in Ruby.[4] It's important to be aware that Sidekiq by default doesn't do scheduling, it only executes jobs. The Enterprise version comes with scheduling out of the box. 
+### Puma
+Puma is the web server shipped with Mastodon and recommended by the Heroku hosting provider as a replacement for Unicorn
+### Gitaly 
+Gitaly provides high-level RPC access to Git repositories. It is used by GitLab to read and write Git data.

@@ -373,9 +373,16 @@ GitLab Workhorse is a smart reverse proxy for GitLab. It handles “large” HTT
 
 ### Gitlab Pages
 One can publish static websites directly from a repository in GitLab
-### Sidekiq
+### Sidekiqㄴ
 Sidekiq is an open source job scheduler written in Ruby.[4] It's important to be aware that Sidekiq by default doesn't do scheduling, it only executes jobs. The Enterprise version comes with scheduling out of the box. 
 ### Puma
 Puma is the web server shipped with Mastodon and recommended by the Heroku hosting provider as a replacement for Unicorn
 ### Gitaly 
 Gitaly provides high-level RPC access to Git repositories. It is used by GitLab to read and write Git data.
+
+### Redis sentinel
+Redis Sentinel is a distributed system:
+
+### Praefect 
+Praefect is an optional reverse-proxy for Gitaly to manage a
+cluster of Gitaly nodes for high availability. 

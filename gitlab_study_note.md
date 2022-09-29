@@ -371,21 +371,35 @@
 Go 
 GitLab Workhorse is a smart reverse proxy for GitLab. It handles “large” HTTP requests such as file downloads, file uploads, Git push/pull and Git archive downloads.
 
+### GitLab Application
+
+### GitLab Rails
+The GitLab Rails console is a powerful utility for directly interacting with your GitLab instance. 
+
+### GitLab Shell
+GitLab Shell handles git SSH sessions for GitLab and modifies the list of authorized keys.
+GitLab Shell is not a Unix shell nor a replacement for Bash or Zsh.
+### Consul
+Consul is a service networking solution to automate network configurations, discover services, and enable secure connectivity 
+across any cloud or runtime.
+
 ### Gitlab Pages
 One can publish static websites directly from a repository in GitLab
-### Sidekiqㄴ
-Sidekiq is an open source job scheduler written in Ruby.[4] It's important to be aware that Sidekiq by default doesn't do scheduling, it only executes jobs. The Enterprise version comes with scheduling out of the box. 
+
+### Sidekiq
+Sidekiq is an open source job scheduler written in Ruby. It's important to be aware that Sidekiq by default doesn't do scheduling, it only executes jobs. The Enterprise version comes with scheduling out of the box. 
 ### Puma
 Puma is the web server shipped with Mastodon and recommended by the Heroku hosting provider as a replacement for Unicorn
+
 ### Gitaly 
 Gitaly provides high-level RPC access to Git repositories. It is used by GitLab to read and write Git data.
 
 ### Redis sentinel
-Redis Sentinel is a distributed system:
+Redis Sentinel is a distributed system
 
 ### Praefect 
 Praefect is an optional reverse-proxy for Gitaly to manage a
 cluster of Gitaly nodes for high availability. 
 
 ### Repository
-
+NuGet, Conana, Maven, NPM

@@ -386,6 +386,11 @@ across any cloud or runtime.
 ### Gitlab Pages
 One can publish static websites directly from a repository in GitLab
 
+### Postgres
+recommended DB
+### PGBouncer
+PgBouncer is a lightweight connection pooler for PostgreSQL.
+https://pgdash.io/blog/pgbouncer-connection-pool.html
 ### Sidekiq
 Sidekiq is an open source job scheduler written in Ruby. It's important to be aware that Sidekiq by default doesn't do scheduling, it only executes jobs. The Enterprise version comes with scheduling out of the box. 
 ### Puma

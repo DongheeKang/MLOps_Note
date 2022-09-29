@@ -386,3 +386,6 @@ Redis Sentinel is a distributed system:
 ### Praefect 
 Praefect is an optional reverse-proxy for Gitaly to manage a
 cluster of Gitaly nodes for high availability. 
+
+### Repository
+

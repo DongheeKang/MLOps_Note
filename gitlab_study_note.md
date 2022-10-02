@@ -388,6 +388,7 @@ One can publish static websites directly from a repository in GitLab
 
 ### Postgres
 recommended DB
+
 ### PGBouncer
 PgBouncer is a lightweight connection pooler for PostgreSQL.
 https://pgdash.io/blog/pgbouncer-connection-pool.html
@@ -402,9 +403,15 @@ Gitaly provides high-level RPC access to Git repositories. It is used by GitLab 
 ### Redis sentinel
 Redis Sentinel is a distributed system
 
+### Elasticsearch
+Elasticsearch repository indexer has to be utilized for indexing.
+For indexing Git repository data, GitLab uses an indexer written in Go.
+
 ### Praefect 
 Praefect is an optional reverse-proxy for Gitaly to manage a
 cluster of Gitaly nodes for high availability. 
 
 ### Repository
+LSF, docker, nfs, via gitlay
+### Package Registry
 NuGet, Conana, Maven, NPM

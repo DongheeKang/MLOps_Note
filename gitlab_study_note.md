@@ -380,8 +380,7 @@ The GitLab Rails console is a powerful utility for directly interacting with you
 GitLab Shell handles git SSH sessions for GitLab and modifies the list of authorized keys.
 GitLab Shell is not a Unix shell nor a replacement for Bash or Zsh.
 ### Consul
-Consul is a service networking solution to automate network configurations, discover services, and enable secure connectivity 
-across any cloud or runtime.
+Consul is a service networking solution to automate network configurations, discover services, and enable secure connectivity across any cloud or runtime. DB service discovery and health checks/failover
 
 ### Gitlab Pages
 One can publish static websites directly from a repository in GitLab
@@ -390,8 +389,9 @@ One can publish static websites directly from a repository in GitLab
 recommended DB
 
 ### PGBouncer
-PgBouncer is a lightweight connection pooler for PostgreSQL.
+PgBouncer is a lightweight connection pooler for PostgreSQL. DB pool manager
 https://pgdash.io/blog/pgbouncer-connection-pool.html
+
 ### Sidekiq
 Sidekiq is an open source job scheduler written in Ruby. It's important to be aware that Sidekiq by default doesn't do scheduling, it only executes jobs. The Enterprise version comes with scheduling out of the box. 
 ### Puma
@@ -400,8 +400,11 @@ Puma is the web server shipped with Mastodon and recommended by the Heroku hosti
 ### Gitaly 
 Gitaly provides high-level RPC access to Git repositories. It is used by GitLab to read and write Git data.
 
+### Redis
+Redis is a distributed system of key/value store, is used for user sessions, cache, queue for Sidekiq
+
 ### Redis sentinel
-Redis Sentinel is a distributed system
+Redis Sentinel is used for health checking and failover management 
 
 ### Elasticsearch
 Elasticsearch repository indexer has to be utilized for indexing.
@@ -416,4 +419,5 @@ LSF, docker, nfs, via gitlay
 ### Package Registry
 NuGet, Conana, Maven, NPM
 
-### Another 
+### RAKE
+Rake is a Make-like program implemented in Ruby. Tasks and dependencies are specified in standard Ruby syntax.

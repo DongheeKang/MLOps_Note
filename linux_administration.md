@@ -1281,6 +1281,14 @@ you have a service as like java/python application, do registering and then runn
 
       $ rsync -a /sc/sc32b/* .
       $ rsync -a /sc/sc32b/* .
+
+
+      # Copying in Linux with Visual Progress
+      $ rsync --progress /path/to/source-file /path/to/destination 
+      $ rsync -r --progress /path/to/source-dir /path/to/destination-dir
+      $ rsync -r --info=progress2 /path/to/source-dir /path/to/destination-dir
+      $ rsync -r --info=progress2 /path/to/source-dir/ /path/to/destination-dir      : copy contents of source-dir, not source-dir itself
+
 ### rssh
 
     A restricted shell and allow only specific protocols such as SCP or SFTP
@@ -1925,6 +1933,7 @@ this is really nice tool for checking disk usage!
       The tcp wrapper / Firewall software can be used to limit access to an NFS server.
       disadvantage of iptables
       TCP Wrapper restrict access by matching usernames, but iptables does not support.
+
 ### Storage area network (SAN)
     ===============================================================================================
     SAN
@@ -2008,35 +2017,6 @@ this is really nice tool for checking disk usage!
       $ strace -p program     : Debug program to connect a running process
       $ ltrace cat /dev/null  : Debug program to check a library call tracer
       $ strings /bin/bash     : print characters, useful for reading non-text files.
-
-### find
-
-      Necessariness tools and tips for security
-      $ find / -perm -u+s           : SUID bit
-      $ find / -perm +4000 -type f  : list of files with SUID bit
-      $ find / -perm -g+s           : GUID bit
-      $ find /usr -uid 0            : owned by root
-
-### Find Files That Have Been Modified Recently in Linux
-* via Find
-      $ find . -mtime -1
-      $ find /home/sports -mmin +120
-      $ find /home/sports -type f -mmin +120
-      $ find . -type f -mmin -120 -mmin +60
-
-      $ find . -type f -newermt 2019-07-24
-      $ find . -type f -newermt 2019-07-24 ! -newermt 2019-07-25
-
-      $ find . -type f -newermt "-24 hours" 
-      $ find . -type f -newermt "-10 minutes" 
-      $ find . -type f -newermt "1 day ago" 
-      $ find . -type f -newermt "yesterday"
-
-* via ls  
-      ls -lt
-      ls -lt | grep 'Jul 27'
-      ls -lt | grep '17:'
-      ls -ltR
 ### Time syncronization
 
     $ cat /etc/timezone
@@ -2083,6 +2063,16 @@ this is really nice tool for checking disk usage!
 
 # Files & Directory 
 
+### Copying files/directories in Linux with Visual Progress
+
+      please have a look rsync command
+
+      $ curl -o /path/to/destination-file file:///path/to/source-file
+
+      if basic commands are already running, like cp, mv, dd, tar or gzip, then can monitor with
+      $ progress -M
+      $ watch lsof /path/to/destination
+      
 ### permission and owner for directory
 
       $ sudo chmod 755 directory
@@ -2128,6 +2118,9 @@ this is really nice tool for checking disk usage!
 
       $ readelf -a binaryfile | grep NEEDED
       $ readelf -a binaryfile | grep interpreter
+
+### fzf command
+
 
 
 <br/><a name="Logging"></a>

@@ -2017,7 +2017,26 @@ this is really nice tool for checking disk usage!
       $ find / -perm -g+s           : GUID bit
       $ find /usr -uid 0            : owned by root
 
+### Find Files That Have Been Modified Recently in Linux
+* via Find
+      $ find . -mtime -1
+      $ find /home/sports -mmin +120
+      $ find /home/sports -type f -mmin +120
+      $ find . -type f -mmin -120 -mmin +60
 
+      $ find . -type f -newermt 2019-07-24
+      $ find . -type f -newermt 2019-07-24 ! -newermt 2019-07-25
+
+      $ find . -type f -newermt "-24 hours" 
+      $ find . -type f -newermt "-10 minutes" 
+      $ find . -type f -newermt "1 day ago" 
+      $ find . -type f -newermt "yesterday"
+
+* via ls  
+      ls -lt
+      ls -lt | grep 'Jul 27'
+      ls -lt | grep '17:'
+      ls -ltR
 ### Time syncronization
 
     $ cat /etc/timezone
@@ -2057,6 +2076,7 @@ this is really nice tool for checking disk usage!
     $ cp original.output backup.output
     $ truncate -s 0 original.output
     $ cat backup.output > original.output
+
 
 
 <br/><a name="Files"></a>

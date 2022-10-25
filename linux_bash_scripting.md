@@ -13,7 +13,9 @@
 
 # Bash shell fundamental
 
-### find I
+
+### find: standard
+### find: security and ownership
 
       Necessariness tools and tips for security
       $ find / -perm -u+s           : SUID bit
@@ -21,7 +23,7 @@
       $ find / -perm -g+s           : GUID bit
       $ find /usr -uid 0            : owned by root
 
-### find II
+### find: Display Modified Date
       $ find . -name '*json*' -printf "%-25p %t\n"
       $ find . -name "*json*" | xargs -d '\n' stat -c "%-25n %y"
       $ find . -name "*json*" | xargs -d '\n' ls -ld
@@ -56,6 +58,25 @@
       $ find . -name "access*log" -exec rm {} \;                    : for older find version
       $ find . -name "access*log" -exec rm -i {} \;                 : will delete with a prompt
       $ find . -delete -name file.txt                               : !!!!!!! will delete all in the directory!!!!!!
+
+
+
+
+
+### Difference Between sort | uniq and sort -u
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 <br/><a name="Scripting"></a>

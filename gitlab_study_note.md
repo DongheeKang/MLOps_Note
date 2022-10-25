@@ -17,9 +17,12 @@
 
 # Architecture
 
+
 1 Ngix server as LB
 2 application servers 
 1 LB persistence server
+
+https://serversforhackers.com/s/load-balancing-with-nginx
 
 1. nginx
 
@@ -370,6 +373,7 @@
 ### GitLab Workhorse 
 Go 
 GitLab Workhorse is a smart reverse proxy for GitLab. It handles “large” HTTP requests such as file downloads, file uploads, Git push/pull and Git archive downloads.
+for git clone via HTTPS and for slow requests that serve raw Git data.
 
 ### GitLab Application
 GitLab application: A REST API, GraphQL API, HTTP API, SCIM API is available in GitLab
@@ -379,7 +383,10 @@ The GitLab Rails console is a powerful utility for directly interacting with you
 
 ### GitLab Shell
 GitLab Shell handles git SSH sessions for GitLab and modifies the list of authorized keys.
-GitLab Shell is not a Unix shell nor a replacement for Bash or Zsh.
+GitLab Shell is not a Unix shell nor a replacement for Bash or Zsh. for git clone, git push etc. via SSH.
+
+
+
 ### Consul
 Consul is a service networking solution to automate network configurations, discover services, and enable secure connectivity across any cloud or runtime. DB service discovery and health checks/failover
 
@@ -399,8 +406,14 @@ Sidekiq is an open source job scheduler written in Ruby. It's important to be aw
 ### Puma
 Puma is the web server shipped with Mastodon and recommended by the Heroku hosting provider as a replacement for Unicorn
 
-### Gitaly 
+### gitaly 
 Gitaly provides high-level RPC access to Git repositories. It is used by GitLab to read and write Git data.
+
+### gitaly ssh
+for internal Git data transfers between Gitaly servers.
+
+### gitaly ruby
+for RPC's that interact with more than one repository, such as merging a branch.
 
 ### Redis
 Redis is a distributed system of key/value store, is used for user sessions, cache, queue for Sidekiq

@@ -2,8 +2,6 @@
 ### Contents
   * [High Availability](#HA)
   * [Netowrk](#Netowrk)
-  * [Service](#Service)
-
 
 
 <br/><a name="HA"></a>
@@ -68,6 +66,9 @@ allows to create a high availability (HA) server infrastructure with a Reserved 
 ###  OpenAIS (Open Implementation of the Application Interface Specification)
 
 ###  CMAN (Oracle connection manager)
+
+
+
 
 
 

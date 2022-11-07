@@ -549,12 +549,472 @@
 
 
 
-
-
-
-
-
-
 <br/><a name="Scripting"></a>
 
 # Bash scripting
+
+### Bash variable and parameter
+
+* Spezielle Typen von Variablen
+
+      \$
+      \\
+      \"
+
+*  explanation
+
+      ${var} = foo/bar/bay         :
+      ${var%/*} = foo/bar          :
+      ${var%%/*} = foo             :
+      ${var#*/} = bay              : delete all the variables
+      ${var##*/} = bar/bay         : delete all the variables
+
+      "${Option%%=*}"
+      "${Option##*=}"
+
+* Spezialparameter
+
+      $*   bezeichnet alle Positionsparameter von 1 an. In Anfuehrungszeichen gesetzt, steht $* fuer ein einziges Wort, bestehend aus dem Inhalt aller Positionsparameter, mit dem ersten internen Feldseperator (meistens Leerzeichen, Tab und Zeilenende) als Trennzeichen.
+      $@   bezeichnet alle Positionsparameter von 1 an. In Anfuehrungszeichen gesetzt, wird es durch die Werte der einzelnen Positionsparameter (jeweils ein einzelnes Wort) ersetzt.
+      $#   Anzahl der Positionsparameter
+      $?   Rueckgabewert (Status) des zuletzt ausgefuehrten Kommandos
+      $-   steht fuer die Optionsflags (von set oder aus der Kommandozeile).
+      $$   Prozessnummer der Shell
+      $!   Prozessnummer des zuletzt im Hintergrund aufgerufenen Kommandos
+      $0   Name des Shellscripts
+      $_   letztes Argument des zuletzt ausgefuehrten Kommandos
+
+* Arithmetik
+
+      z=`expr $z + 3` # Aufruf des externen Kommandos expr
+      let z=z+3       # Aufruf des internen Kommandos
+      let "z += 3"    # Mit Quotes sind Leerzeichen und special operators erlaubt.
+      z=$(($z+3))     # neue verkuerzte Schreibweise (ab Version 2.0)
+      z=$[$z+3]       # alte Schreibweise
+
+      + -         Vorzeichen
+      ! ~         logische und bitweise Negation
+      * / %       Multiplikation, Division, Modulo
+      + -         Addition und Subtraktion
+      << >>       bitweise links und rechts-Shift-Operation
+      <= >= <>    Vergleiche
+      == !=       gleich und ungleich
+
+      &           bitweise Addition
+      ~           bitweise XOR
+      |           bitweise ODER
+      &&          bitweise UND
+      ||         logisches ODER
+
+* Condition
+
+      =~                                                   : bit true, then will do
+      if ! [[ "${argInstanceName}" =~ ^(BW|IW).$ ]];       : BW. or IW.
+      if [[ $str =~ ^/ ]];                                 : start from "/"
+
+* Logic
+
+      $ false && echo howdy!
+
+      $ true && echo howdy!
+        howdy!
+      $ true || echo howdy!
+  
+      $ false || echo howdy!
+        howdy!
+
+* Options
+
+      -r file     #Check if file is readable.
+      -w file     #Check if file is writable.
+      -x file     #Check if we have execute access to file.
+      -f file     #Check if file is an ordinary file (not a directory, a device file, etc.)
+      -s file     #Check if file has size greater than 0.
+      -d file     #Check if file is a directory.
+      -e file     #Check if file exists.  Is true even if file is a directory.
+      -z file     #True  if string is null (or empty). this succeeds if file is unset
+
+### Bash command and parameter
+* kommand wie macht man
+
+      option1 option2 : parameter1,2 des Befehls, parameter0 $0 ist commando
+      $ <commando> $1 $2            
+      $ ba TAB TAB...               : dann vorschlagte Kommandos mit "ba*" angezeigt wird.
+
+* command
+
+      $(Kommando) oder `Kommando`
+
+      $(ls -l /tmp)
+      newvariable=$(printf "foo")
+
+      Bedingte Ausfuehrung
+      COMMAND1 && COMMAND2
+        stellen eine logische UND-Verknuepfung dar. Wurde Kommando1 fehlerfrei ausgefuehrt
+        (exit status 0 heißt Abarbeitung ohne Fehler), wird auch Kommando2 ausgefuehrt.
+      COMMAND1 || COMMAND2
+        Stellen eine logische ODER-Verknuepfung dar. Kommando2 wird nur ausgefuehrt,
+        wenn bei Kommando1 ein Fehler aufgetreten ist.
+
+      if grep someuser /etc/passwd; then
+          # do something
+      fi
+      if ( w | grep someuser | grep sqlplus ); then
+       # someuser is logged in and running sqlplus
+      fi
+      if $(grep ERROR /var/log/messages); then
+          # send alerts
+      fi
+
+* Parametererweiterung
+
+      ${Parameter}
+      ${Parameter:-default}
+      ${Parameter:=default}
+      ${Parameter:?err_msg}
+      ${Parameter:+alt_value}
+      ${Parameter:Offset:Laenge}
+      ${#Parameter}
+      ${var#Pattern} und ${var##Pattern}
+      ${var%Pattern} und ${var%%Pattern}
+      ${var/Pattern/Replacement} und ${var/Pattern//Replacement}
+
+* Array
+
+      #!/bin/bash
+      array=( zero one two three four five )
+      array[6]="Dieser Text ist ein Element des Arrays"
+
+      echo ${array[0]}                # zero
+      echo ${array[1]}                # one
+      echo ${array:0}                 # zero
+                                      # Parametererweiterung, erstes Element.
+      echo ${array:1}                 # ero
+                                      # Parametererweiterung, erstes Element,
+                                      # Start an Position #1 (2. Buchstabe).
+      echo ${array[1]:1}              # ne
+                                      # Parametererweiterung, zweites Element,
+                                      # Start an Position #1 (2. Buchstabe).
+      echo ${#array[2]}               # 3
+                                      # Laenge des dritten Elements.
+      element_count=${#array[@]}      # oder
+      element_count=${#array[*]}      # Anzahl der Elemente: 7
+
+### Echo
+
+* standard
+
+      $ echo $HISTSIZE
+      $ echo $HISTFILESIZE
+      $ echo $PS1 : primaeres Prompt
+      $ echo $PS2 : sekundaeres Prompt
+
+* Ruckgabewert des letzten Kommandos
+
+      $ echo $?
+
+* Shell expands double quotes ", however single quotes ' are not expanded  "
+
+      $ echo "$SHELL" '$SHELL'   ->   /bin/bash  $SHELL
+      $ echo '$USER'             ->   $USER
+      $ echo "$USER"             ->   kang
+
+
+* Echo usage 1
+
+      example="Hello"
+
+      $example       Hello
+      "$example"     Hello
+      \$example      $example
+      '$example'     $example
+
+      echo "The first character of PATH is ${$PATH:0:1}"    <- wrong
+      echo "The first character of PATH is ${PATH:0:1}"     <- correct
+
+      Variable_1=10
+      Variable_2="Der Mond ist ein gruener Kaese."
+      Variable_3="A B  C    D"
+      Variable_4=$(hostname)
+      echo \$Variable_1 = $Variable_1
+      echo "\$Variable_2 = $Variable_2"
+      echo '$Variable_1 + $Variable_2' = ${Variable_1}${Variable_2}
+      echo $Variable_3
+      echo "$Variable_3"
+      echo $Variable_4
+
+      ---------------------------------------------------------------
+      $Variable_1 = 10
+      $Variable_2 = Der Mond ist ein gruener Kaese.
+      $Variable_1 + $Variable_2 = 10Der Mond ist ein gruener Kaese.
+      A B C D
+      A B  C   D
+      asterix
+      ---------------------------------------------------------------
+
+* Echo usgae 2
+
+      leer=
+      default="voll"
+      string="1234567890"
+      array=( zero one two three four five )
+
+      echo ${leer-$default}   # gibt nichts aus, denn $leer ist definiert
+      echo ${undef-$default}  # gibt "voll" aus, denn $undef ist nicht definiert
+      echo ${leer:-$default}  # gibt "voll" aus (:)
+
+      default_filename=generic.data
+      : ${1:?"Dateiname wird auf generic.data gesetzt."}       # Fehlermeldung, wenn $1 fehlt
+
+      filename=${1:=$default_filename} # setzen des Parameters
+      leer=${leer:+$default}           # sollte leer nicht NULL sein, wird er mit "voll" !" belegt
+
+      echo ${string:0:1}               # von links beginnend mit 0 und einem Zeichen: 1
+      echo ${string:(-3):2}            # von rechts und 2 Zeichen: 89
+
+      laeng_string=${#string}          # ergibt 10
+      echo ${#array}                   #  Laenge des ersten Elements: 4
+      element_count=${#array[@]}       # oder
+      element_count=${#array[*]}       # Anzahl der Elemente: 6
+
+      var1=abcd12345abc6789
+      pattern1=a*c                     # wildcard trifft alles zwischen 'a' und 'c'
+      pattern2=b*9                     # alles zwischen 'b' und '9'
+      echo ${var1#$pattern1}           # d12345abc6789
+      echo ${var1##$pattern1}          # 6789
+      echo ${var1%$pattern2}           # abcd12345a
+      echo ${var1%%$pattern2}          # a
+      echo ${pattern1/abc/ABC}         # "abcd12345abc6789" -> "ABCd12345abc6789"
+      echo ${pattern1//abc/ABC}        # "abcd12345abc6789" -> "ABCd12345ABC6789"
+
+
+* Echo usage 3
+
+      $ echo $PPID : Parent process ID of the current process
+      $ echo $$    :        process ID of the current process
+
+      When passing to a child shell, double quotes are expended before passing command (in the parent shell), while single quotes are expended in the child process
+      $ bash -c echo 'parent $$ $PPID'            >
+      $ bash -c "echo parent $$ $PPID"            > parent 23033 23011
+      $ bash -c 'echo child $$ $PPID'             > child 25798 23033
+      $ echo "$USER_/this is my user name"        > /this is my user name
+      $ echo "${USER}_/this is my user name"      > root_/this is my user name
+
+      Runs a command that replaces the current shell
+      $ echo $$        -------> 27316
+      $ bash
+      $ echo $$        -------> 27369
+      $ exec ls
+        anaconda-ks.cfg 
+        clearlooks.tar.gz 
+        Desktop 
+        install.log 
+        set1 
+        um2
+        bluecurve.tar.gz 
+        declare1 
+        icons 
+        install.log.syslog 
+        um1 
+        umdois
+      $ echo $$       --------> 27316
+
+### Streams, pipes, and redirection
+* print out to the monitor
+
+      /dev/null 2>&1
+
+      1>/dev/null
+      2>/dev/null
+      &>/dev/null
+
+* Example) Find the root user
+
+      grep ^root: /etc/passwd >/dev/null 2>&1
+      if [ $? -neq 0 ]; then
+          echo "root was not found - check the pub at the corner"
+      fi
+
+      oder more simple form
+
+      if ! grep ^root: /etc/passwd >/dev/null 2>&1; then
+          echo "root was not found - check the pub at the corner"
+      fi
+
+
+* Use streams, pipes and redirects
+
+      standard-eingabe und -ausgabe STDIN(0) -> STDOUT(1) -> STDERR(2)
+      Es ist moeglich, die Ein-u.ausgabekanaele umzuleiten.
+      Ausgabeumleitung geht mit > (Datei)
+      Eingabeumleitung geht mit < (Datei)
+
+      Bei Ausgabeumleitung wird eine bereits bestehande Datei des gleichen Namens ueberschreiben
+      $ ls -lR /etc > etcfiles
+      $ ls -lR /etc/ 2> etcfiles.errs
+      $ ls -lR /etc 2>> etcfiles
+
+      configure ">>" meaning whether cannot overwrite or can overwrite by set!
+      $ set -o noclobber       : not allow
+      $ set +o noclobber       :     allow
+
+      Doppelte Ausgabeumleiungszeichen haengen die Ausgabe am eine bestehende Datei an
+      $ cat << string
+      $ >a
+      $ >b
+      $ >string
+
+      Redirection, can use "&" to send both stdout and stderr to a file ("&>" or "&>>")
+      $ ps >  file                : create or overwrite
+      $ ps >> file                : create or append
+      $ ps &> file                : stdout and stderr into file
+      $ cmd > file 2>&1           : stdout and stderr into file
+      $ cmd 1> file1 2> file2     : stdout into 1 and stderr into 2
+      $ ls /etc >/dev/null 2>&1   : no print
+
+      Pipes with tee kann man Datenstrom in einer Textdatei ausgeben. Both display to monitor and also to the file, important!
+      $ grep "kernel" /var/log/messages | tee kernel_messages.txt
+
+
+### Bash fucntion
+
+* Function I
+
+      #!/bin/bash
+      multiply ()                       # multipliziert die uebergebenen Parameter
+      {                                 # Anzahl der Parameter ist variabel
+          local product=1
+          until [ -z "$1" ]             # Until nutzt den ersten uebergebenen Parameter !"
+          do
+              let "product *= $1"
+              shift
+          done
+          echo $product                 # wird nicht auf STDOUT ausgegeben,
+      }                                 # wenn es an eine Variable uebergeben wird
+      mult1=15383; mult2=25211
+      val1=`multiply $mult1 $mult2`
+      echo "$mult1 X $mult2 = $val1"    # 387820813
+
+* Function II 
+
+      #! /bin/bash
+      myadd() {
+          # $1 erstes Argument
+          tmp=0
+          args=$@
+          for i in $args do
+            tmp=`expr $tmp + $i`
+          done
+          return $tmp
+      }
+      # main
+      myadd 1 2 3 $VAR
+      RES=$?
+      myadd $RES 5 6 $VAR2
+      RES=$?
+
+* Function III
+
+      $ function addiere {let summe=$1+$2; echo -e "Summe ist $summe"}
+
+### while Loop
+* while 1
+
+      while read -r line ; do
+          if [[ "$line" = '*Good signature*' ]]; then
+              echo ".......................so find"
+          fi
+      done < "${locVerificate}"
+
+* while 2
+
+      #!/bin/sh
+      var0=0
+      LIMIT=10
+      while [ "$var0" -lt "$LIMIT" ]
+      do
+          echo -n "$var0 "             # -n suppresses newline.
+          var0=`expr $var0 + 1`        # var0=$(($var0+1)) also works.
+      done
+
+* while 3
+
+      #!/bin/sh
+      while read -r line ; do
+          if [[ "$line" = '*Good signature*' ]]; then
+              echo ".......................so find"
+          fi
+      done < "${locVerificate}"
+
+* for ... do
+
+      #! /bin/sh
+      for planet in Mercury Venus Earth Mars Jupiter Saturn Uranus
+      do
+          echo $planet
+      done
+
+      # oder aber auch
+      NUMBERS="9 7 3 8 37.53"
+      for number in `echo $NUMBERS`
+      do
+          echo "$number "
+      done
+
+* while und until
+
+      #!/bin/sh
+      var0=0
+      LIMIT=10
+      while [ "$var0" -lt "$LIMIT" ]
+      do
+          echo -n "$var0 "           # -n suppresses newline.
+          var0=`expr $var0 + 1`      # var0=$(($var0+1)) also works.
+      done
+  
+* case
+
+      #!/bin/sh
+      arch=$1
+      case $arch in
+          i386 ) echo "80386-based machine";;
+          i486 ) echo "80486-based machine";;
+          i586 ) echo "Pentium-based machine";;
+          i686 ) echo "Pentium2+-based machine";;
+          *    ) echo "Other type of machine";;
+      esac
+
+### Renaming
+
+* renamer I
+
+      $ rename 's/d0d0/psi/' *
+      $ rename 's/data/M377101/' 377101/*
+      $ rename "4C" "4CB" *
+      $ rename htm html *
+      $ rename 's/^hospital\.php\?loc=(\d{4})$/hospital_$1/' hospital.php*
+
+* renamer II
+
+      ---------------------------------------------------
+      #!/bin/sh
+      hist_add coral$1.root coral-1{0001,1001,1002,1003,1004,2001,2002,2003,7002,7003,7004,8001,8002,8003,8004}-$1.root
+
+      ---------------------------------------------------
+      #!/bin/sh
+      for i in 1 2 3 4;
+          do mv mDST-2000${i}.root mDST-Lambda-2000${i}.root;
+          do echo mDST-2200${i}.root mDST-${i}.root;
+      done
+
+      ---------------------------------------------------
+      #!/bin/bash
+      criteria=$1
+      re_match=$2
+      replace=$3
+      for i in $( ls *$criteria* );
+      do
+          src=$i
+          tgt=$(echo $i | sed -e "s/$re_match/$replace/")
+          mv $src $tgt
+      done

@@ -2017,6 +2017,7 @@ this is really nice tool for checking disk usage!
       $ strace -p program     : Debug program to connect a running process
       $ ltrace cat /dev/null  : Debug program to check a library call tracer
       $ strings /bin/bash     : print characters, useful for reading non-text files.
+      
 ### Time syncronization
 
     $ cat /etc/timezone

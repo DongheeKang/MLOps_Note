@@ -502,22 +502,22 @@
         -e 'Text gehört davor' -e 'a\' -e 'Text der danach stehen soll' -e ' }'
 
 * think about this!
-   $ cat bistru.txt
-   line 1
-   line 2
-   line 3
-   line 4
-   line 5
-   line 6
-   line 7
-   line 8
-   line 9
 
-   $ sed -n 'p;N;N' bistru.txt
-   line 1
-   line 4
-   line 7
+      $ cat bistru.txt
+        line 1
+        line 2
+        line 3
+        line 4
+        line 5
+        line 6
+        line 7
+        line 8
+        line 9
 
+      $ sed -n 'p;N;N' bistru.txt
+        line 1
+        line 4
+        line 7
 
 ### tr
 

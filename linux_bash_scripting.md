@@ -15,6 +15,10 @@
 
 
 ### find: standard
+
+
+
+
 ### find: security and ownership
 
       Necessariness tools and tips for security
@@ -67,7 +71,7 @@
 
 
 
-
+###
 
 
 

@@ -2171,6 +2171,10 @@ counts of bytes, characers, words and lines of a file
 ### seq
     $ seq 1 10                : print out 1 2 3 ... 10 in vertical line
 
+### favorite
+    favorite to store your favorite commands from history
+    $ favorite --add myhost 'ssh me@myhost'
+
 
 <br/><a name="Files"></a>
 

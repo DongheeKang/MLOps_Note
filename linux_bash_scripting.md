@@ -5,6 +5,7 @@
 ### Contents
   * [Bash shell fundamental](#Shell)  
   * [Bash scripting](#Scripting)
+  * [Bash scripting](#Question)
 
     Network and Security issues are covered in another session
     https://github.com/DongheeKang/MLOps_Note/blob/main/linux_network.md
@@ -349,9 +350,6 @@
       Hat man einmal ein Muster in \(...\) definiert, kann man es mit \Zahl erneut einsetzen.
 
 
-
-
-
 ### sed
 
 * option 
@@ -413,9 +411,6 @@
       10q                     zeigt die ersten 10 Zeilen an
       /^X/w file              schreibt alle Zeilen, die mit ``X'' beginnen, in file
 
-
-
-
 * Der Stream-Editor arbeitet nach dem Texfilter-Prizip, die zu bearbeitende Datei kann als Befelszeilen-Argument angegeben werden, die Ausgabe erfolgt an der Standardausgabe
   
       $ sed 's/rumba/samba/g' data1 > data2         : rumba to samba then save
@@ -447,7 +442,6 @@
       $ sed '11,20y/abc/@@@/' file       : translate a,b,or c on lines 11 through 20 for @
       $ sed '/123/{s/ab/AB/g}' file      : replaces ab for AB only on lines that have 123
       $ sed '/@#%/{ s/.*//g }' file      : remove nonblank line(.*) when lines contain @#%
-
 
 * Another example
 
@@ -535,19 +529,21 @@
       $ tr -d '\r' < vmargs.txt | tr '\n' ' '    : Join lines and separate with spaces
 
 ### awk
+* Print 3 and 4th field by awk in a file
+
+      $ awk '{print $3 "\t" $4}' marks.txt
 
 * this is differ
 
-      awk 'NR%3 != 0' filename
-      awk 'NR % 3 == 1' filename
+      $ awk 'NR%3 != 0' filename
+      $ awk 'NR % 3 == 1' filename
 
 * this is same!
 
-      awk 'NR%2 !=0' zzz.txt
-      awk 'NR%2 ==1' zzz.txt
+      $ awk 'NR%2 !=0' zzz.txt
+      $ awk 'NR%2 ==1' zzz.txt
 
-
-
+### Q&A 
 
 <br/><a name="Scripting"></a>
 
@@ -1018,3 +1014,168 @@
           tgt=$(echo $i | sed -e "s/$re_match/$replace/")
           mv $src $tgt
       done
+
+### Chronometer
+
+* Chronometer in hour format, Shorter and faster...
+
+      $ stf=$(date +%s.%N); 
+            for ((;;));do ctf=$( date +%s.%N );
+            echo -en "\r$(date -u -d "0 $ctf sec - $stf sec" "+%H:%M:%S.%N")";
+            done
+
+* Chronometer in hour format, Just add a format to chronometer in bash
+      $ stf=$(date +%s.%N);st=${stf/.*/};sn=%{stf/*./};for ((;;));
+                  do ctf=$( date +%s.%N );ct=${ctf/.*/};cn=${ctf/*./};
+                  dtf=$(echo "scale=3; $ctf-$stf" | bc); dt=${dtf/.*/}; dt=${dt:=0};
+                  echo -en "\r$(date -u -d @$dt "+%H:%M:%S.${dtf/*./}")";
+                  done
+
+* Chronometer : A way for tracking times in bash
+      $ stf=$(date +%s.%N);st=${stf/.*/};sn=%{stf/*./};
+                  for ((;;));do ctf=$( date +%s.%N );
+                  ct=${ctf/.*/};cn=${ctf/*./};
+                  echo -en "\r$(echo "scale=3; $ctf-$stf" | bc)";
+                  done
+
+
+<br/><a name="Question"></a>
+
+# Q&A
+
+### Q. How offen some word fequently?
+
+      $ cat words.txt 
+        the day is sunny the the
+        the sunny is is
+
+      $ cat words.txt | tr -s ' ' '\n' | sort | uniq -c | sort -r | awk '{ print $2, $1 }'
+      $ tr -s ' ' '\n' < words.txt | sort | uniq -c |sort -nr| awk '{print $2, $1}'
+
+### Q. How would you print just the 10th line of a file?
+
+      $ awk 'NR == 10' file.txt
+      $ sed -n 10p file.txt
+
+### Q. Find tel number like 987-123-4567 or (123) 456-7890
+
+      $ sed -n -r '/^([0-9]{3}-|\([0-9]{3}\) )[0-9]{3}-[0-9]{4}$/p' file.txt
+      $ grep -P '^(\d{3}-|\(\d{3}\) )\d{3}-\d{4}$' file.txt
+
+### Q. Kommandosubstitution
+      #!/bin/bash
+      filename=/tmp/sample_file
+
+      # cat sample_file
+      #
+      # 1 a b c
+      # 2 d e fg
+
+      declare -a array1
+      array1=($(cat "$filename" | tr '\n' ' '))
+
+      # Loads contents
+      # of $filename into array1.
+      # list file to stdout.
+      # change linefeeds in file to spaces.
+
+      echo ${array1[@]}
+
+      # List the array:
+      # 1 a b c 2 d e fg
+      #
+      #  Each whitespace-separated "word" in the file has been assigned to an element of the array.
+
+      element_count=${#array1[*]}
+      echo $element_count  
+
+      # 8
+
+### Q. convert 2 rows to 3 rows in a file
+      name age
+      alice 21
+      ryan 30
+       ----
+      name alice ryan
+      age 21 30
+
+      ncol=`head -n1 file.txt | wc -w`
+      for i in `seq 1 $ncol`
+      do
+    	    echo `cut -d' ' -f$i file.txt`
+      done
+
+### Q. Can you make a backup for your home directory
+
+      #!/bin/bash
+      SRCD="/home/"
+      TGTD="/var/backups/"
+      OF=home-$(date +%Y%m%d).tgz
+      tar -cZf $TGTD$OF $SRCD
+
+### Q. Send an email from the terminal when job finishes
+
+      $ wait_for_this.sh; echo "wait_for_this.sh finished running" | mail -s "Job Status Update" username@gmail.com
+
+### Q. function to find the fastest DNS server
+      $ curl -s http://public-dns.info/nameserver/br.csv
+          | cut -d, -f1 | xargs -i timeout 1 ping -c1 -w 1 {} | grep time
+          | sed -u "s/.* from \([^:]*\).*time=\([^ ]*\).*/\2\t\1/g" | sort -n | head -n1
+
+
+### Q. Get/List firefox bookmarks by tag from json backup
+
+      $ ftagmarks(){
+                  jq -r --arg t "$1" '.children[] as $i
+                  |if $i.root == "tagsFolder"
+                  then ([$i.children[]
+                  as $j|{title: ($j.title), urls: [$j.children[].uri]}])
+                  else empty end|.[]
+                  as $k|
+                  if ($k.title|contains($t))
+                  then $k.urls
+                  else empty end|.[]?' "$2";
+      }
+
+### Q. Find the package that installed a command
+
+      $ whatinstalled() { which "$@" | xargs -r readlink -f | xargs -r dpkg -S ;}
+
+      $ whatinstalled () {
+                  local cmdpath=$(realpath -eP $(which -a $1 | grep -E "^/" | tail -n 1) 2>/dev/null)
+                                      && [ -x "$cmdpath" ] && dpkg -S $cmdpath 2>/dev/null
+                  | grep -E ": $cmdpath\$" | cut -d ":" -f 1; }
+
+### Q. How can you make a copy of image file, cd image copy?
+
+      $ dd if=/dev/sr0 of=debian.iso bs=1M
+
+### Q. Move a folder and merge it with another folder
+
+      $ gcp -r -l source/ destination/
+
+### Q. Delete all but the last 1000 lines of file
+      $ ex -c '1,$-1000d' -c 'wq' file
+
+### Q. List wireless clients connected to an access point
+      $ iw dev ath0 station dump
+
+### Q. copy one partition to another with progress
+      $ pv -tpreb /dev/sdc2 | dd of=/dev/sdb2 bs=64K conv=noerror,sync
+
+### Q. Convert a Python interactive session to a python script
+      $ sed  's/^\([^>.]\)/#\1/;s/^>>> //;s/^\.\.\./  /'
+
+### Q. Retrieve a download count for URLs in apache logs
+      $ zgrep 'pattern' /var/logs/apache2/access.log* | awk '{print $7}' | sort -n | uniq -c | sort -rn
+
+### Q. Slow down the screen output of a command
+      $ ls -lart | lolcat -a
+
+### Q. Basic sed usage with xargs to refactor a node.js depdendency
+      $ cat matching_files.txt | xargs sed -i '' "s/require('global-module')/require('..\/some-folder\/relative-module')/"
+
+### Q. Automatically update all the installed python packages
+      $ for i in `pip list -o --format legacy|awk '{print $1}'`;
+            do pip install --upgrade $i; 
+            done

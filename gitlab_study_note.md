@@ -100,5 +100,11 @@ Rake is a Make-like program implemented in Ruby. Tasks and dependencies are spec
 <br/><a name="Architecture"></a>
 
 # Architecture
+https://gitlab.cern.ch/
+https://auth.cern.ch/auth/realms/cern/protocol/openid-connect/auth?client_id=gitlab-prod&nonce=da2a5a07df2577cc34739e3c6fc99d19&redirect_uri=https%3A%2F%2Fgitlab.cern.ch%2Fusers%2Fauth%2Fopenid_connect%2Fcallback&response_type=code&scope=openid%20profile&state=8818561fb3d3f725be611a71b5dac19f
+https://git.uni-paderborn.de/users/sign_in
+
+
+
 
 

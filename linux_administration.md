@@ -2268,8 +2268,6 @@ counts of bytes, characers, words and lines of a file
 
       $ logger -t my_log_message  here is my message!
 
-
-
       $ cat /etc/systemd/journald.conf
       $ cat /var/log/journal/    : somtimes not here, but in /var/log/syslog
 

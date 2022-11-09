@@ -1882,9 +1882,6 @@ How to work?
       $ iptables –A INPUT –p icmp –m set –-match-set my_ip_set src –j REJECT
       $ iptables –A INPUT –p icmp –m iprange –-src-range 192.16.22.41-192.16.22.43 –j REJECT
 
-
-
-
 Saving IP Tables Rules, 
 
     $ /sbin/iptables-save                : debian case, this is command

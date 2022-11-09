@@ -89,14 +89,6 @@ Rake is a Make-like program implemented in Ruby. Tasks and dependencies are spec
 
 
 
-
-
-
-
-
-
-
-
 <br/><a name="Architecture"></a>
 
 # Architecture
@@ -106,5 +98,10 @@ https://git.uni-paderborn.de/users/sign_in
 
 
 
+### Ngix 
 
+    sudo mkdir -p /etc/gitlab/ssl
+    sudo chmod 755 /etc/gitlab/ssl
+    sudo cp gitlab.example.com.key gitlab.example.com.crt /etc/gitlab/ssl/
 
+/etc/gitlab/ssl/gitlab.example.com.key and /etc/gitlab/ssl/gitlab.example.com.crt, 

@@ -1148,8 +1148,8 @@
 ## Senario 11. HA architecture
 
 1 Nginx server as LoadBalancer
-2 application servers 
-1 LB persistence server
+2 Two application servers 
+1 One LB persistence server (database + cache)
 
 https://serversforhackers.com/s/load-balancing-with-nginx
 
@@ -1278,12 +1278,14 @@ https://serversforhackers.com/s/load-balancing-with-nginx
       }
     sudo nginx -t
     sudo service nginx reload
+    
     # Let's create the cert
     $ sudo ./certbot-auto certonly --webroot -w /var/www/html \
         -d lb.serversforhackers.com \
         --non-interactive --agree-tos --email admin@example.com
 
     $ sudo vi /etc/nginx/sites-available/default
+
       upstream app {
         server IPHERE:80;
         server IPHERE:80;

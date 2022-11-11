@@ -1,11 +1,10 @@
 # Linux bash scripting
-    * Bash shell fundamental 
-    * Bash scripting
+
 
 ### Contents
   * [Bash shell fundamental](#Shell)  
   * [Bash scripting](#Scripting)
-  * [Bash scripting](#Question)
+  * [Quesionary](#Question)
 
     Network and Security issues are covered in another session
     https://github.com/DongheeKang/MLOps_Note/blob/main/linux_network.md
@@ -106,7 +105,7 @@
       $ find / -perm +4000                  : Document with SUID-bit format
       $ find / -size +500M | xargs ls -l    : Datei grosser als 500M
 
-### find: Display Modified Date
+### find: display modified Date
 
       $ find . -name '*json*' -printf "%-25p %t\n"
       $ find . -name "*json*" | xargs -d '\n' stat -c "%-25n %y"
@@ -229,7 +228,7 @@
       \$[ 0-9]*\.[0-9]\{2\} : Matches $xx.xx or $ xxx.xx,  whereas the chracters following $ could be a space or number
       [0-9]\{2}-[0-9]\{4\}-[0-9]\{3\} : Matches numbers on the pattern xx-xxxx-xxx
 
--  Zeichenklassen,  Wiederholungsoperatoren
+- Zeichenklassen,  Wiederholungsoperatoren
 
       . 	      ist ein Platzhalter und bezeichnet jedes einzelne Zeichen außer das Zeilenende.
       [abc$] 	trifft alle aufgeführten Zeichen.
@@ -543,7 +542,7 @@
       $ awk 'NR%2 !=0' zzz.txt
       $ awk 'NR%2 ==1' zzz.txt
 
-### Q&A 
+
 
 <br/><a name="Scripting"></a>
 
@@ -1039,9 +1038,9 @@
                   done
 
 
-<br/><a name="Question"></a>
-
 # Q&A
+
+<br/><a name="Question"></a>
 
 ### Q. How offen some word fequently?
 

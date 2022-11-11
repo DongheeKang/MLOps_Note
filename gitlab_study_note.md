@@ -86,6 +86,9 @@ NuGet, Conana, Maven, NPM
 
 ### RAKE
 Rake is a Make-like program implemented in Ruby. Tasks and dependencies are specified in standard Ruby syntax.
+Rake is a software task management and build automation tool. It allows the user to specify tasks and describe dependencies as well.
+It is used to handle administrative commands or tasks
+Rake is a popular task runner for Ruby and Rails applications. For example, Rails provides the predefined Rake tasks for creating databases, running migrations, and performing tests. You can also create custom tasks to automate specific actions - run code analysis tools, backup databases, and so on.
 
 
 
@@ -104,4 +107,15 @@ https://git.uni-paderborn.de/users/sign_in
     sudo chmod 755 /etc/gitlab/ssl
     sudo cp gitlab.example.com.key gitlab.example.com.crt /etc/gitlab/ssl/
 
-/etc/gitlab/ssl/gitlab.example.com.key and /etc/gitlab/ssl/gitlab.example.com.crt, 
+* how to create? (have a look intot the part of SSL)
+    /etc/gitlab/ssl/gitlab.example.com.key
+    /etc/gitlab/ssl/gitlab.example.com.crt
+
+
+### Services
+
+
+### A
+
+
+### B

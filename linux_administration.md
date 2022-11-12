@@ -1,4 +1,5 @@
 # Linux system administration
+
 ### Contents
   * [Linux System](#Linux)
   * [Installation](#Installation)
@@ -7,12 +8,8 @@
   * [User Management](#Users)
   * [Service](#Service)
   * [File system](#Filesystem)
-  * [Shell](#Shell)
   * [Files and Directories](#Files)
   * [Logging](#Logging)
-
-    Network and Security issues are covered in another session
-    https://github.com/DongheeKang/MLOps_Note/blob/main/linux_network.md
 
 
 Technical Recommendations:
@@ -30,6 +27,11 @@ Technical Recommendations:
   * SSH
   * SSL/TLS
   * VPN
+
+
+Network and Security issues are covered in another session
+https://github.com/DongheeKang/MLOps_Note/blob/main/linux_network.md
+
 
 <br/><a name="Linux System"></a>
 
@@ -374,7 +376,7 @@ Technical Recommendations:
 
 ### dpkg
 
-    Originally used by Debian and now by Ubuntu. Uses the .deb format and was the first to have a widely known dependency resolution tool, APT. The ncurses-based front-end for APT, aptitude, is also a popular package manager for Debian-based systems.
+Originally used by Debian and now by Ubuntu. Uses the .deb format and was the first to have a widely known dependency resolution tool, APT. The ncurses-based front-end for APT, aptitude, is also a popular package manager for Debian-based systems.
 
       $ dpkg -i <package_name>
       $ dpkg -Gi package(s).deb          install/upgrade package file(s)
@@ -405,7 +407,7 @@ Technical Recommendations:
 
 ### RPM 
 
-    Created by Red Hat. RPM is the Linux Standard Base packaging format and the base of a number of additional tools, including apt4rpm, Red Hat's up2date, Mandriva's urpmi, openSUSE's ZYpp, PLD Linux's poldek, and YUM, which is used by Fedora, Red Hat Enterprise Linux, and Yellow Dog Linux.
+Created by Red Hat. RPM is the Linux Standard Base packaging format and the base of a number of additional tools, including apt4rpm, Red Hat's up2date, Mandriva's urpmi, openSUSE's ZYpp, PLD Linux's poldek, and YUM, which is used by Fedora, Red Hat Enterprise Linux, and Yellow Dog Linux.
 
       $ rpm -Uvh packages(s).rpm          install/upgrade package file(s)
       $ rpm -e package                    remove package
@@ -435,8 +437,7 @@ Technical Recommendations:
       | - Initial version of the package
 
 ### apt-get
-
-* *How to find out the packages
+* How to find out the packages
 
       $ sudo apt-cache search “metasearch engine”                : keyword
       $ sudo apt-cache show apache2                              : package name
@@ -463,7 +464,7 @@ Technical Recommendations:
       $ apt-get remove <package_name>
       $ apt-get purge <package_name>
 
-### put the list for unbuntu library
+### Put the list for unbuntu library
 * legacy
 
       $ vi /etc/apt/sources.list
@@ -1416,14 +1417,14 @@ Redis is a data structure store that acts as a NoSQL Database. It is a popular i
 ### Go
  
     - Remove former Go installation folder
-    sudo rm -rf /usr/local/go
+    $ sudo rm -rf /usr/local/go
 
     - install
-    curl --remote-name --location --progress-bar "https://go.dev/dl/go1.17.10.linux-amd64.tar.gz"
-    echo '87fc728c9c731e2f74e4a999ef53cf07302d7ed3504b0839027bd9c10edaa3fd  go1.17.10.linux-amd64.tar.gz' | shasum -a256 -c - && \
+    $ curl --remote-name --location --progress-bar "https://go.dev/dl/go1.17.10.linux-amd64.tar.gz"
+    $ echo '87fc728c9c731e2f74e4a999ef53cf07302d7ed3504b0839027bd9c10edaa3fd  go1.17.10.linux-amd64.tar.gz' | shasum -a256 -c - && \
       sudo tar -C /usr/local -xzf go1.17.10.linux-amd64.tar.gz
-    sudo ln -sf /usr/local/go/bin/{go,gofmt} /usr/local/bin/
-    rm go1.17.10.linux-amd64.tar.gz
+    $ sudo ln -sf /usr/local/go/bin/{go,gofmt} /usr/local/bin/
+    $ rm go1.17.10.linux-amd64.tar.gz
 
 ### X server
 
@@ -1950,230 +1951,6 @@ this is really nice tool for checking disk usage!
       built on top of SANs do provide file-level access, and are known as shared-disk file systems.
 
 
-<br/><a name="Shell"></a>
-
-# Bash Shell 
-
-### Wenn ich Hilfe brauche unbekannte Programm Name!
-
-      $ whatis <command>         : sucht Erklaerung der Befehl                            
-      $ apropos <command>        : search the whatis database for complete words with apropos
-      $ whereis <command>        : zeigt Pfade zu Binaer und /oder Konfigurationsdateien
-      $ which <command>          : zeigt Pfade zu ausfuehrbaren Dateien.                     
-      $ man -k <command>         : Pfade der Manpages und Pfade zu Programmquellen
-      $ <command> --help         : typical help
-
-### useful tips for ls
-      $ ls -l 'which locate'     : list of location indicated by 'which locate'
-      $ ls -l $(which passwd)    : Der Befehl in der Klammer wird zusert ausgefuehrt (which passwd) und die Ausgabe dieses Befehls (/usr/bin/passwd) wird an der selben Position in die Befehlszeile eingefuegt. Das resultierende Kommando ist dann:
-      $ ls -li  : Inode show
-  	  $ ls -lS  : sort by Size
-  	  $ ls -lc  : sort by last modification of file status information
-
-
-### Useful command for administration  
-      $ expand        : Converts tabs to spaces
-      $ unexpand      : Converts spaces to tab
-      $ fmt           : a formatter for simplifying and optimizing text files
-      $ nl            : numbers of lines of files
-      $ wc            : counts of bytes, characers, words and lines of a file
-      $ sort          : sort lines of text files alphabetically
-      $ uniq          : removes consecutive duplicate lines
-      $ split         : splits a file into different groups/files
-      $ cut           : cut the field
-      $ paste         : horizontalles cat, paste together lines on a file into vertical columns
-      $ join          : horizontalles cat, prints a pair of input lines
-      $ pr            : Convertsa text file for printing few page printing
-      $ stat          : Status of this files who access, modify, etc
-      $ file          : show info about file
-      $ type (ls, echo, firefox)      : type zeigt fuer ausfuehrbare Dateien
-
-      $ who -u        : users information
-      $ dmesg         : write kernal message
-      $ lspci         : display information PCI buses in the system
-      $ lsusb -v      : display information USB buses in the system
-      $ lsdev         : display information I/O address, IRQ/DMA channels
-      $ iostat        : monitoring system input/output device load
-      $ vmstat        : reports virtual memory statistics about processes, memory, paging, block I/O, traps, disks and cpu activity.
-      $ mpstat -P 1   : output each available processor, 0 being the first one
-      $ free -h       : total amount of physical and virtual memory
-      $ w             : Wer ist momentan an System angemeldet? info.  from /var/run/utmp
-      $ last          : Wer war momentan an diesem System eingemeldet?
-      $ uptime        : how long in service, how many user in machine
-      $ lsof /tmp     : open files and corresponding processes.
-      $ sar -d        : output disk statistics
-      $ fuser         : a block device mounted on that directory
-      $ nice          : Prozessprioritaet
-      $ renice        : Prozessprioritaet
-      $ pgrep         : Wie viele Prozess fuer Kang im Lauf?
-      $ pkill         : kill all process of kang?
-
-      $ strace -p program     : Debug program to connect a running process
-      $ ltrace cat /dev/null  : Debug program to check a library call tracer
-      $ strings /bin/bash     : print characters, useful for reading non-text files.
-
-### Time syncronization
-
-    $ cat /etc/timezone
-    $ tzselect                   : set time zone Europe/Berlin
-    $ timedatectl set-ntp true   : NTP network time synch is enable
-
-    $ date
-    $ hwclock
-    $ ntpdate pool.ntp.org       : access to standard ntp server
-    $ ntpq -p                    : information about current ntpd server connection
-    $ ntpdc                      : ntp diagnose with interactive mode
-
-### Local information
-
-    $ locale                  : Language and local setting
-    $ iconv                   : iconv can use for converting between win(euc-kr) and ubuntu(utf-8)
-
-### Background prozess
-
-    $ bg 1
-    $ fg 1
-    $ nohup updatedb &
-    $ screen (remote shell)
-
-### touch to change create date
-
-    $ touch -d tomorrow test             : 
-    $ touch -d '1 day ago' test          : 
-    $ touch -d '5 years ago' test        : 
-    $ touch test{1..10}                  : 
-
-    $ touch -t YYMMDDHHMM fileName       :  set the timestamp 
-    $ touch -r file2 file1               :  file2 is updated with the time stamp of file1
-
-### truncate
-
-    $ cp original.output backup.output
-    $ truncate -s 0 original.output
-    $ cat backup.output > original.output
-
-### history
-
-    $ vi .bash_history
-    $ echo $HISTOFILE
-
-    $ history
-    his> !100               : re-use command of 100 line
-    his> !echo              : re-use echo command used before
-    his> !?test             : fueht den letzten Befehl aus, in dem test vorkommt
-    his> !!                 : re-use of last command
-    his> !n	                : re-use of command in line number n
-    his> ^string1^string2   : repeat the last command replacing with first occurrence of string1 with string2
-    his> !xxxxx:s/$$/$PPID/ :
-    his> Ctrl + r           : find contents
-
-
-### date
-    $ date "+DATE: %m/%d/%y%nTIME: %H:%M:%S"
-
-### cat
-
-    process Text Streams Using Filters
-  	$ cat -n  : number all line
-  	$ cat -b  : number non-blank line
-    $ tac     : wie cat but reverse print
-
-### head & tail
-
-  	$ head -n1                    : just first line or "head -1" is same
-  	$ tail -f /var/log/messages   : -f (follow) "Live" stream
-
-### expand
-
-  	$ expand    : wandelt Tabulatorzeichen in Leerzeichen um
-  	$ unexpand  : wandelt Leerzeichen in Tabstopps
-  	$ expand    : Converts tabs to spaces (usually by default, 1 tab = 8 spaces)
-   	$ unexpand  : Converts spaces to tab
-
-### fmt
-a formatter for simplifying and optimizing text files
-
-  	$ fmt -w 35 text.txt                        : formatiert Text in der angegebenen Spaltenzahl, standarmaesig 75 Zeichen breite
-    $ fmt -w 35 text.txt | pr -h "Title" -2     : pr bereitet Textdateien fuer eine Druckansgabe vor. Es zeigt Zeit, Datum, Seiten
-
-
-### nl
-numbers of lines of files
-
-    $ nl data1 > data2  : put number in every line
-
-### wc
-counts of bytes, characers, words and lines of a file
-
-    $ wc -c, --bytes
-    $ wc -m, --chars
-    $ wc -l, --lines
-    $ wc -L, --max-line-length
-    $ wc -w, --words
-
-### sort
-
-    $ sort      : sort lines of text files alphabetically
-    $ sort -n   : sortiert nach numerisschen, sort reads the number and not the value
-           -o   : outfile
-           -r   : reverse file
-    $ sort -nr  : displays summary and sorts the result in order of largest to smallest numeric and reversal
-
-### uniq
-
-    $ uniq      : removes consecutive duplicate lines
-    $ uniq file : reduziert mehrere identische aufeinanderfolgende Zeilen auf eine Zeile
-
-#### split
-
-    $ split      : splits a file into different groups/files
-    $ split -b 11m README README_
-    $ split -l 1000 README README_
-    $ cat READAME_* > README
-
-### cut
-
-    -d Feldtrennzeichen 
-    -f Feldnummer
-
-    $ cut -d'' -f2
-    $ cut -d:  -f2
-    $ cut -d:  -f1,6 /etc/passwd         
-    $ cat /etc/passwd | grep user | cut -f1 -d:
-
-### xargs
-    xargs build and execute command lines from standard input
-    $ find . -name '*.mp3' | xargs rm
-
-### Simple find using internal data base
-    $ locate *.sxw
-    $ updatedb &
-
-### alias
-    $ unalias ls   : deactive alias
-    $ builtin ls   : origianlkommando zurueck
-
-### Hexdump
-    $ hexdump /dev/sda | head -n 32 | tail -n 5 : Hexdump(16bit) important for programmer
-
-### od
-    $ od -tx(-txC) /etc/passwd
-
-### test
-    $ test -e FileName        : file exists?
-
-### read
-    $ read -p "Name :" name	  : prompt asking and get name
-
-### shift
-    $ shift 2                 : move arguments to two position left
-
-### seq
-    $ seq 1 10                : print out 1 2 3 ... 10 in vertical line
-
-### favorite
-    favorite to store your favorite commands from history
-    $ favorite --add myhost 'ssh me@myhost'
 
 
 <br/><a name="Files"></a>

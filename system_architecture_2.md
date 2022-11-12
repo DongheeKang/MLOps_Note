@@ -369,7 +369,7 @@ https://serversforhackers.com/s/load-balancing-with-nginx
 
 
 
-# Senario 11. HA architecture
+# Senario 12. Gitlab simple version
 
 ## Overview
 
@@ -382,6 +382,8 @@ The GitLab installation consists of setting up the following components:
 5. Database
 6. GitLab
 7. Nginx
+8. Verirfying
+9. Advanced setup
 
 
 ## Important notes
@@ -695,7 +697,7 @@ Make sure to edit the config file to match your setup:
     sudo service nginx restart
 
 
-## 8. Done!
+## 8. Verirfying
 
 ### Double-check Application Status
 
@@ -723,7 +725,7 @@ nobody can access your GitLab by using this login information later on.
 - - -
 
 
-## Advanced Setup Tips
+## 9. Advanced Setup
 
 ### Custom Redis Connection
 

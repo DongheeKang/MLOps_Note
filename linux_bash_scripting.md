@@ -316,10 +316,21 @@ counts of bytes, characers, words and lines of a file
       -path
       -empty
       -executable
-      -atime       : access
-      -ctime       : chagned
-      -mtime       : modified
       -maxdepth    : directory maximum depth level
+
+      -ctime n : Many times this is understood as a creation time but that wrong. Ctime is change time of file stats such as ownership, what permissions it has etc.
+      -mtime n : File modification time. Value of mtime is updated when content of file changes
+      -atime n : File access time. Value of atime is modified when file is opened. 
+
+      the default unit is n 24-hour periods i.e. day
+      please use if you want to specifiy time units, something like below
+
+      -atime -1h30m 
+      -atime -20d
+
+      +n  : for greater than n
+      -n  : for less than n
+       n  : for exactly n
 
 * executing
 
@@ -398,7 +409,7 @@ counts of bytes, characers, words and lines of a file
       $ find . -mtime -1                           : modified less than n days ago
       $ find /home/sports -mmin +120               : modified more than 120 mins ago file and dir
       $ find /home/sports -type f -mmin +120       : modified more than 120 mins ago file only
-      $ find . -type f -mmin -120 -mmin +60        : 60 min < time < 120 min file
+      $ find . -type f -mmin -120 -mmin +60        : modified between 60 min < time < 120 min
 
       $ find . -type f -newermt 2019-07-24                        : changed earlier than 2019-07-24
       $ find . -type f -newermt 2019-07-24 ! -newermt 2019-07-25  : modifed on 2019-07-24      
@@ -409,6 +420,7 @@ counts of bytes, characers, words and lines of a file
       $ find . -type f -newermt "yesterday"
 
 * via ls  
+
       $ ls -lt
       $ ls -lt | grep 'Jul 27'
       $ ls -lt | grep '17:'
@@ -423,9 +435,9 @@ counts of bytes, characers, words and lines of a file
       $ find . -delete -name file.txt                               : !!!! will delete all in the directory!!!!!!
 
 ### find: time related
-      $ find /home -amin 10  : zugegriffenen Datei vor n Min
+      $ find /home -amin 10  : zugegriffenen Datei vor n Min  
       $ find /home -cmin 20  : geaendertene Datei
-      $ find /home -mtime 1  : vor 1 mal 24 Stunden gmodifiziert
+      $ find /home -mtime 1  : vor 1 mal 24 Stunden modifiziert
       $ find /home -ctime 2  : vor weniger als 2 mal 24 Stunden geaendert
 
       $ find . -iname "*" -daystart -mtime 1 -type f
@@ -717,6 +729,7 @@ counts of bytes, characers, words and lines of a file
 
       -e script
       -i in-line
+      -n to suppress default behaviour use this option
 
 * options 
 
@@ -792,12 +805,37 @@ counts of bytes, characers, words and lines of a file
 * using sed, find non-ascii character in file 
 
       $ sed -i 's/[^\x0-\xB1]//g' sample.txt
-      $ sed -n 'l' sample.txt
+      $ sed -n 'l' sample.txt                            : l-list  
 
 * multiple commend
-      $ sed -n 'p' input.txt              : to suppress default behaviour use -n option. p-print
+
+      $ sed -n 'p' input.txt                             : p-print
       $ sed -n -e '/line/ p' -e '/line/ q' input.txt     : multiple command, p-print, q-quit command
       $ sed -n '/line/ p; /line/ q' input.txt            : same 
+
+* n and p application, and hold, get, and exahnge
+
+      $ sed '' books_authors.txt
+          Milk and Honey
+          - Rupi Kaur
+          Ariel
+          - Sylvia Plath
+      $ sed -n 'p;n' books_authors.txt
+          Milk and Honey
+          Ariel
+      $ sed -n 'n;p' books_authors.txt
+          - Rupi Kaur
+          - Sylvia Plath
+      $ sed -n 'n;s/^- //;p' books_authors.txt
+          Rupi Kaur
+          Sylvia Plath
+      $ sed -n 'h;n;/Rupi Kaur/{g;p;}' books_authors.txt
+          Rupi Kaur
+      $ sed -E -n 'N; s/(.*)\n- (.*)/"\1" by \2/; p' books_authors.txt
+          "Milk and Honey" by Rupi Kaur
+          "Ariel" by Sylvia Plath
+      $ sed -E -n 'h;n; /Kaur/ {G;s/- (.*)\n(.*)/"\2" by \1/;p;}' books_authors.txt
+          "Milk and Honey" by Rupi Kaur
 
 * Another example I 
 

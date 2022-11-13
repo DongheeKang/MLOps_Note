@@ -107,7 +107,7 @@ https://serversforhackers.com/s/load-balancing-with-nginx
         }
     }
 
-## 4. SSL terminatin on the load balancer
+## 4. SSL terminating on the load balancer
 
     cd /opt
     $ sudo git clone https://github.com/certbot/certbot
@@ -718,11 +718,6 @@ The setup has created an admin account for you. You can use it to log in:
 **Important Note:**
 Please go over to your profile page and immediately change the password, so
 nobody can access your GitLab by using this login information later on.
-
-**Enjoy!**
-
-
-- - -
 
 
 ## 9. Advanced Setup

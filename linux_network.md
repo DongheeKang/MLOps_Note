@@ -682,7 +682,7 @@ by default the timeout is 2 minutes.
           RemoteForward localhost:8022 localhost:22
           user dongheekang
 
-* Persistent 
+* Persistent Tunnels
 
       $ autossh [-V] [-M port[:echo_port]] [-f] [SSH_OPTIONS]
       $ autossh -X -L 5432:<DB server IP>:5432 -R 873:<local RSYNC server>:873 [user@]remote_ssh_server
@@ -1553,9 +1553,10 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
 # Security
 
 ### Secure Shell SSH
-SSH is a communication Protocol. The traffic is encrypted
-SSHD is the server (Open SSH Daemon) and SSH is the client.
-the server must have sshd installed and running
+1. SSH is a communication Protocol. 
+2. The traffic is encrypted.
+3. SSHD is the server (Open SSH Daemon) and SSH is the client.
+4. the server must have sshd installed and running
 
 * SSH configuration
 
@@ -1602,27 +1603,37 @@ the server must have sshd installed and running
 
   - copy the public key
 
-        $ ssh-copy-id demo@SERVER_IP_ADDRESS
+        $ ssh-copy-id demo@remote_host_ip_address
 
   - (optional) copy public key manually
 
+        In local machine
         $ cat ~/.ssh/id_rsa.pub
-        | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...rggpFmu3HbXBnWSUdf localuser@machine.local
+        | ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAA...rggpFmu3HbXBnWSUdf demo@host_ip_address
         | ctrl + c
 
-        $ gpasswd -a demo sudo
+        In the target machine
+        $ gpasswd -a demo sudo            : Add demo user to the sudo group.
         $ su - demo
         $ mkdir .ssh
         $ chmod 700 .ssh
 
+        $ touch .ssh/authorized_keys
         $ vi .ssh/authorized_keys
         | ctrl + v
 
-        $ chmod 600 .ssh/authorized_keys
+        or 
+        push public key from local to target.
+        $ scp .ssh/id_rsa.pub demo@remote_host_ip_address:         : at local
+        $ cat id_rsa.pub >> .ssh/authorized_keys                   : at target
+
+        then 
+        $ chmod 644 .ssh/authorized_keys                   : 600 is more strict! 
+
 
 ### How to login without password?  Passwordless
-
 * using sshpass
+
       use -p option (standard)
       § sshpass -p 'Bael@123' ssh tools@10.149.20.11 -p4455 'hostname; df -h | grep sd; tail -2 /var/log/dpkg.log';
         
@@ -1639,6 +1650,7 @@ the server must have sshd installed and running
       $ sshpass -f .sshpasswd ssh tools@10.149.20.11 'hostname; df -h | grep sd; tail -2 /var/log/dpkg.log';
 
 * using ssh
+
       $ ssh-keygen -t rsa
       $ ssh-copy-id tools@10.149.20.11 -p4455
       $ ssh -p '4455' 'tools@10.149.20.11’
@@ -1647,6 +1659,17 @@ the server must have sshd installed and running
       this is the way of passwordless ssh option
       $ ssh tools@10.149.20.11 'hostname; df -h | grep sd; tail -2 /var/log/dpkg.log'; 
 
+
+### Restrict Commands for SSH Users
+      Go to the server and user home directroy
+
+      $ vi /home/testuser/.ssh/authorized_keys
+        ssh-rsa AAAAB3NzaC1yc2E...OrsMdr bluelake@Pacific
+      
+      modify with this
+      from="192.168.1.10", command="/usr/bin/ls" ssh-rsa AAAAB3NzaC1yc2E...OrsMdr bluelake@Pacific
+       
+      only ls command will be allowed. more ips can be added with comma separation. 
 
 ### GPG standard
 Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). 

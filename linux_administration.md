@@ -2168,6 +2168,7 @@ based on the SAP infrastructure
       $ watch lsof /path/to/destination
       
 ### permission and owner for directory
+* chmod
 
       $ sudo chmod 755 directory
 
@@ -2189,10 +2190,42 @@ based on the SAP infrastructure
 
       chmod o-w  :  to remove the write permission for others
 
-### chgrp 
+* chgrp 
 
       $ chown kang:admin myfile     : owner:group
       $ chgrp kim myfile            : nur gruppe aendern
+
+### Set Default Permission for New Files and Subdirectories
+* fstab
+
+      Add ACL, it is a mechanism that allows us to set complex permissions to a filesystem
+      $ vi /etc/fstab
+        # <file system> <dir>   <type>  <options>        <dump> <pass>
+          /dev/sda4    /home    ext3    rw,relatime,acl   0     1
+          ...
+      
+      Thenn make it enable! 
+      $ mount -oremount /dev/sda4
+
+* setfacl
+
+      $ setfacl -PRdm u::rwx,g::rw,o::r /home
+
+      -d sets the default permission for the /home directory
+      -m signifies that we want to make changes to the ACL
+      -R will apply the permission to all the files and subdirectories in the /home folder recursively
+      -P will prevent the operation from following symbolic links — to avoid the risk of compromising security
+
+      $ touch /home/hey/test
+      $ ls -l /home/hey/test
+        .rwxrw-r-- hey hey 0 B Fri Jan 21 22:42:01 2022 test
+       
+       if we want to assign permissions for a user who is not the file or directory owner 
+      $ setfacl -PRdm u:1001:rw /home  
+
+### Advanced File Permissions in Linux
+
+
 
 ### “No such file or directory” error when executing a binary
 
@@ -2338,7 +2371,7 @@ based on the SAP infrastructure
 
     $ ls -t1
     $ ls -t1 | head -5
-### copy Directory Structure Without Files
+### copy directory structure without files
     $ tree -dfi --noreport rootDir | xargs -I{} mkdir -p "/tmp/test/{}"
     $ find rootDir -type d | xargs -I{} mkdir -p "/tmp/test/{}"
     $ find rootDir -type d -exec mkdir -p "/tmp/test/{}" \;

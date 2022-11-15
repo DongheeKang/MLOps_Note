@@ -1601,7 +1601,7 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
         ~/.ssh/id_rsa (private key)
         ~/.ssh/id_rsa.pub (public key)
 
-  - copy the public key
+  - copy the public key to remote(target) server
 
         $ ssh-copy-id demo@remote_host_ip_address
 
@@ -1623,13 +1623,131 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
         | ctrl + v
 
         or 
-        push public key from local to target.
-        $ scp .ssh/id_rsa.pub demo@remote_host_ip_address:         : at local
-        $ cat id_rsa.pub >> .ssh/authorized_keys                   : at target
+        push public key from local to remote(target).
+        $ scp .ssh/id_rsa.pub demo@remote_host_ip_address:         : at local to remote(target)
+        $ cat id_rsa.pub >> .ssh/authorized_keys                   : at remote(target) server 
 
-        then 
+        then at remote(target) server 
         $ chmod 644 .ssh/authorized_keys                   : 600 is more strict! 
 
+### Restrict Commands for SSH Users
+
+      Assumption. you are super user.
+      Go to the server and user home directroy
+
+      $ vi /home/testuser/.ssh/authorized_keys
+        ssh-rsa AAAAB3NzaC1yc2E...OrsMdr bluelake@Pacific
+      
+      modify with this
+      from="192.168.1.10", command="/usr/bin/ls" ssh-rsa AAAAB3NzaC1yc2E...OrsMdr bluelake@Pacific
+       
+      only ls command will be allowed. more ips can be added with comma separation. 
+
+### Limit SSH Access to Specific Clients by Address
+* simpele way
+    
+      @ server to protect our remote server against brute-force attacks
+      It allows to login only with the root user or any other available user with sudo privileges
+
+      $ sudo nano /etc/ssh/sshd_config
+      ........
+      PasswordAuthentication no
+      ........
+
+      $ sudo systemctl restart ssh
+      or
+      $ sudo kill -HUP `cat /var/run/sshd.pid`
+      $ sudo kill -HUP $(cat /var/run/sshd.pid)
+
+* TCP wrapper
+
+      To deny every host we add a wildcard to the /etc/hosts.deny file:
+      $ vi /etc/hosts.deny
+        .......... 
+        sshd : ALL
+        ..... 
+
+      Then allow to access for specific hosts 
+      $ vi /etc/hosts.allow
+        sshd : 192.168.0.0/24
+        sshd : 127.0.0.1
+        sshd : [::1]
+        sshd : myhost.local.com
+
+* Firewalls, IP Filters, and IP Tables
+
+      $ iptables -A INPUT -p tcp --dport 22 --source 172.10.1.10 -j ACCEPT     # Add SSH access to a single host
+      $ iptables -A INPUT -p tcp --dport 22 --source 192.168.1.0/24 -j ACCEPT  # Add SSH access to a subnetwork
+      $ iptables -A INPUT -p tcp --dport 22 -j DROP                            # Drop all other sources
+
+* sshd advanced way
+
+      $ /etc/sshd_config 
+
+        PermitRootLogin yes/no;             : disable root access
+
+        PermitTunnel yes/no;                : disable tunnels and forwarding
+        AllowTcpForwarding yes/no; 
+        DisableForwarding; yes/no;
+
+        UsePAM yes/no                       : use PAM (see below)
+        PasswordAuthentication no           : disable password authentication
+        AuthenticationMethods publickey     : enable key-based authentication
+        AllowUsers / AllowGroups            : allow users and groups
+        DenyUsers / DenyGroups              : deny users and groups
+        ChrootDirectory chroot_path         : chroot users sessions
+
+* PAM authentication
+      
+      $ vi  /etc/security/access.conf
+
+        # Allows user foo and members for admins group from the console and the specified IPv6 address and IPv4 subnet
+        + : @admins foo : LOCAL 2001:db8:0:101::/64 10.1.1.0/24
+
+        # Disallow console logins to all but the shutdown, sync and all other accounts, which are a member of the wheel group.
+        - : ALL EXCEPT (wheel) shutdown sync : LOCAL
+
+        # Block all other users from all other sources
+        - : ALL : ALL
+
+* Dynamic blocking by iptable
+
+      Enable recent rules for incoming SSH
+      $ iptables -A INPUT -p tcp -m tcp --dport 22 -m state --state NEW -m recent --set --name SSH --rsource -j ACCEPT \
+        - Rate limit SSH connections 5 (--hitcound) attempts for each 60s (--seconds)
+ 
+      Rate limit SSH connections 5 (--hitcound) attempts for each 60s (--seconds)
+      $  iptables -A INPUT -p tcp -m tcp --dport 22 -m recent --update --seconds 60 --hitcount 5 --rttl --name SSH \ --rsource -j LOG --log-prefix "SSH_BAN"
+      
+      Log the blocked attempts (optional)
+      $ iptables -A INPUT -p tcp -m tcp --dport 22 -m recent --update --seconds 60 --hitcount 5 --rttl --name SSH \ --rsource -j DROP
+
+* Dynamic blocking by PAM
+
+      First install pam_abl
+      $ sudo apt-get install -y libpam-abl   
+
+      it should be added to PAM stack configuration 
+      $ vi /etc/pam.d/common_auth
+
+        # here are the per-package modules (the "Primary" block)
+        auth    required     pam_abl.so config=/etc/security/pam_abl.conf
+
+      pam_abl will show the current contents of the blocklist
+      $ vi /etc/security/pam_abl.conf
+        # pam_abl
+        Failed users:
+            foo (15)
+                Blocked based on rule [*/sshd]
+        Failed hosts:
+            10.1.1.150 (15)
+                Not blocking
+      
+* another solutions
+
+      One way is to write a script that continuously monitors the SSH daemon log files, and create IP Tables rules on the fly, removing them after a quarantine period. That approach already is conveniently packed in many open-source solutions such as 
+
+      denyhosts, fail2ban, and sshguard
 
 ### How to login without password?  Passwordless
 * using sshpass
@@ -1659,17 +1777,6 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
       this is the way of passwordless ssh option
       $ ssh tools@10.149.20.11 'hostname; df -h | grep sd; tail -2 /var/log/dpkg.log'; 
 
-
-### Restrict Commands for SSH Users
-      Go to the server and user home directroy
-
-      $ vi /home/testuser/.ssh/authorized_keys
-        ssh-rsa AAAAB3NzaC1yc2E...OrsMdr bluelake@Pacific
-      
-      modify with this
-      from="192.168.1.10", command="/usr/bin/ls" ssh-rsa AAAAB3NzaC1yc2E...OrsMdr bluelake@Pacific
-       
-      only ls command will be allowed. more ips can be added with comma separation. 
 
 ### GPG standard
 Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). 

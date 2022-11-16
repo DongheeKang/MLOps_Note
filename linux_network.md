@@ -8,6 +8,7 @@
 
 
 <br/><a name="Networking"></a>
+==============================================================================================
 
 # Networking
 
@@ -1549,6 +1550,7 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
 
 
 <br/><a name="Security"></a>
+==============================================================================================
 
 # Security
 
@@ -1845,10 +1847,7 @@ It is a tool to provide digital encryption and signing services using the OpenPG
     In dbcat, verification of signed documents will be perforemd
       $ gpg2 --no-default-keyring --keyring SAPGlobalGPGSign.key --verify .checksum.md5.asc .checksum.md5
 
-#### GPG command
-    ===============================================================================================
-    GPG command set
-    ===============================================================================================
+### GPG command set
     [generate key]
       gpg2 --gen-key
       gpg: checking the trustdb
@@ -2026,85 +2025,10 @@ Firewall rules with iptables
         $ vi /etc/iptables/rules             : debian, ubuntu
         $ vi /etc/sysconf/iptables           : CentOS, Fedora   
 
-
-### Obtaining an SSL certificate from the server
-* Use a browser Firefox or Chrome, find the PEM 
-      
-      access connect security from the address bar, and download PEM 
-
-* No browser way, use command line 
-
-      $ openssl s_client -connect dongheekang.com:443
-      $ openssl s_client -showcerts -connect dongheekang.com:443
-      $ openssl s_client -showcerts -connect dongheekang.com:443 </dev/null | sed -n -e '/-.BEGIN/,/-.END/ p' > certifs.pem
-
-* Servers Behind Reverse Proxies
-
-  In some situations, our server might sit behind a reverse proxy for load-balancing purposes.
-
-      $ nslookup dongheekang.com                       : find the server IP address first!
-        Server:		192.168.0.1
-        Address:	192.168.0.1#53
-        Non-authoritative answer:
-        Name:	dongheekang.com
-        Address: 172.64.104.34
-        .......  some more output
-
-      $ openssl s_client -showcerts -connect 172.64.104.34:443                               : this will not work
-      $ openssl s_client -servername dongheekang.com -showcerts -connect 172.64.104.34:443   : need option --servername
-
-
-### SSL/TLS authentication
-    ==============================================================================================
-    SSL authentication
-    ==============================================================================================
-    The following instructions assume that you are the administrator of swshare repository.
-    (https://dba.wdf.sap.corp/swshare/)
-
-    • SSL authentication (administrator level)
-
-      - Create a certificate for the landscape's domain
-        $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 \
-          -keyout "SAPGlobalSSLSign.crt" \
-          -out "SAPGlobalSSLSign.key" \
-          -days 365 \
-          -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
-
-      - You should now have 2 certificates, keep key file in safe region. And copy the public key file to the swshare
-        "SAPGlobalSSLSign.crt" private certificate key move to /root/SAPGlobalSSLSign.crt
-        "SAPGlobalSSLSign.key" public certificate key move to /swshare/dbcat/v3.8/certs/SAPGlobalSSLSign.key
-
-      - Generate self-signed certificate files, here is an example for signing of checksum list of ASE
-        $ export signfile=/swshare/ase/16.0.02.06/linux_x86_64
-        $ openssl dgst -sha256 -sign "/root/SAPGlobalSSLSign.crt" -out "${signfile}"/.checksum5.md5.sig "${signfile}"/.checksum.md5
-
-      - Verification of signed file will be performed in the factory
-        modFactoryTransferValidateSignature( ) in factoryTransfer.sh
-
-### SSL : simplified version
-    ==============================================================================================
-    SSL procedure
-    ==============================================================================================
-    Need super user privileges
-      $ sudo su -
-
-      $ cd /var/tmp/dbcatTrans/zfinal/
-
-      $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "SAPGlobalSSLCA.key" -out "SAPGlobalSSLCA.crt" \
-        -days 365 -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
-
-      $ openssl dgst -sha256 -sign SAPGlobalSSLSign.crt -out .checksum.md5.sig .checksum.md5
-
-      $ openssl dgst -sha256 -verify <(openssl x509 -in /var/tmp/dbcatTrans/zfinal/SAPGlobalSSLSing.key -pubkey -noout) \
-        -signature .checksum.md5.sig .checksum.md5.sig
-
-    https://www.digicert.com/kb/ssl-support/openssl-quick-reference-guide.htm
-
-
 ### SSL/TLS encryption
-    ===================================================================================================
-    SSL/TLS standard: Secure Sockets Layer and Transport Layer Security with ECC, RSA or DSA encryption
-    ===================================================================================================
+
+    SSL/TLS: Secure Sockets Layer and Transport Layer Security with ECC, RSA or DSA encryption
+    
     • Self signed vs Let’s Encrypt vs StartSSL.com(not available)
       - You can use CA tools in OpenSSL, run /etc/pki/tls/misc/CA 
         $ cd /etc/pki/tls/misc
@@ -2165,6 +2089,72 @@ Firewall rules with iptables
         $ openssl dgst -sha256 -verify <(openssl x509 -in "/home/c5258293/git/dbcat/certs/SAPGlobalSSLCA.crt"  \
           -pubkey -noout) -signature /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.sha256 /var/tmp/dbcatTrans/dbaenv-fetch-1.7/.checksum.md5
 
+### SSL/TLS authentication (SAP)
+    The following instructions assume that you are the administrator of swshare repository.
+    (https://dba.wdf.sap.corp/swshare/)
+
+    • SSL authentication (administrator level)
+
+      - Create a certificate for the landscape's domain
+        $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 \
+          -keyout "SAPGlobalSSLSign.crt" \
+          -out "SAPGlobalSSLSign.key" \
+          -days 365 \
+          -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
+
+      - You should now have 2 certificates, keep key file in safe region. And copy the public key file to the swshare
+        "SAPGlobalSSLSign.crt" private certificate key move to /root/SAPGlobalSSLSign.crt
+        "SAPGlobalSSLSign.key" public certificate key move to /swshare/dbcat/v3.8/certs/SAPGlobalSSLSign.key
+
+      - Generate self-signed certificate files, here is an example for signing of checksum list of ASE
+        $ export signfile=/swshare/ase/16.0.02.06/linux_x86_64
+        $ openssl dgst -sha256 -sign "/root/SAPGlobalSSLSign.crt" -out "${signfile}"/.checksum5.md5.sig "${signfile}"/.checksum.md5
+
+      - Verification of signed file will be performed in the factory
+        modFactoryTransferValidateSignature( ) in factoryTransfer.sh
+
+### SSL procedure: simplified version (SAP)
+    inspired by https://www.digicert.com/kb/ssl-support/openssl-quick-reference-guide.htm
+
+    • Need super user privileges
+
+      $ sudo su -
+
+      $ cd /var/tmp/dbcatTrans/zfinal/
+
+      $ openssl req -nodes -x509 -sha256 -newkey rsa:4096 -keyout "SAPGlobalSSLCA.key" -out "SAPGlobalSSLCA.crt" \
+        -days 365 -subj "/C=DE/ST=SAP SE/L=Walldorf/O=bssbd/OU=dbcat/CN=dbcat's Sign Key"
+
+      $ openssl dgst -sha256 -sign SAPGlobalSSLSign.crt -out .checksum.md5.sig .checksum.md5
+
+      $ openssl dgst -sha256 -verify <(openssl x509 -in /var/tmp/dbcatTrans/zfinal/SAPGlobalSSLSing.key -pubkey -noout) \
+        -signature .checksum.md5.sig .checksum.md5.sig
+
+### Obtaining an SSL certificate from the server
+* Use a browser Firefox or Chrome, find the PEM 
+      
+      access connect security from the address bar, and download PEM 
+
+* No browser way, use command line 
+
+      $ openssl s_client -connect dongheekang.com:443
+      $ openssl s_client -showcerts -connect dongheekang.com:443
+      $ openssl s_client -showcerts -connect dongheekang.com:443 </dev/null | sed -n -e '/-.BEGIN/,/-.END/ p' > certifs.pem
+
+* Servers Behind Reverse Proxies
+
+  In some situations, our server might sit behind a reverse proxy for load-balancing purposes.
+
+      $ nslookup dongheekang.com                       : find the server IP address first!
+        Server:		192.168.0.1
+        Address:	192.168.0.1#53
+        Non-authoritative answer:
+        Name:	dongheekang.com
+        Address: 172.64.104.34
+        .......  some more output
+
+      $ openssl s_client -showcerts -connect 172.64.104.34:443                               : this will not work
+      $ openssl s_client -servername dongheekang.com -showcerts -connect 172.64.104.34:443   : need option --servername
 
 ### OpenVPN
 * Installation and configuration of OpenVPN
@@ -2347,6 +2337,7 @@ Fail2Ban is then used to update firewall rules to reject the IP addresses for a 
 
 
 <br/><a name="HA"></a>
+==============================================================================================
 
 # High Availability
 

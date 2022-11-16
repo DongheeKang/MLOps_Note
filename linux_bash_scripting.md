@@ -9,6 +9,7 @@
 
 
 <br/><a name="Shell"></a>
+==============================================================================================
 
 # Bash command
 
@@ -272,9 +273,9 @@ counts of bytes, characers, words and lines of a file
 
 
 <br/><a name="Search"></a>
+==============================================================================================
 
 # Bash searching
-
 1. find
 2. regular expression
 3. sed
@@ -974,6 +975,7 @@ counts of bytes, characers, words and lines of a file
       $ gawk -i inplace '!/Donghee/' myfile.txt
 
 <br/><a name="Scripting"></a>
+==============================================================================================
 
 # Bash scripting
 1. Bash variable and parameter
@@ -1475,10 +1477,10 @@ counts of bytes, characers, words and lines of a file
                   echo -en "\r$(echo "scale=3; $ctf-$stf" | bc)";
                   done
 
+<br/><a name="Question"></a>
+==============================================================================================
 
 # Q&A
-
-<br/><a name="Question"></a>
 
 * Q. only directory!
 

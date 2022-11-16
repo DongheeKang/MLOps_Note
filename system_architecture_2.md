@@ -16,7 +16,7 @@
     
 
 
-# Senario 11. HA architecture
+# Senario 11. HA architecture for Nginx
 
 1 Nginx server as LoadBalancer
 2 Two application servers 
@@ -365,6 +365,11 @@ https://serversforhackers.com/s/load-balancing-with-nginx
     #!/usr/bin/env bash
     ,,,
     sudo bash firewalls.sh  
+
+
+
+
+# Senario 12. HA architecture for Ubuntu
 
 
 

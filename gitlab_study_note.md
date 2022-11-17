@@ -1462,6 +1462,7 @@ sudo gitlab-rake db:migrate
 
 # Administration
 
+## selected topics (personal view)
 ### Ngix setup
 
 * how to handle SSL?
@@ -1473,7 +1474,7 @@ sudo gitlab-rake db:migrate
       /etc/gitlab/ssl/gitlab.example.com.key
       /etc/gitlab/ssl/gitlab.example.com.crt
 
-      refer to the part of SSL 
+      refer to the part of SSL : linux_network.md
 
 
 
@@ -1492,6 +1493,10 @@ sudo gitlab-rake db:migrate
 
 
 ## Prerequisites
+
+### 
+
+
 ### GitLab Docker image
 
 The GitLab Docker images are monolithic images of GitLab running all the

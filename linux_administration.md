@@ -2195,6 +2195,20 @@ based on the SAP infrastructure
       $ chown kang:admin myfile     : owner:group
       $ chgrp kim myfile            : nur gruppe aendern
 
+### Advanced File Permissions in Linux
+* no matter who launches the file, it runs with privileges of the owning group
+
+      $ chmod g+s file2
+      $ chmod g-s file2
+
+* with sticky bi, the files under public could only be deleted by the file owners
+
+      $ chmod +t public
+
+* monitor our system for any suspicious usages of the setuid bits to gain superuser privileges.
+
+      $ find / -user root -perm -4000 -exec ls -ldb {} \;
+
 ### Set Default Permission for New Files and Subdirectories
 * fstab
 
@@ -2223,7 +2237,6 @@ based on the SAP infrastructure
        if we want to assign permissions for a user who is not the file or directory owner 
       $ setfacl -PRdm u:1001:rw /home  
 
-### Advanced File Permissions in Linux
 
 
 

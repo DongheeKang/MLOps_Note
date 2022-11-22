@@ -1589,7 +1589,10 @@ Redis is a data structure store that acts as a NoSQL Database. It is a popular i
 
 <br/><a name="Filesystem"></a>
 ==============================================================================================
+
 # File systems
+
+      ReiserFS, Btrfs, msdos, vfat, ntfs, xfs, cramfs, jfs
 
 ### Tracking down Where disk space hss gone on linux
       
@@ -1652,11 +1655,6 @@ Redis is a data structure store that acts as a NoSQL Database. It is a popular i
       $ gdisk /dev/sdc  : GPT partion   (128 Primary, GUID partition, nur Primary)
       $ parted          : nice method
 
-
-* File systems
-
-      ReiserFS, Btrfs, msdos, vfat, ntfs, xfs, cramfs, jfs
-
 * Formatting/Creating filesystems
 
       $ mkfs
@@ -1712,11 +1710,6 @@ Redis is a data structure store that acts as a NoSQL Database. It is a popular i
       $ hdparm              : IDE/SATA device harddisk standard information
       $ sdparm --enumerate  : summary of SCSI device
 
-* Attribute of directory
-
-      $ lsattr     	: list of attribute
-      $ chattr    	: change of attribute
-
 * smart
 
       Self monitoring analysis and reporting technology to monitor hard drive
@@ -1732,11 +1725,67 @@ Redis is a data structure store that acts as a NoSQL Database. It is a popular i
       $ /etc/init.d/autofs restart              : apply permanently
       /xxx/xxx will be created by auto.master and auto.netz
 
+### Filesystem mount and unmount
+
+* check
+
+      $ cat /etc/fstab
+      # <file system> <mount point>   <type>  <options>       <dump>  <pass>
+      /dev/sdb1  /              ext4     rw,defaults,noatime,commit=120,data=ordered 0  1
+      /dev/sdb2  /home	        ext4     rw,defaults,noatime,data=ordered	       0  2
+      /dev/sda3  /media/Backup  ntfs-3g  defaults,locale=en_US.UTF-8                 0  0
+      /dev/sda2  /media/Data	  ntfs-3g  defaults,locale=en_US.UTF-8                 0  0
+
+* mount
+
+      $ mount /media/Data
+      $ mount /dev/sda2
+
+      $ mount -o
+      loop – mount as a loop device
+      rw – mount the filesystem read-write (default)
+      ro – mount the filesystem read-only
+      iocharset=value – character to use for accessing the filesystem (default iso8859-1)
+      noauto – the filesystem will not be mounted automatically during system boot
+
+      $ umount /dev/sdd1  
+      $ umount /mnt/archIso
+      $ umount -l mount_point         : lazy unmount, to complete pending read or write operations    
+      $ umount -f mount_point         : force unmount
+
+* ISO image
+
+      $ mount /media/Data/archLinux.iso /mnt/archIso -o loop
+      $ mount | grep archIso
+        /media/Data/archLinux.iso on /mnt/archIso type udf (ro,relatime,utf8)
+
+* Samba share
+
+      cifs-utils package is required to mount a Samba share.
+
+      $ mkdir /mnt/winShare
+      $ mount -t smbfs //192.168.0.7/sharedOnWin /mnt/winShare -o username=kent,password=kent_PWD
+
+      $ mount | grep winShare
+
+* NFS Mount
+
+      $ mkdir /mnt/nfsShare
+      $ mount -t nfs 192.168.0.8:/export/nfs/shared /mnt/nfsShare
+  
+* USB 
+
+      $ fdisk -l
+      $ nmkdir /mnt/usb16G
+      $ mount /dev/sdd1 /mnt/usb16G
+
+      $ mount | grep usb16G
 
 ### RAID configuration
       $ mdadm                : raid storage
       $ sfdisk               : fancy method
       $ resize2fs /dev/md0   : repossible expand without unmount
+
 ### ISCSI
       Network transmission of scsi protocol via TCP connection
       SCSI (Small Computer System Interface)
@@ -1846,19 +1895,48 @@ Redis is a data structure store that acts as a NoSQL Database. It is a popular i
         Each logical volume is translated into a mapped device.
         Each segment translates into a line in the mapping table that describes the device.
 
-* command sets
+* Partition of device(disk)
 
-      Partition of device(disk)
-      $ fdisk,sfdisk,vgscan
+      $ fdisk, sfdisk
 
+* Scan for devices, partitions, and physical volumes
+
+      § lvmdiskscan
+      $ pvdisplay, pvs
+      $ vgdisplay, vgs, vgscan
+      $ lvdisplay, lvs
+
+* PV
+       
       create a physical volume
-      $ pvcreate, pvdisplay
+      $ pvcreate /dev/sdc
 
-      configuration of volume group
-      $ vgcreate, vgdisplay
+      If file systems are upgraded and have to move data to new one.
+      $ pvmove
 
-      configuraion of logical volume
-      $ lvcreate, lvdisplay
+* VG 
+
+      Activate If you meet machine crash, emergency boot, and activate LVM device
+      $ vgchange
+
+      configuration of volume group (VG)
+      $ vgcreate
+
+      Rename of VG
+      $ vgrename
+
+      Delete VG or PV
+      $ vgreduce, vgextend vg_big /dev/sdc1
+
+* LV 
+
+      configuraion of logical volume (LV)
+      $ lvcreate -L 8G -n ProjectA VG_Projects
+      $ lvcreate -l 100%FREE -n ProjectB VG_Projects
+      $ lvcreate -l 30%VG -n DatabaseA VG_Databases
+
+      LVM snapshots *important* not lvsnapshot or so.
+      $ lvcreate
 
       Format of LV
       $ mkfs.ext4, mkdir, mount
@@ -1869,20 +1947,36 @@ Redis is a data structure store that acts as a NoSQL Database. It is a popular i
       Verkleinern of LV
       $ umount, resize2fs, lvreduce
 
-      Delete PV
-      $ vgreduce, vgextend vg_big /dev/sdc1
+      Rename of LV
+      $ lvrename
 
-      LVM snapshots
-      $ lvcreate
+### Partion with parted tool
+parted is a bit advanced than fdisk
 
-      If file systems are upgraded and have to move data to new one.
-      $ pvmove
+    $ parted                : interactive mode
 
-      Activate If you meet machine crash, emergency boot, and activate LVM device
-      $ vgchange
+    monitoring first
+    $ parted /dev/sda
+    $ parted /dev/sda unit s print unit chs print
+    $ parted /dev/sdb unit GiB print  
 
-      Rename of VG and LV
-      $ vgrename, lvrename
+    $ parted-s /dev/sdb mklabel gpt
+    $ parted-s /dev/sdb mkpart primary fat32 0% 512MiB
+    $ parted-s /dev/sdb mkpart primary linux-swap 1048576s 16GiB
+    $ parted-s /dev/sdb mkpart primary ext4 16GiB 40%
+    $ parted-s /dev/sdb mkpart primary ext4 40% 60%
+    $ parted-s /dev/sdb mkpart primary ext4 60% 100%
+    $ parted-s /dev/sdb name 1 EFI-Boot
+    $ parted-s /dev/sdb name 2 Swap
+    $ parted-s /dev/sdb name 3 root
+    $ parted-s /dev/sdb name 4 /opt
+    $ parted-s /dev/sdb name 5 /home
+    $ parted-s /dev/sdb set 1 esp on  
+
+    # parted -s /dev/sdb rm 5
+    # parted -s /dev/sdb resizepart 4 70%                           : resize
+    # parted -s /dev/sdb mkpart primary ext4 70% 100%               : create
+    # parted -s /dev/sdb name 5 /home
 
 ### Creation of LVM Volume
 based on the LPIC note
@@ -1923,6 +2017,14 @@ based on the LPIC note
         > /dev/mapper/vg_big-lv_big_1 on /mnt type ext4 (rw)
         $ cp /boot/*  /mnt/
 
+### Modifying Logical Volumes and Volume Groups
+
+      Remove "/dev/sdb3" from volume group "VG_Databases" to "VG_Projects"
+      $ vgreduce VG_Databases /dev/sdb3 
+      $ vgextend VG_Projects /dev/sdb3
+
+      $ lvextend -L +5G /dev/VG_Projects/ProjectA      : Size of LV changed from 8 to 13.
+      $ lvreduce -L -2G /dev/VG_Projects/ProjectB      : Size of LV changed from 8 to 6.
 
 ### Modifying LVM Volume
     Q) If you add some more disk space within Logiral Volume? "lvextend"
@@ -2090,14 +2192,19 @@ based on the SAP infrastructure
 
 ### NFS (Network File System)
 
-    NFS(Network File System)
+* NFS(Network File System)
       exportfs, nfsstat, showmout, rpcinfo    at server
       fstab, mount                            at client
 
-    Securing NFS
+* Securing NFS
       The tcp wrapper / Firewall software can be used to limit access to an NFS server.
       disadvantage of iptables
       TCP Wrapper restrict access by matching usernames, but iptables does not support.
+
+* Mount
+      $ mkdir /mnt/nfsShare
+      $ mount -t nfs 192.168.0.8:/export/nfs/shared /mnt/nfsShare
+
 
 ### Storage area network (SAN)
     Storage area network (SAN)
@@ -2145,27 +2252,30 @@ based on the SAP infrastructure
 
     Projects use many inodes, so delete files in projects directory!
 ### file extention
-
     .a — stands for “archive”, for example, glibc.a, static library
     .so — stands for “shared object”, shared library
+
+### Attribute of directory
+    $ lsattr     	: list of attribute
+    $ chattr    	: change of attribute
 
 
 ### List the Open File Descriptors in the Current Bash Session
 
-      $ ls -la /proc/$$/fd/      : display the file descriptors of the current bash sessions
-      $ lsof  -p $$              : lists information about open files for running processes on the system
+    $ ls -la /proc/$$/fd/      : display the file descriptors of the current bash sessions
+    $ lsof  -p $$              : lists information about open files for running processes on the system
 
-      $ lsof -a -d 0-2147483647 -p $$       : -d to specify a range of file descriptors
-                                              -a to “and” or combine these selections together
+    $ lsof -a -d 0-2147483647 -p $$       : -d to specify a range of file descriptors
+                                            -a to “and” or combine these selections together
 ### Copying files/directories in Linux with Visual Progress
 
-      please have a look rsync command
+    please have a look rsync command
 
-      $ curl -o /path/to/destination-file file:///path/to/source-file
+    $ curl -o /path/to/destination-file file:///path/to/source-file
 
-      if basic commands are already running, like cp, mv, dd, tar or gzip, then can monitor with
-      $ progress -M
-      $ watch lsof /path/to/destination
+    if basic commands are already running, like cp, mv, dd, tar or gzip, then can monitor with
+    $ progress -M
+    $ watch lsof /path/to/destination
       
 ### permission and owner for directory
 * chmod

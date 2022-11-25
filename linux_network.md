@@ -150,12 +150,14 @@
 
     $ nbtscan 192.168.1.142                
     $ avahi-resolve -a 192.168.1.142
+
 ### How do I know my public IP in local machine?
 
     $ curl ipinfo.io/ip
     $ curl -s ipinfo.io/ip
     $ wget -qO- http://ipecho.net/plain ; echo
     $ dig +short myip.opendns.com @resolver1.opendns.com
+
 ### Get a list of all IP addresses on a LAN
 
     $ ifconfig                             <---- one can extract ip from inet & broadcast column
@@ -261,6 +263,58 @@ For Nginx, one can deal port!
 
     $ iperf3 -s                                      : -s server on the server side
     $ iperf3 -u -c 172.16.38.137                     : -u specify UDP on the client side
+
+### Checking the number of open HTTP connections with Netstat
+
+* netstat
+
+    $ netstat -a
+      Active Internet connections (servers and established)              <----------- this one is important
+      Proto Recv-Q Send-Q Local Address           Foreign Address         State
+      udp        0      0 192.168.238.129:bootpc  192.168.238.254:bootps  ESTABLISHED
+      raw6       0      0 [::]:ipv6-icmp          [::]:*                  7
+      Active UNIX domain sockets (servers and established)               <----------- interanl communication only
+      Proto RefCnt Flags       Type       State         I-Node   Path
+      unix  3      [ ]         DGRAM      CONNECTED     15330    /run/systemd/notify
+      unix  2      [ ACC ]     STREAM     LISTENING     15333    /run/systemd/private
+
+    
+* explanation I
+
+      Proto  : protocol(TCP or UDP).
+      Recv-Q : bytes in the queue for that socket.
+      Send-Q : If both the Recv-Q and Send-Q are at 0, the applications on both sides of the connection are okay
+      Local Address   : The address and the port number of the local end of the socket.
+      Foreign Address : The address and the port number of the remote end of the socket.
+      State           : 
+          ESTABLISHED : A working connection has been established between the two endpoints, allowing data to be transferred.
+          SYN-SENT    : made a connection request and is waiting for the remote host to accept.
+          CLOSING     : The socket is waiting for a termination connection request acknowledgment from the remote connection.
+
+* explanation II       
+      
+      Proto : protocol used by the socket. It will be ‘unix’.
+      RefCnt: Reference Count. It shows the number of processes attached to this socket.
+      Flags : usually set to ACC for SO_ACCEPTON. Socket is waiting for a connection request. 
+              SO_WAITDATA, displayed by W 
+              SO_NOSPACE, displayed by N
+              SO_WAITDATA the socket needs to read, while SO_NOSPACE means there is no space to write data
+      Type  : socket type.
+              STREAM: Stream socket. The communication is reliable. The packets will arrive in order.
+              DGRAM: Socket is in Datagram mode. a connectionless network socket. packets arrive out of order and might not arrive.
+      State : 
+          FREE         : This socket is not allocated.
+          LISTENING    : The socket is in the process of listening for incoming connection requests.
+          CONNECTING   : The socket is about to establish a connection.
+          CONNECTED    : A connection has been established with another application, and the socket is able to transmit.
+          DISCONNECTING: The socket is disconnecting.
+      I-Node: Unix sockets are files. Therefore, the I-Node field points to the metadata of the socket.
+      Path  : The path of the socket file.
+ 
+* List Only HTTP Connections
+
+      $ netstat -an | grep :80 
+      $ netstat -a | grep http 
 
 ### How to ping a specific port? 
 
@@ -1779,7 +1833,6 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
       this is the way of passwordless ssh option
       $ ssh tools@10.149.20.11 'hostname; df -h | grep sd; tail -2 /var/log/dpkg.log'; 
 
-
 ### GPG standard
 Gpg2 is the OpenPGP part of the GNU Privacy Guard (GnuPG). 
 It is a tool to provide digital encryption and signing services using the OpenPGP standard.
@@ -1792,7 +1845,6 @@ It is a tool to provide digital encryption and signing services using the OpenPG
       ECDH
       ECDSA
       EdDSA
-
 
 * Creating a new GPG key
   - create gpg key

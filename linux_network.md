@@ -1648,11 +1648,11 @@ Performance Counters for Linux. we need to install iPerf on both the client and 
         |     UseKeychain yes
         |     IdentityFile ~/.ssh/id_ed25519
 
-  - add your SSH private key to the ssh-agent and store your passphrase in the keychain (macOS only)
+  - add your SSH private key to the ssh-agent via ssh-add
 
         $ ssh-add -K ~/.ssh/id_ed25519
 
-  - Now public key goes into the target server as "authorized_keys" file
+  - Now public key goes into the "authorized_keys" file on the target server
 
         ~/.ssh/id_rsa (private key)
         ~/.ssh/id_rsa.pub (public key)
